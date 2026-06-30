@@ -1,0 +1,232 @@
+DOC-006
+Optimization Architecture Specification
+1. Amaç
+
+Bu belge MARS'ın optimizasyon mimarisini tanımlar.
+
+Hiçbir solver doğrudan çalışmaz.
+
+Bütün solverlar Optimization Orchestrator tarafından yönetilir.
+
+2. Optimization Orchestrator
+
+Görevleri:
+
+Hangi solver çalışacak?
+Hangi sırayla çalışacak?
+Solver tekrar çalışmalı mı?
+Çözüm kabul edilmeli mi?
+Simülasyon yapılmalı mı?
+3. Solver Kataloğu
+Solver-01
+Line Balancing Solver
+
+Amaç:
+
+Operasyonları operatörlere dağıtmak.
+
+Kararları:
+
+Kim hangi operasyonu yapacak?
+Kaç kişi gerekli?
+2 tur mu?
+Hazırlık kaç operasyon alacak?
+
+Girdiler:
+
+Skill Matrix
+SMV
+Öncelik grafı
+Hat kapasitesi
+
+Çıktılar:
+
+Operatör → Operasyon eşleşmesi
+Hat çevrim süresi
+Denge skoru
+Solver-02
+Flow Optimization Solver
+
+Amaç:
+
+Flow Unit'lerin fabrikadaki hareketini optimize etmek.
+
+Kararlar:
+
+Hangi hatta gidecek?
+Ne zaman transfer olacak?
+Bekleyecek mi?
+Bölünecek mi?
+Solver-03
+Scheduling Solver
+
+Amaç:
+
+Zaman planı oluşturmak.
+
+Kararlar:
+
+Başlangıç zamanı
+Bitiş zamanı
+Termin
+Vardiya
+
+Bu solver ağırlıklı olarak CP-SAT kullanacak.
+
+Solver-04
+Operator Assignment Solver
+
+Kararlar:
+
+Hangi operatör?
+Hangi makine?
+Hangi vardiya?
+Eğitim mi, üretim mi?
+Solver-05
+Recovery Solver
+
+Makine durduğunda:
+
+Yeni dengeleme
+Yeni hat
+Yeni plan
+Geçici ekip
+Solver-06
+Simulation Solver
+
+Karar uygulanmadan önce:
+
+Simülasyon
+KPI tahmini
+Risk analizi
+4. Solver Çalışma Sırası
+
+Varsayılan sıra:
+
+1. Flow
+
+↓
+
+2. Line Balancing
+
+↓
+
+3. Operator Assignment
+
+↓
+
+4. Scheduling
+
+↓
+
+5. Simulation
+
+↓
+
+6. Decision Score
+
+Bu sıralama değiştirilebilir ancak aynı anda çalışan solverlar da tanımlanabilir.
+
+5. Solver Arayüzü
+
+Bütün solverlar aynı arayüzü uygulamalıdır.
+
+Input:
+- Factory State
+- Decision Request
+- Constraints
+- Objectives
+
+Output:
+- Candidate Solution
+- KPI
+- Risk
+- Cost
+- Runtime
+
+Bu sayede gelecekte farklı algoritmalar (CP-SAT, MIP, Metaheuristic vb.) aynı çatı altında çalışabilir.
+
+6. Solver Seçim Stratejisi
+
+Her problem tek solver gerektirmez.
+
+Örnek:
+
+Yeni sipariş geldi
+
+→ Flow Solver
+
+→ Scheduling Solver
+
+Operatör rapor aldı
+
+→ Operator Solver
+
+→ Line Balancing Solver
+
+Makine bozuldu
+
+→ Recovery Solver
+
+→ Scheduling Solver
+
+7. OR-Tools Nerede?
+
+Sadece Scheduling Solver'da değil.
+
+Önerilen kullanım:
+
+Solver	Ana Teknoloji
+Line Balancing	OR-Tools CP-SAT
+Scheduling	OR-Tools CP-SAT
+Flow	OR-Tools + Graph Algorithms
+Operator	OR-Tools CP-SAT
+Recovery	OR-Tools + Rule Engine
+Simulation	Ayrık Olay Simülasyonu (Discrete Event Simulation)
+
+Yani OR-Tools, sistemin birçok yerinde kullanılacak; tek bir büyük model yerine birkaç daha küçük ve yönetilebilir model olarak.
+
+8. Optimization Orchestrator'ın Avantajları
+Büyük problemi küçük problemlere böler.
+Gerçek zamanlı karar verebilir.
+Yeni solver eklenebilir.
+AI tahminlerini kullanabilir.
+Çözüm süreleri kısalır.
+Hata izolasyonu kolaylaşır.
+📌 Bu Belgenin Çıktısı
+
+Artık MARS tek bir optimizasyon modeli değil, çok çözücülü (multi-solver) bir optimizasyon platformu olarak tanımlandı.
+
+Bu mimari sayesinde:
+
+Hat dengeleme bağımsız geliştirilebilir.
+Operatör atama bağımsız iyileştirilebilir.
+Scheduling modeli ayrı optimize edilebilir.
+Yeni solverlar sisteme eklenebilir.
+
+Bu, uzun vadede sistemi hem daha hızlı hem de daha sürdürülebilir hale getirir.
+
+❗ Bir Sonraki Belge (Gerçek Matematik Başlıyor)
+
+Buraya kadar mimariyi kurduk.
+
+Sıradaki belge artık ilk defa formüller ve optimizasyon değişkenleri içerecek:
+
+DOC-007 – Mathematical Optimization Model: Line Balancing Solver
+
+Bu belge sadece Hat Dengeleme için yazılacak.
+
+İçinde:
+
+Kümeler (Sets)
+Parametreler
+Karar değişkenleri
+Hard Constraints
+Soft Constraints
+Amaç fonksiyonları
+CP-SAT eşlemesi
+PostgreSQL tablo ilişkileri
+
+yer alacak.
+
+Bu yaklaşımı özellikle seçiyorum; çünkü senin projenin en kritik modülü hat dengeleme. Önce bunu mükemmel seviyeye getiririz, sonra aynı matematiksel disiplini diğer solverlara uygularız. Böylece sistem modüler, test edilebilir ve gerçek fabrikalarda ölçeklenebilir olur
