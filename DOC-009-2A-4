@@ -1,0 +1,320 @@
+MARS APS
+DOC-009A-4
+OR-Tools CP-SAT Implementation Specification
+
+Version: 1.0
+
+Engine: Line Balancing Engine
+
+Solver: Google OR-Tools CP-SAT
+
+Status: Implementation Ready
+
+1. Amaç
+
+Bu belge, Line Balancing Engine'in matematiksel modelinin Google OR-Tools CP-SAT kullanılarak nasıl uygulanacağını tanımlar.
+
+Belgenin hedefleri:
+
+Solver bağımsız mimariyi korumak
+CP-SAT modelinin oluşturulmasını standartlaştırmak
+Kod organizasyonunu belirlemek
+Performans ve bakım kolaylığı sağlamak
+2. Katmanlı Mimari
+Decision Context
+        │
+        ▼
+Feature Resolver
+        │
+        ▼
+Constraint Builder
+        │
+        ▼
+Objective Builder
+        │
+        ▼
+Solver Adapter
+        │
+        ▼
+CP-SAT Model
+        │
+        ▼
+Solution Mapper
+        │
+        ▼
+Balance Plan
+
+CP-SAT yalnızca Solver Adapter katmanında yer almalıdır.
+
+3. Modül Yapısı
+
+Önerilen proje yapısı:
+
+line_balancing/
+│
+├── application/
+│   ├── use_cases/
+│   ├── services/
+│   └── orchestration/
+│
+├── domain/
+│   ├── entities/
+│   ├── value_objects/
+│   ├── constraints/
+│   ├── objectives/
+│   └── features/
+│
+├── infrastructure/
+│   ├── solver/
+│   │   ├── cp_sat_adapter.py
+│   │   ├── variable_builder.py
+│   │   ├── constraint_builder.py
+│   │   ├── objective_builder.py
+│   │   ├── solution_mapper.py
+│   │   └── callbacks.py
+│   └── repositories/
+│
+└── tests/
+
+Bu ayrım Domain Driven Design (DDD) yaklaşımıyla uyumludur.
+
+4. CP-SAT Model Oluşturma Akışı
+DecisionContext
+      │
+      ▼
+Variable Builder
+      │
+      ▼
+Constraint Builder
+      │
+      ▼
+Objective Builder
+      │
+      ▼
+CpModel()
+      │
+      ▼
+CpSolver()
+      │
+      ▼
+Solution Mapper
+
+Her adım tek sorumluluk ilkesine (Single Responsibility Principle) uymalıdır.
+
+5. Variable Builder
+
+Görevi:
+
+Karar değişkenlerini oluşturmak
+İsimlendirme standardını korumak
+Değişken indekslerini yönetmek
+
+Örnek değişken grupları:
+
+Grup	Tip
+Assignment	BoolVar
+LineSelection	BoolVar
+Workload	IntVar
+Queue	IntVar
+BalanceScore	IntVar (ölçeklenmiş)
+
+Not: CP-SAT kesirli değişkenleri doğal olarak desteklemediği için sürekli değerler uygun ölçek faktörüyle tamsayıya dönüştürülmelidir.
+
+6. Constraint Builder
+
+Constraint Builder yalnızca katalogdaki kısıtları modele dönüştürür.
+
+Akış:
+
+Constraint Library
+        │
+        ▼
+Constraint Builder
+        │
+        ▼
+model.Add(...)
+
+Her constraint ayrı bir fonksiyon veya sınıf olarak uygulanmalıdır. Böylece test edilebilirlik artar.
+
+7. Objective Builder
+
+Objective Builder'ın görevi:
+
+Aktif objective profilini yüklemek
+Ağırlıkları uygulamak
+Soft constraint cezalarını eklemek
+Nihai amaç fonksiyonunu oluşturmak
+
+Akış:
+
+Objective Library
+        │
+        ▼
+Normalization
+        │
+        ▼
+Weighted Sum
+        │
+        ▼
+model.Maximize(...)
+
+Farklı stratejiler (Weighted Sum, Lexicographic vb.) aynı arayüz üzerinden seçilebilmelidir.
+
+8. Solver Configuration
+
+Varsayılan öneriler:
+
+Parametre	Varsayılan
+max_time_in_seconds	30
+relative_gap_limit	0.01
+num_search_workers	CPU çekirdeği sayısı
+random_seed	Yapılandırılabilir
+log_search_progress	Geliştirme ortamında açık
+cp_model_presolve	Açık
+
+Bu değerler ortam (development/test/production) bazında değiştirilebilir.
+
+9. Çözüm Durumları
+
+Solver sonuçları standartlaştırılmalıdır.
+
+Solver Durumu	Sistem Durumu
+OPTIMAL	Optimal
+FEASIBLE	Kabul Edilebilir
+INFEASIBLE	Çözüm Yok
+MODEL_INVALID	Model Hatası
+UNKNOWN	Belirsiz
+
+Üst katmanlar yalnızca bu soyut durumlarla çalışmalıdır.
+
+10. Solution Mapper
+
+Solver çıktısı doğrudan uygulamaya verilmez.
+
+Görevi:
+
+Değişken değerlerini okumak
+İş kurallarına uygun nesnelere dönüştürmek
+KPI hesaplamalarını tetiklemek
+Açıklama motoru için veri hazırlamak
+
+Çıktı:
+
+BalancePlan
+11. Incremental Optimization
+
+Her olayda model sıfırdan oluşturulmamalıdır.
+
+Desteklenecek stratejiler:
+
+Etkilenen operatörleri yeniden çöz
+Etkilenen hattı yeniden çöz
+Etkilenen operasyon kümesini yeniden çöz
+
+Tam optimizasyon yalnızca gerekli olduğunda çalıştırılmalıdır.
+
+12. Warm Start Stratejisi
+
+Önceki geçerli plan, yeni çözüm için başlangıç noktası olarak kullanılabilir.
+
+Avantajları:
+
+Daha kısa çözüm süresi
+Daha az plan değişikliği
+Operasyonel kararlılık
+
+Not: CP-SAT'ta bu yaklaşım çözüm ipuçları (solution hints) ile uygulanabilir.
+
+13. Callback Mimarisi
+
+Solver çalışırken aşağıdaki olaylar izlenebilir:
+
+Yeni en iyi çözüm bulundu
+Süre sınırına yaklaşıldı
+İyileşme durdu
+Çözüm tamamlandı
+
+Bu bilgiler izleme ekranı ve loglama için kullanılabilir.
+
+14. Hata Yönetimi
+
+Aşağıdaki durumlar standart şekilde ele alınmalıdır:
+
+Durum	Aksiyon
+Geçersiz model	Model oluşturma durdurulur
+Çözüm bulunamadı	Alternatif strateji çalıştırılır
+Süre sınırı	En iyi uygulanabilir çözüm döndürülür
+Bellek yetersiz	Problem bölünerek yeniden çözülür
+15. Performans Stratejileri
+
+Büyük ölçekli fabrikalar için öneriler:
+
+Gereksiz değişken oluşturmama
+Ön işleme (preprocessing)
+Simetri kırıcı kısıtlar
+Alan daraltma (domain reduction)
+Kısmi yeniden optimizasyon
+Paralel çözüm
+
+Her optimizasyon tekniği ölçülebilir performans kazanımı ile doğrulanmalıdır.
+
+16. Loglama ve İzlenebilirlik
+
+Her çözüm için aşağıdaki bilgiler saklanmalıdır:
+
+Solver sürümü
+Parametre seti
+Objective profili
+Aktif constraint listesi
+Çözüm süresi
+Objective değeri
+En iyi aday plan
+Kullanılan Decision Context sürümü
+
+Bu kayıtlar hata analizi ve denetlenebilirlik için gereklidir.
+
+17. Test Stratejisi
+
+Üç katmanlı test yaklaşımı önerilir:
+
+Katman	Amaç
+Unit Test	Variable, Constraint ve Objective Builder doğrulaması
+Integration Test	CP-SAT modelinin uçtan uca doğrulanması
+Benchmark Test	Gerçek üretim senaryolarında performans ölçümü
+
+Her benchmark; çözüm süresi, objective değeri ve KPI iyileşmesi açısından raporlanmalıdır.
+
+18. Kabul Kriterleri
+
+Bir CP-SAT uygulaması tamamlanmış sayılabilmesi için:
+
+Matematiksel model eksiksiz uygulanmış olmalıdır.
+Constraint Library'deki aktif kısıtlar doğru şekilde modele aktarılmalıdır.
+Objective Library profilleri desteklenmelidir.
+Sonuçlar tekrar üretilebilir olmalıdır.
+Çözüm süresi tanımlanan SLA hedeflerini karşılamalıdır.
+Çözüm, Decision Engine ile standart BalancePlan sözleşmesi üzerinden entegre olmalıdır.
+📌 DOC-009A-4 Sonucu
+
+Bu belge ile Line Balancing Engine'in CP-SAT uygulama mimarisi tanımlanmış oldu. Artık elimizde:
+
+matematiksel model,
+kısıt kütüphanesi,
+amaç fonksiyonları,
+solver uygulama katmanı
+
+bulunuyor.
+
+Bu noktada önemli bir proje kararı
+
+Bence artık yeni dokümanlar yazmadan önce, elimizdeki bu dört belgeyi temel alarak küçük ama gerçek çalışan bir Minimum Viable Optimizer (MVO) geliştirmeliyiz.
+
+Bu MVO:
+
+5–10 operatör,
+10–20 operasyon,
+tek üretim hattı
+
+üzerinde çalışacak basit bir Line Balancing Engine olacaktır.
+
+Bu prototip sayesinde matematiksel model, veri modeli ve mimari kararlar erken doğrulanır. Daha sonra çok hatlı, gerçek zamanlı ve büyük ölçekli sürüme güvenle geçilebilir. Bu yaklaşım, ileride yüzlerce sayfalık dokümanın sahada uygulanabilirliğini de kanıtla
