@@ -1,0 +1,390 @@
+MARS APS
+DOC-008
+Chapter-5
+Physical Database Model
+
+Version: 1.0
+
+Status: Architecture Freeze
+
+1. Amaç
+
+Physical Database Model'in amacı:
+
+Mantıksal modeli PostgreSQL üzerinde yüksek performanslı, ölçeklenebilir ve güvenli bir fiziksel veritabanına dönüştürmektir.
+
+Bu bölüm;
+
+PostgreSQL
+EF Core
+Prisma
+SQLAlchemy
+
+gibi ORM'ler tarafından doğrudan uygulanabilecek seviyededir.
+
+2. Fiziksel Şema Yapısı
+
+Tek bir public şeması yerine modüler şemalar kullanılacaktır.
+
+master
+engineering
+planning
+execution
+aps
+optimization
+quality
+maintenance
+analytics
+ai
+system
+audit
+event
+
+Her modül yalnızca kendi şemasına yazma yetkisine sahip olacaktır.
+
+3. Veri Tipi Standartları
+Alan	PostgreSQL Tipi	Kural
+Id	UUID	Primary Key
+FactoryId	UUID	Zorunlu
+Name	VARCHAR(200)	UTF-8
+Code	VARCHAR(50)	Unique
+Description	TEXT	Opsiyonel
+Status	SMALLINT	Enum
+Quantity	INTEGER	≥ 0
+SMV	NUMERIC(8,3)	Dakika
+Efficiency	NUMERIC(5,2)	%
+Score	NUMERIC(6,3)	0-100
+JsonData	JSONB	Esnek alan
+CreatedAt	TIMESTAMPTZ	UTC
+UpdatedAt	TIMESTAMPTZ	UTC
+DeletedAt	TIMESTAMPTZ	Soft Delete
+4. Primary Key Standardı
+
+Her tabloda:
+
+Id UUID PRIMARY KEY
+
+UUID v7 tercih edilir.
+
+Neden?
+
+Sıralanabilir.
+Index parçalanmasını azaltır.
+Dağıtık sistemlerde güvenlidir.
+5. Foreign Key Standardı
+
+Örnek
+
+Order
+    │
+    ▼
+OrderItem
+    │
+    ▼
+FlowUnit
+    │
+    ▼
+OperationInstance
+
+Her FK için:
+
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+
+APS sisteminde cascade delete kullanılmayacaktır.
+
+6. Soft Delete
+
+Hiçbir üretim kaydı fiziksel olarak silinmez.
+
+Her tabloda:
+
+IsDeleted BOOLEAN
+
+DeletedAt TIMESTAMPTZ
+
+DeletedBy UUID
+
+bulunacaktır.
+
+7. Ortak Kolonlar
+
+Tüm tablolar aşağıdaki alanları içerir.
+
+Alan
+Id
+FactoryId
+CreatedAt
+CreatedBy
+UpdatedAt
+UpdatedBy
+Version
+RowHash
+IsDeleted
+
+Bu alanlar BaseEntity üzerinden yönetilecektir.
+
+8. Constraint Standartları
+NOT NULL
+
+Kimlik alanları
+
+Her zaman zorunlu.
+
+CHECK
+
+Örnek
+
+Quantity >=0
+
+SMV>0
+
+Efficiency BETWEEN 0 AND 150
+UNIQUE
+
+Örneğin
+
+FactoryId + Code
+
+kombinasyonu.
+
+EXCLUDE
+
+Çakışan vardiyalar
+
+Çakışan rezervasyonlar
+
+aynı anda engellenebilir.
+
+9. Index Stratejisi
+Primary Index
+
+Primary Key
+
+Secondary Index
+FactoryId
+
+Status
+
+CreatedAt
+
+UpdatedAt
+Composite Index
+
+Örneğin
+
+FactoryId
+
+↓
+
+ProductionLine
+
+↓
+
+Status
+APS Indexleri
+OperationId
+
+OperatorId
+
+MachineId
+
+FlowUnitId
+
+DecisionId
+
+OptimizationRunId
+Partial Index
+
+Sadece aktif kayıtlar için.
+
+WHERE IsDeleted=false
+10. JSONB Kullanım Kuralları
+
+JSON yalnızca:
+
+Solver Parameters
+AI Features
+Event Payload
+Dynamic Configuration
+
+için kullanılacaktır.
+
+Üretim verisi JSON içine yazılmaz.
+
+11. Partition Strategy
+
+En büyük tablolar partition edilir.
+
+Tablo	Partition
+Event	Gün
+ProductionEvent	Gün
+Decision	Ay
+OptimizationRun	Ay
+FlowHistory	Ay
+AuditLog	Ay
+12. History Tabloları
+
+Kritik tablolar için geçmiş tutulur.
+
+Örneğin:
+
+OperatorHistory
+
+MachineHistory
+
+FlowUnitHistory
+
+AssignmentHistory
+
+DecisionHistory
+
+Bu tablolar değişiklikleri saklar.
+
+13. Event Tabloları
+
+Append-only yapı.
+
+Örnek:
+
+OrderCreated
+
+FlowUnitMoved
+
+OperatorAssigned
+
+MachineStopped
+
+DecisionExecuted
+
+Event satırı güncellenmez.
+
+14. Materialized View Stratejisi
+
+Gerçek zamanlı raporlar için.
+
+Örnek:
+
+CurrentWIP
+
+CurrentBalance
+
+CurrentCapacity
+
+FactoryHealth
+
+OperatorUtilization
+
+Belirli aralıklarla yenilenir.
+
+15. Transaction Kuralları
+APS
+
+READ COMMITTED
+
+Solver
+
+REPEATABLE READ
+
+Finansal veri olursa
+
+SERIALIZABLE
+
+16. Kilitleme Stratejisi
+
+Uzun süreli table lock yasaktır.
+
+Tercih edilen yöntem:
+
+Row Lock
+Optimistic Lock
+
+Version alanı kullanılacaktır.
+
+17. Beklenen Veri Hacmi
+Tablo	Tahmini Satır
+Factory	100
+Line	2.000
+Machine	50.000
+Operator	250.000
+Order	20 M
+OrderItem	100 M
+FlowUnit	1 B+
+OperationInstance	10 B+
+Event	50 B+
+Decision	500 M
+OptimizationRun	100 M
+
+Bu tahminler, ölçeklenebilirlik kararlarını yönlendirecektir.
+
+18. Performans Hedefleri
+İşlem	Hedef
+Order Lookup	<20 ms
+FlowUnit Lookup	<10 ms
+Operator Assignment	<50 ms
+Current Factory State	<100 ms
+Solver Input View	<300 ms
+Dashboard KPI	<500 ms
+19. Güvenlik
+
+Her tablo:
+
+Factory bazlı erişim
+Role bazlı erişim
+Audit kayıtları
+
+ile korunacaktır.
+
+Kritik tablolar:
+
+Decision
+OptimizationRun
+Assignment
+
+ayrıca değişiklik geçmişi (audit) tutacaktır.
+
+20. Fiziksel Tasarım İlkeleri
+UUID v7 kullan.
+Soft delete uygula.
+JSONB'yi sadece dinamik veriler için kullan.
+FK'leri zorunlu tut.
+Büyük tabloları partition et.
+Aktif kayıtlar için partial index oluştur.
+History ve Event tablolarını ayır.
+Materialized View ile raporları hızlandır.
+Solver doğrudan ham tabloları okumaz; mantıksal görünümleri kullanır.
+Her değişiklik audit ve event mekanizmasına yansır.
+📌 Chapter-5 Sonucu
+
+Bu bölümle birlikte MARS'ın fiziksel PostgreSQL mimarisi tanımlandı. Artık bu dokümana dayanarak:
+
+SQL migration dosyaları üretilebilir.
+ORM modelleri oluşturulabilir.
+Performans testleri planlanabilir.
+Claude Code veritabanı katmanını doğrudan geliştirebilir.
+🚨 Ancak Burada Çok Önemli Bir Eksik Kaldı
+
+Şimdiye kadar:
+
+Entity'leri tanımladık.
+İlişkileri tanımladık.
+Fiziksel veritabanını tanımladık.
+
+Ama APS'nin gerçekten çalışmasını sağlayan veri henüz modellenmedi.
+
+Senin sisteminin en güçlü tarafı şu olacak:
+
+Operatörün gerçek performansı
+Öğrenme eğrisi
+Yorgunluk modeli
+Operasyonlar arası geçiş süreleri
+Yardım alma/verme davranışı
+Hazırlık ve montaj arasındaki akış
+
+Bunlar normal ERP tablolarında bulunmaz. Bunlar üretim zekâsı (Manufacturing Intelligence) verileridir.
+
+Ben olsam DOC-008 / Chapter-6'yı klasik indeksler yerine şu konuya ayırırım:
+
+Manufacturing Intelligence Data Model
+
+Bu bölümde, APS'nin diğer sistemlerden daha iyi karar verebilmesini sağlayacak tüm özel veri yapıları (Learning Curve, Fatigue Model, Skill Graph, Bottleneck History, Flow Pattern, Operator Collaboration Graph, Dynamic SMV vb.) tasarlanmalı. Bence MARS'ın rekabet avantajı tam olarak burada doğacak.
