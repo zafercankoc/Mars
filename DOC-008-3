@@ -1,0 +1,498 @@
+Mükemmel. Artık Entity'leri (Chapter-2) ve Relationship Model'i (Chapter-3) oluşturduk.
+
+Fakat burada tekrar bir mimari kararı alıyorum.
+
+Birçok kişi "Logical Database Model" bölümünü sadece tablo listesi olarak yazar. Biz öyle yapmayacağız.
+
+Çünkü MARS sıradan bir ERP değildir.
+
+Bu sistem;
+
+APS
+MES
+AI
+Digital Twin
+Event Sourcing
+Optimization
+
+aynı veri modelini kullanacak.
+
+Bu yüzden önce Logical Database Architecture oluşturacağız.
+
+MARS APS
+DOC-008
+Chapter-4
+Logical Database Model
+
+Version 1.0
+
+1. Amaç
+
+Logical Database Model'in amacı:
+
+Sistemin hangi verileri saklayacağını değil, bu verilerin neden var olduğunu ve hangi modül tarafından kullanılacağını tanımlamaktır.
+
+Bu model:
+
+PostgreSQL'e dönüşebilir.
+ORM'e dönüşebilir.
+API'ye dönüşebilir.
+Solver Input'una dönüşebilir.
+2. Katmanlı Veri Mimarisi
+
+MARS veriyi 12 ana katmana ayırır.
+
+L01 Master Data
+
+↓
+
+L02 Product Engineering
+
+↓
+
+L03 Human Resources
+
+↓
+
+L04 Production Planning
+
+↓
+
+L05 Production Execution
+
+↓
+
+L06 APS Decision
+
+↓
+
+L07 Optimization
+
+↓
+
+L08 Quality
+
+↓
+
+L09 Maintenance
+
+↓
+
+L10 Analytics
+
+↓
+
+L11 AI
+
+↓
+
+L12 System
+
+Bu katmanlar birbirine bağımlıdır ancak kendi içinde modülerdir.
+
+L01 MASTER DATA
+
+Bu katman sistemin değişmeyen veya çok az değişen referans verilerini içerir.
+
+Modüller
+Factory
+
+Amaç
+
+Fabrika tanımı.
+
+Department
+
+Kesim
+
+Hazırlık
+
+Montaj
+
+Kalite
+
+Paket
+
+Production Line
+
+A Bandı
+
+B Bandı
+
+C Bandı
+
+Work Center
+
+Örneğin
+
+Singer
+
+Overlok
+
+Reçme
+
+Lastik
+
+Kalite
+Machine
+
+Her fiziksel makine.
+
+Shift
+
+Vardiyalar.
+
+Calendar
+
+Çalışma takvimi.
+
+Holiday
+
+Resmi tatiller.
+
+Customer
+Supplier
+L02 PRODUCT ENGINEERING
+
+Ürün bilgileri.
+
+Bu katman APS'nin en önemli girdilerinden biridir.
+
+Product
+
+Model
+
+Variant
+
+Renk
+
+Beden
+
+Kumaş
+
+BOM
+
+Malzeme ağacı.
+
+Route
+
+Üretim rotası.
+
+Operation
+
+Operasyon tanımları.
+
+Operation Dependency
+
+Bu tablo artık Graph yapısındadır.
+
+Yani
+
+Foreign Key değildir.
+
+Standard SMV
+
+Standart süre.
+
+Machine Requirement
+
+Makine ihtiyacı.
+
+Skill Requirement
+
+Yetenek ihtiyacı.
+
+L03 HUMAN RESOURCES
+
+APS operatörü yalnızca kişi olarak görmez.
+
+Bir kaynak olarak görür.
+
+Operator
+Skill
+Operator Skill
+Attendance
+
+Devam bilgisi.
+
+Training
+Performance
+Learning Curve
+Fatigue
+Medical Restriction
+
+Örneğin
+
+Ayakta çalışamaz.
+
+Reçme kullanamaz.
+
+Gece vardiyası yapamaz.
+L04 PRODUCTION PLANNING
+
+Burada artık siparişler vardır.
+
+Order
+Order Item
+Demand
+Forecast
+Production Plan
+Plan Item
+Scenario
+Planning Version
+L05 PRODUCTION EXECUTION
+
+APS'nin canlı çalıştığı katman.
+
+Flow Unit
+Bundle
+Operation Instance
+Assignment
+Queue
+Transfer
+WIP
+Production Log
+Downtime
+Line Status
+Machine Status
+Operator Status
+L06 APS DECISION
+
+APS burada yaşar.
+
+Decision
+
+Her karar.
+
+Decision Rule
+Decision Candidate
+
+Solver'ın ürettiği alternatifler.
+
+Decision Score
+Decision History
+Decision Explanation
+
+AI
+
+neden
+
+bu kararı verdi?
+
+L07 OPTIMIZATION
+
+OR-Tools
+
+buradadır.
+
+Optimization Run
+Constraint
+Constraint Result
+Objective
+Solver Configuration
+Solver Result
+Solver KPI
+Scenario Result
+L08 QUALITY
+
+Inspection
+
+Repair
+
+Defect
+
+Defect Category
+
+Rework
+
+Quality Gate
+
+L09 MAINTENANCE
+
+Machine Health
+
+Breakdown
+
+Preventive Maintenance
+
+Tool Change
+
+Oil Change
+
+Calibration
+
+L10 ANALYTICS
+
+KPI
+
+Efficiency
+
+Balance Score
+
+OEE
+
+Utilization
+
+Factory Health
+
+Prediction Accuracy
+
+L11 AI
+
+Feature Store
+
+Training Dataset
+
+Prediction
+
+Inference
+
+Feedback
+
+Model Registry
+
+Prompt History
+
+L12 SYSTEM
+
+User
+
+Role
+
+Permission
+
+Audit Log
+
+API Key
+
+Integration
+
+Webhook
+
+Configuration
+
+3. Entity Yaşam Döngüsü
+
+Her Entity aşağıdaki yaşam döngüsüne sahiptir.
+
+Created
+
+↓
+
+Validated
+
+↓
+
+Active
+
+↓
+
+Modified
+
+↓
+
+Archived
+
+↓
+
+Deleted
+
+APS
+
+Deleted
+
+yerine
+
+Archive
+
+kullanacaktır.
+
+4. Ortak Alanlar (Base Entity)
+
+Sistemdeki bütün tablolar aşağıdaki alanları ortak olarak taşır:
+
+Alan	Amaç
+Id	UUID
+FactoryId	Çoklu fabrika desteği
+CreatedAt	Oluşturulma zamanı
+UpdatedAt	Güncellenme zamanı
+CreatedBy	Kullanıcı
+UpdatedBy	Kullanıcı
+Version	Optimistic Lock
+Status	Aktif/Pasif vb.
+IsDeleted	Soft Delete
+RowHash	Değişiklik kontrolü
+5. Entity Sınıfları
+
+Her tablo aşağıdaki sınıflardan birine aittir.
+
+Sınıf	Açıklama
+Master	Referans veri
+Transaction	İşlemsel veri
+State	Anlık durum
+Event	Olay kaydı
+History	Geçmiş kayıt
+Analytics	KPI ve raporlama
+AI	Yapay zekâ verisi
+Configuration	Sistem ayarları
+6. Normalizasyon Kuralları
+Katman	Normalizasyon
+Master Data	3NF
+Transaction	3NF
+Event	Append-only
+State	Denormalize edilebilir
+Analytics	Star Schema
+AI Feature Store	Geniş (Wide Table) yapı
+
+Bu ayrım önemlidir; çünkü her katmanın performans ve kullanım amacı farklıdır.
+
+7. APS İçin Kritik Mantıksal Görünümler (Logical Views)
+
+Veritabanındaki ham tabloların yanında, karar motorunun doğrudan kullandığı mantıksal görünümler tanımlanacaktır:
+
+View	Kullanım
+CurrentFactoryState	Fabrikanın anlık durumu
+CurrentLineBalance	Hat bazında yük ve denge
+AvailableOperators	Çalışmaya uygun operatörler
+AvailableMachines	Kullanılabilir makineler
+ActiveFlowUnits	Üretimdeki aktif Flow Unit'ler
+BottleneckAnalysis	Darboğaz analizi
+LineCapacitySnapshot	Hat kapasite özeti
+SolverInputView	OR-Tools için hazırlanmış veri
+AIFeatureView	AI modelleri için özellik kümesi
+
+Bu görünümler fiziksel tablo değildir; mantıksal katman ile uygulama katmanı arasındaki köprüdür.
+
+8. Bu Bölümün Sonucu
+
+Chapter-4 ile artık MARS'ın mantıksal veri mimarisi tanımlanmış oldu:
+
+Hangi veri katmanları var?
+Her katmanın sorumluluğu nedir?
+Entity'ler nasıl sınıflandırılır?
+Ortak alanlar nelerdir?
+APS, Solver ve AI aynı veriyi nasıl farklı mantıksal görünümler üzerinden kullanır?
+
+Bu noktadan sonra fiziksel PostgreSQL tasarımına geçebiliriz.
+
+📌 Bence Bir Sonraki Bölüm
+
+DOC-008 / Chapter-5 – Physical Database Model sadece SQL tablo listesi olmamalı.
+
+Orada her tablo için:
+
+Kolonlar
+Veri tipleri
+Primary Key
+Foreign Key
+Unique Constraint
+Check Constraint
+Default değerler
+İndeks önerileri
+Partition stratejisi
+Beklenen satır hacmi (100 bin, 10 milyon, 1 milyar vb.)
+Günlük okuma/yazma yoğunluğu
+
+tanımlanmalı.
+
+Bu bilgiler, PostgreSQL şemasını doğrudan oluşturabilecek ve gelecekte performans darboğazlarını önceden öngörebilecek seviyede ayrıntı sağlayacaktır. Bu da MARS'ı gerçekten kurumsal ölçekte çalışabilecek bir sistem haline getirir.
