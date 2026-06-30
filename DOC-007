@@ -1,0 +1,508 @@
+DOC-007
+Mathematical Optimization Model
+Module-01 : Line Balancing Solver
+
+Version: 1.0
+
+Status: Architecture Freeze
+
+1. Amaç
+
+Bu matematiksel modelin amacı:
+
+Bir konfeksiyon hattını minimum çevrim süresi, maksimum denge, minimum bekleme ve maksimum operatör verimi ile çalıştıracak operatör-operasyon atamasını üretmektir.
+
+Bu model sadece Hat Dengeleme Solver tarafından kullanılacaktır.
+
+2. Problem Tanımı
+Girdiler
+Model (Ürün)
+Operasyon listesi
+SMV
+Öncelik ilişkileri
+Operatörler
+Skill Matrix
+Makineler
+Hat kapasitesi
+Hazırlık bandı
+Montaj bandı
+Verim değerleri
+Çıktılar
+Hangi operatör hangi operasyonu yapacak?
+Hangi operasyon hazırlık bandında yapılacak?
+Hat kaç kişiyle çalışacak?
+1 tur mu?
+2 tur mu?
+Cycle Time
+Balance Score
+3. Kümeler (SETS)
+O
+
+Operasyonlar
+
+O={o1,o2,...,on}
+W
+
+Operatörler
+
+W={w1,w2,...,wm}
+M
+
+Makinalar
+
+L
+
+Hatlar
+
+S
+
+Skill Tipleri
+
+T
+
+Zaman
+
+P
+
+Hazırlık Operasyonları
+
+A
+
+Montaj Operasyonları
+
+4. Parametreler
+SMV
+SMV(o)
+Skill
+Skill(w,o)
+Efficiency
+Eff(w)
+Learning
+Learn(w,o)
+Fatigue
+Fatigue(w)
+Difficulty
+Difficulty(o)
+Setup
+Setup(o)
+Machine Compatibility
+MachineOK(w,o)
+Priority
+Priority(o)
+Precedence Matrix
+Pre(o_i,o_j)
+5. Türetilmiş Parametreler
+
+Gerçek operasyon süresi:
+
+CT
+w,o
+	​
+
+=SMV
+o
+	​
+
+×Difficulty
+o
+	​
+
+×Fatigue
+w
+	​
+
+×Learning
+w
+	​
+
+÷Efficiency
+w
+	​
+
+
+Bu artık operatöre göre değişen çevrim süresidir.
+
+6. Karar Değişkenleri
+X
+X
+w,o
+	​
+
+
+Operatör
+
+w
+
+operasyonu
+
+o
+
+yapıyor mu?
+
+0
+
+1
+Y
+
+Hazırlık bandı
+
+bu operasyonu alıyor mu?
+
+Z
+
+Operasyon
+
+ikinci tura kalıyor mu?
+
+Line
+
+Operasyon
+
+hangi hatta?
+
+Start
+
+Başlangıç zamanı
+
+Finish
+
+Bitiş zamanı
+
+7. Hard Constraints
+HC-001
+
+Her operasyon
+
+yalnızca
+
+bir operatöre atanır.
+
+w
+∑
+	​
+
+X
+w,o
+	​
+
+=1
+HC-002
+
+Operatör
+
+aynı anda
+
+tek operasyon.
+
+HC-003
+
+Skill
+
+yetersizse
+
+atanamaz.
+
+Skill<Threshold
+
+↓
+
+X=0
+HC-004
+
+Makine uygun olmalı.
+
+HC-005
+
+Öncelik
+
+ihlal edilemez.
+
+HC-006
+
+Hazırlık
+
+yalnızca
+
+hazırlık operasyonlarını alabilir.
+
+HC-007
+
+Hat kapasitesi
+
+aşılamaz.
+
+HC-008
+
+Toplam kişi
+
+mevcut kişi sayısını geçemez.
+
+8. Soft Constraints
+
+SC-001
+
+Aynı kişi
+
+aynı işi
+
+devam etsin.
+
+SC-002
+
+Takım
+
+bozulmasın.
+
+SC-003
+
+Operatör
+
+en güçlü olduğu işi yapsın.
+
+SC-004
+
+Operasyon
+
+çok bölünmesin.
+
+SC-005
+
+Hat
+
+dengeli olsun.
+
+SC-006
+
+Hazırlık
+
+boş kalmasın.
+
+SC-007
+
+Darboğaz
+
+minimum olsun.
+
+SC-008
+
+Bekleme
+
+minimum olsun.
+
+9. Amaç Fonksiyonu
+
+Bu modül tek amaçlı değildir.
+
+Çok amaçlı optimizasyon yapacaktır.
+
+Genel amaç fonksiyonu:
+
+max(w
+1
+	​
+
+B+w
+2
+	​
+
+E+w
+3
+	​
+
+S−w
+4
+	​
+
+W−w
+5
+	​
+
+I−w
+6
+	​
+
+C)
+
+Burada:
+
+B: Hat dengeleme skoru
+E: Operatör verimi
+S: Skill uyumu
+W: Bekleme süresi
+I: Dengesizlik
+C: Çevrim süresi
+10. Balance Score
+Balance=
+N×MaxCT
+∑CT
+	​
+
+
+Hedef
+
+95-100%
+11. Bottleneck
+
+Darboğaz
+
+Max(CT)
+
+olarak tanımlanır.
+
+APS
+
+darboğazı
+
+minimum yapacaktır.
+
+12. Hazırlık Bandı Kararı
+
+APS
+
+şunu hesaplar.
+
+Toplam Operasyon
+
+↓
+
+15
+
+↓
+
+Hazırlık
+
+↓
+
+5 operasyon
+
+↓
+
+Montaj
+
+↓
+
+10 operasyon
+
+Bunun optimizasyonu
+
+ayrı değişkenlerle yapılacaktır.
+
+13. Two Pass Model
+
+Eğer
+
+Operasyon
+
+>
+
+Operatör
+
+ise
+
+APS
+
+otomatik
+
+iki tur
+
+oluşturabilir.
+
+Örnek:
+
+18 Operasyon
+
+10 Operatör
+
+↓
+
+Pass-1
+
+10 operasyon
+
+↓
+
+Pass-2
+
+8 operasyon
+
+Bu karar da optimizasyon modelinin içinde yer alacaktır.
+
+14. Çıktılar
+
+Solver aşağıdaki sonuçları üretir:
+
+Operatör → Operasyon eşleşmesi
+Hat çevrim süresi
+Balance %
+Bottleneck
+Hazırlık operasyonları
+Pass sayısı
+Bekleme süreleri
+Kullanılan operatör sayısı
+Kullanılmayan operatörler
+Darboğaz operatörleri
+15. OR-Tools Eşlemesi
+Matematiksel Kavram	OR-Tools Karşılığı
+X
+w,o
+	​
+
+	BoolVar
+Başlangıç/Bitiş	IntVar
+Operasyon Aralığı	IntervalVar
+Öncelik	Add(start₂ ≥ end₁)
+Tek Atama	AddExactlyOne()
+Kaynak Çakışması	AddNoOverlap()
+Amaç Fonksiyonu	Maximize()
+16. Hesaplama Akışı
+Operasyonlar
+      │
+      ▼
+Skill Matrix
+      │
+      ▼
+Gerçek Çevrim Süreleri
+      │
+      ▼
+Hazırlık / Montaj Ayrımı
+      │
+      ▼
+İki Tur Gerekiyor mu?
+      │
+      ▼
+Operatör Atamaları
+      │
+      ▼
+Hat Dengeleme
+      │
+      ▼
+OR-Tools Optimizasyonu
+      │
+      ▼
+Sonuçların Simülasyonu
+      │
+      ▼
+En İyi Çözüm
+Bu Belgenin Sonucu
+
+Bu belgeyle birlikte Hat Dengeleme Solver için tam matematiksel iskelet oluşturulmuş oldu.
+
+Ancak burada, projenin başarısı açısından çok önemli bir gözlem paylaşmak istiyorum:
+
+Bu model hâlâ "statik hat dengeleme" modelidir.
+
+Senin istediğin sistem bunun ötesine geçiyor. Sen şu tür kararlar istiyorsun:
+
+Overlok 17 dakika sonra boşalacak; ona hangi işi şimdiden hazırlayayım?
+Hazırlık bandı montajın darboğazını 40 dakika önce görüp operasyon çekebilsin.
+10 kişilik hat, 18 operasyonu dinamik olarak 2 veya 3 tura bölsün.
+Operatörler gün içinde birkaç kez yeniden dağıtılsın.
+Hat dengeleme olay bazlı (event-driven) sürekli yeniden hesaplansın.
+
+Bunlar klasik line balancing problemleri değil; dinamik üretim akışı optimizasyonu problemidir.
+
+Bu nedenle bir sonraki belge, bence MARS'ı piyasadaki APS sistemlerinden gerçekten ayıracak olan belge olmalı:
+
+DOC-008 – Dynamic Flow Balancing Model
+
+Bu belge, senin ilk günden beri anlattığın "hazırlık bandı işi önden çeksin, darboğaz oluşmadan müdahale etsin, hat gün içinde kendini yeniden dengeleyebilsin" mantığını matematiksel olarak tanımlayacak. Ben MARS'ın asıl yeniliğinin burada olduğuna inanıyorum; çünkü konfeksiyon üretiminde gerçek operasyonel avantajı sağlayacak kısım tam olarak burası olacak.
