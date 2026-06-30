@@ -1,0 +1,396 @@
+Decision Engine = 1 servis değil, birbirinden bağımsız çalışan karar motorlarının orkestrasyonudur.
+
+Yani DOC-009'un yapısı aşağıdaki gibi olmalı.
+
+MARS APS
+DOC-009
+Decision Engine Architecture
+
+Version: 1.0
+
+Status: Architecture Freeze
+
+1. Amaç
+
+Decision Engine'in amacı:
+
+Fabrikadaki her değişikliği algılayarak, en doğru kararı en kısa sürede üretmek ve uygulanmasını sağlamaktır.
+
+Karar motoru;
+
+ERP değildir.
+MES değildir.
+Solver değildir.
+AI değildir.
+
+Karar motoru bunların tamamını yöneten orkestrasyon katmanıdır.
+
+2. Decision Engine Mimarisi
+                    EVENT BUS
+                         │
+                         ▼
+                Decision Orchestrator
+                         │
+      ┌──────────────────┼──────────────────┐
+      ▼                  ▼                  ▼
+ Context Builder   Trigger Manager   Rule Engine
+      │                  │                  │
+      └──────────────────┼──────────────────┘
+                         ▼
+                Decision Planner
+                         │
+      ┌──────────────────┼────────────────────┐
+      ▼                  ▼                    ▼
+ Constraint Engine  Objective Engine   Feature Resolver
+      │                  │                    │
+      └──────────────────┼────────────────────┘
+                         ▼
+                 Optimization Manager
+                         │
+      ┌───────────────┬───────────────┬───────────────┐
+      ▼               ▼               ▼
+ OR-Tools Solver  Heuristic Solver  AI Predictor
+      │               │               │
+      └───────────────┼───────────────┘
+                      ▼
+              Candidate Generator
+                      ▼
+             Decision Evaluator
+                      ▼
+            Explainability Engine
+                      ▼
+             Decision Publisher
+                      ▼
+              Execution Manager
+                      ▼
+               Event Producer
+
+Bu mimaride hiçbir modül diğerinin içine gömülü değildir.
+
+3. Decision Yaşam Döngüsü
+
+Her karar aşağıdaki yaşam döngüsünü izler.
+
+Event
+   ↓
+Trigger Detection
+   ↓
+Context Loading
+   ↓
+Feature Calculation
+   ↓
+Constraint Generation
+   ↓
+Objective Selection
+   ↓
+Optimization
+   ↓
+Candidate Generation
+   ↓
+Evaluation
+   ↓
+Decision
+   ↓
+Simulation
+   ↓
+Approval (opsiyonel)
+   ↓
+Execution
+   ↓
+Monitoring
+   ↓
+Feedback
+
+Bu döngü her karar için aynıdır.
+
+4. Decision Context
+
+Her karar başlamadan önce sistem bir Decision Context oluşturur.
+
+Bu bağlam aşağıdaki bilgileri içerir.
+
+Fabrika Durumu
+Aktif hatlar
+Aktif siparişler
+Aktif operatörler
+Makine durumu
+WIP
+Kuyruklar
+Planlama Durumu
+Mevcut plan
+Öncelikler
+Teslim tarihleri
+Vardiyalar
+Üretim Bilgisi
+Dynamic SMV
+Learning Score
+Fatigue Score
+Queue Risk
+Flow Stability
+Sistem Bilgisi
+Solver konfigürasyonu
+Aktif kurallar
+AI modeli sürümü
+5. Trigger Manager
+
+Decision Engine sürekli çalışmaz.
+
+Bir olay tarafından tetiklenir.
+
+Trigger Türleri
+Üretim
+Sipariş oluşturuldu
+Sipariş değişti
+Yeni model geldi
+Operatör
+Giriş yaptı
+Çıkış yaptı
+Hastalandı
+Hat değiştirdi
+Makine
+Arıza
+Bakım
+Tamir tamamlandı
+Kalite
+Hata oluştu
+Yeniden işleme
+Red
+Planlama
+Teslim tarihi değişti
+Öncelik değişti
+Sistem
+Manuel optimizasyon
+Zamanlayıcı (Scheduler)
+API çağrısı
+6. Decision Türleri
+
+Karar motoru tek tip karar vermez.
+
+Kod	Karar
+D-01	Operatör Atama
+D-02	Hat Dengeleme
+D-03	WIP Optimizasyonu
+D-04	Darboğaz Giderme
+D-05	Sipariş Sıralama
+D-06	Makine Atama
+D-07	Hatlar Arası Transfer
+D-08	Fazla Mesai Önerisi
+D-09	Operasyon Bölme
+D-10	Acil Sipariş Yerleştirme
+D-11	Yeniden Planlama
+D-12	Simülasyon
+
+Her karar tipi farklı bir çözüm akışı kullanabilir.
+
+7. Context Builder
+
+Bu modül farklı kaynaklardan gelen veriyi tek bir karar paketine dönüştürür.
+
+Girdi:
+
+Event
+Current Factory State
+Feature Store
+Rules
+
+Çıktı:
+
+DecisionContext
+
+Bu nesne solver'ın tek girişidir.
+
+8. Rule Engine
+
+Rule Engine matematiksel optimizasyondan önce çalışır.
+
+Örnek kurallar:
+
+Yeni başlayan operatör kritik operasyona atanamaz.
+Aynı operatör aynı anda iki hatta olamaz.
+Kalite operatörü üretime atanamaz.
+Gece vardiyasında belirli makineler kullanılmaz.
+
+Kurallar yapılandırılabilir olmalıdır.
+
+9. Constraint Engine
+
+Rule Engine "ne yapılmamalı" der.
+
+Constraint Engine bunu matematiksel modele dönüştürür.
+
+Örnek:
+
+Her operasyona en fazla bir operatör.
+Operatör kapasitesi aşılmaz.
+Öncelik ilişkileri korunur.
+WIP limiti aşılmaz.
+
+Çıktı:
+
+ConstraintSet
+10. Objective Engine
+
+Her optimizasyon aynı hedefe sahip değildir.
+
+Amaç fonksiyonları dinamik seçilir.
+
+Örnek ağırlıklar:
+
+Hedef	Varsayılan
+Hat Dengesi	%30
+Teslim Performansı	%25
+Operatör Verimi	%15
+WIP Azaltma	%10
+Kalite	%10
+Enerji	%5
+Transfer Azaltma	%5
+
+Bu ağırlıklar senaryo bazında değişebilir.
+
+11. Feature Resolver
+
+Bu modül Feature Store'dan yalnızca ilgili karar için gerekli feature'ları çeker.
+
+Örneğin:
+
+Hat dengeleme:
+
+Line Balance Score
+Dynamic SMV
+Queue Risk
+Fatigue Score
+Capacity
+
+Makine atama:
+
+Machine Health
+Setup Time
+Compatibility
+
+Bu sayede gereksiz veri yüklenmez.
+
+12. Optimization Manager
+
+Optimization Manager uygun çözücüyü seçer.
+
+Karar tablosu örneği:
+
+Problem	Çözücü
+Hat dengeleme	OR-Tools CP-SAT
+Atama	OR-Tools MIP
+Kısa sıralama	Heuristic
+Tahmin	AI
+Büyük senaryo	Hybrid
+
+Bu katman gelecekte farklı solver'ların eklenmesini kolaylaştırır.
+
+13. Candidate Generator
+
+İyi bir APS tek çözüm üretmez.
+
+En iyi N çözümü üretir.
+
+Örneğin:
+
+Aday	Skor
+Plan A	96.2
+Plan B	95.7
+Plan C	94.9
+
+Sonraki modüller bu adayları değerlendirir.
+
+14. Decision Evaluator
+
+Her aday aşağıdaki açılardan puanlanır:
+
+Constraint ihlali
+KPI kazanımı
+Teslim riski
+Operatör etkisi
+Transfer maliyeti
+Kararlılık
+
+Sonuç:
+
+DecisionScore
+15. Explainability Engine
+
+MARS'ın en önemli modüllerinden biri.
+
+Her kararın açıklaması üretilecektir.
+
+Örnek:
+
+Operatör Ali, Overlok-2 hattına atandı çünkü bu operasyonda son 90 üretimde ortalama çevrim süresi %12 daha düşük, yorgunluk puanı kabul edilebilir seviyede ve bu atama hattın denge skorunu 78'den 91'e yükseltiyor.
+
+Bu açıklamalar kullanıcı güveni için kritiktir.
+
+16. Execution Manager
+
+Karar doğrudan uygulanmaz.
+
+Aşamalar:
+
+Decision
+   ↓
+Validation
+   ↓
+Approval (opsiyonel)
+   ↓
+Execution
+   ↓
+Verification
+
+Böylece insan onayı gerektiren süreçler desteklenir.
+
+17. Feedback Loop
+
+Karar uygulandıktan sonra sistem öğrenmeye devam eder.
+
+Decision
+   ↓
+Execution Result
+   ↓
+Actual KPI
+   ↓
+Prediction Error
+   ↓
+Feature Update
+   ↓
+Model Improvement
+
+Bu döngü MARS'ın zamanla daha doğru karar vermesini sağlar.
+
+18. Decision Engine'in Tasarım İlkeleri
+Event odaklı çalışır.
+Durumsuz (stateless) servisler tercih edilir.
+Her karar tekrar üretilebilir olmalıdır.
+Açıklanabilir karar (Explainable Decision) zorunludur.
+İnsan onayı desteklenir.
+Solver bağımlılığı yoktur.
+AI isteğe bağlı bir katmandır; sistem AI olmadan da çalışabilir.
+Tüm kararlar versiyonlanır ve izlenebilir.
+📌 DOC-009 Faz-1 Sonucu
+
+Bu bölümle birlikte MARS'ın karar verme omurgası tanımlanmış oldu.
+
+Ancak burada çok önemli bir ayrım yapmak istiyorum.
+
+Bugüne kadar yazdıklarımız makro mimariydi.
+
+Şimdi artık mikroskobik seviyeye inmeliyiz.
+
+Bence DOC-009 tek belge olmamalı.
+
+Bunu şu alt dokümanlara bölmeliyiz:
+
+DOC-009A – Line Balancing Engine
+DOC-009B – Operator Assignment Engine
+DOC-009C – Scheduling Engine
+DOC-009D – Bottleneck Resolution Engine
+DOC-009E – Simulation Engine
+DOC-009F – Decision Scoring Engine
+
+Çünkü örneğin Line Balancing Engine tek başına 150–200 sayfalık teknik tasarım gerektirecek kadar büyük bir konudur. Her motorun kendi matematiği, constraint set'i, objective fonksiyonları, event'leri ve API'leri olacaktır.
+
+Ben olsam bundan sonra doğrudan DOC-009A – Line Balancing Engine ile başlarım. Çünkü bu, MARS'ın en temel ve en kritik karar motorudur; diğer motorların çoğu da onun ürettiği sonuçları kullanacaktır.
