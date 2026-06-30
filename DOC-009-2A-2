@@ -1,0 +1,361 @@
+Bu belgeyi yazmadan önce önemli bir mimari düzeltme yapmak istiyorum.
+
+Önceki dokümanlarda kısıtları "liste" şeklinde tanımladık. Bu, küçük projelerde yeterlidir; ancak MARS'ın hedeflediğimiz ölçeğinde sürdürülebilir olmaz.
+
+Benim önerim, Constraint Library'yi yazılım geliştiricilerinin kullanacağı gerçek bir katalog olarak tasarlamak.
+
+Her constraint bir birinci sınıf varlık (first-class artifact) olmalıdır.
+
+Her constraint'in:
+
+benzersiz kimliği,
+iş kuralı,
+matematiksel tanımı,
+etkinleştirme koşulu,
+önceliği,
+test senaryoları,
+versiyonu
+
+olmalıdır.
+
+Bu yaklaşım, ileride kural yönetimi (Rule Management) ve A/B optimizasyon testleri için de güçlü bir temel oluşturur.
+
+MARS APS
+DOC-009A-2
+Constraint Library Specification
+
+Version: 1.0
+
+Engine: Line Balancing Engine
+
+Status: Architecture Freeze
+
+1. Amaç
+
+Bu dokümanın amacı, Line Balancing Engine tarafından kullanılan tüm matematiksel kısıtların standart bir formatta tanımlanmasını sağlamaktır.
+
+Her constraint:
+
+benzersizdir,
+versiyonlanır,
+test edilir,
+gerektiğinde etkinleştirilebilir/devre dışı bırakılabilir.
+2. Constraint Sınıfları
+Kod	Sınıf	Açıklama
+HC	Hard Constraint	İhlal edilemez
+SC	Soft Constraint	İhlal edilebilir, ceza uygulanır
+DC	Dynamic Constraint	Duruma göre etkinleşir
+TC	Temporal Constraint	Zaman ilişkileri
+RC	Resource Constraint	Kaynak kısıtları
+QC	Quality Constraint	Kalite kısıtları
+BC	Business Constraint	İş kuralları
+3. Constraint Kimliklendirme
+
+Standart format:
+
+LB-HC-001
+
+Anlamı:
+
+LB → Line Balancing
+HC → Hard Constraint
+001 → Sıra numarası
+
+Örnekler:
+
+LB-HC-001
+LB-HC-002
+LB-SC-015
+LB-RC-007
+LB-TC-011
+4. Constraint Şablonu
+
+Her constraint aşağıdaki alanları içerir.
+
+Alan	Açıklama
+ConstraintId	Benzersiz kimlik
+Name	Adı
+Type	HC / SC / DC ...
+Description	İş kuralı
+MathematicalForm	Matematiksel ifade
+Parameters	Kullanılan parametreler
+DecisionVariables	Etkilenen değişkenler
+ActivationCondition	Ne zaman aktif?
+Severity	Kritiklik
+Penalty	Soft constraint ise ceza
+Version	Sürüm
+TestCases	Doğrulama senaryoları
+5. Hard Constraint Örnekleri
+LB-HC-001
+
+Adı: Single Primary Operator
+
+Açıklama:
+
+Bir operasyona aynı anda yalnızca bir ana operatör atanabilir.
+
+Matematiksel Tanım:
+
+o∈O
+∑
+	​
+
+X
+o,p
+	​
+
+=1
+
+Kritiklik: Critical
+
+Test Senaryoları:
+
+Tek operatör → Geçer
+İki operatör → Başarısız
+Sıfır operatör → Başarısız
+LB-HC-002
+
+Adı: Single Active Assignment
+
+Bir operatör aynı anda yalnızca bir operasyon üzerinde çalışabilir.
+
+p∈P
+∑
+	​
+
+X
+o,p
+	​
+
+≤1
+LB-HC-003
+
+Adı: Skill Eligibility
+
+Operatörün yeterlilik seviyesi minimum gereksinimi karşılamalıdır.
+
+Aktivasyon:
+
+Skill Control = Enabled
+LB-HC-004
+
+Adı: Shift Availability
+
+Operatör vardiya dışında atanamaz.
+
+LB-HC-005
+
+Adı: Machine Compatibility
+
+Operasyon yalnızca uyumlu makinede yapılabilir.
+
+LB-HC-006
+
+Adı: Operation Precedence
+
+Öncelik ilişkileri korunmalıdır.
+
+LB-HC-007
+
+Adı: Line Capacity
+
+Hat kapasitesi aşılmaz.
+
+LB-HC-008
+
+Adı: Machine Capacity
+
+Makine kapasitesi aşılmaz.
+
+LB-HC-009
+
+Adı: Mandatory Quality Gate
+
+Kalite kontrol adımları atlanamaz.
+
+LB-HC-010
+
+Adı: Required Resource
+
+Operasyon için zorunlu ekipman mevcut olmalıdır.
+
+6. Soft Constraint Örnekleri
+LB-SC-001
+
+Adı: Preferred Line
+
+Operatör tercih ettiği hatta çalışmıyorsa ceza uygulanır.
+
+Penalty: 5
+
+LB-SC-002
+
+Adı: Learning Curve
+
+Operatör öğrenme eğrisinin dışında bir operasyona atanırsa ceza uygulanır.
+
+Penalty: 10
+
+LB-SC-003
+
+Adı: Operator Fatigue
+
+Yorgunluk eşiğine yakın operatör kritik operasyona atanırsa ceza uygulanır.
+
+Penalty: 25
+
+LB-SC-004
+
+Adı: Operation Split
+
+Bir operasyonun bölünmesi ek maliyet oluşturur.
+
+Penalty: 20
+
+LB-SC-005
+
+Adı: Inter-Line Transfer
+
+Hatlar arası transfer tercih edilmez.
+
+Penalty: 15
+
+7. Dynamic Constraint Örnekleri
+
+Dynamic constraint'ler yalnızca belirli koşullarda etkinleşir.
+
+LB-DC-001
+
+Adı: Emergency Order Protection
+
+Aktivasyon:
+
+Order.Priority = Emergency
+
+Bu durumda normal öncelik kuralları değişebilir.
+
+LB-DC-002
+
+Adı: Machine Failure Recovery
+
+Aktivasyon:
+
+Machine.Status = Failed
+
+Makineye bağlı operasyonlar yeniden dağıtılır.
+
+LB-DC-003
+
+Adı: Overtime Mode
+
+Aktivasyon:
+
+Overtime = Enabled
+
+Vardiya süresi kısıtı farklı değerlendirilir.
+
+8. Temporal Constraint Örnekleri
+LB-TC-001
+
+Operasyonlar öncelik sırasına göre tamamlanmalıdır.
+
+LB-TC-002
+
+Bekleme süresi belirlenen üst sınırı aşmamalıdır.
+
+LB-TC-003
+
+Bundle transfer süresi limit içinde olmalıdır.
+
+9. Resource Constraint Örnekleri
+LB-RC-001
+
+Makine aynı anda yalnızca bir operasyona hizmet verebilir.
+
+LB-RC-002
+
+Operatör kapasitesi günlük sınırı aşamaz.
+
+LB-RC-003
+
+Yardımcı ekipman çakışması engellenmelidir.
+
+10. Constraint Öncelikleri
+Seviye	Açıklama
+P1	Güvenlik ve yasal zorunluluklar
+P2	Fiziksel uygulanabilirlik
+P3	Üretim sürekliliği
+P4	Performans optimizasyonu
+P5	Tercih ve konfor
+
+Çözüm sırasında üst seviye kısıtlar her zaman önce değerlendirilir.
+
+11. Constraint Aktivasyon Profilleri
+
+Aynı constraint her senaryoda aktif olmak zorunda değildir.
+
+Örnek profil:
+
+Constraint	Normal	Acil Sipariş	Simülasyon
+LB-HC-001	✔	✔	✔
+LB-SC-003	✔	✔	✔
+LB-SC-005	✔	✖	✔
+LB-DC-001	✖	✔	✔
+
+Bu yapı farklı çalışma modlarını destekler.
+
+12. Constraint Çakışmaları
+
+Nadir durumlarda iki kısıt aynı anda farklı yönlerde baskı oluşturabilir.
+
+Bu nedenle sistem:
+
+Hard constraint ihlallerini kesinlikle reddeder.
+Soft constraint'ler için toplam ceza skorunu hesaplar.
+Çakışmaları karar açıklamasına dahil eder.
+13. Test ve Doğrulama
+
+Her constraint için en az aşağıdaki testler bulunmalıdır:
+
+Pozitif senaryo (kural sağlanıyor)
+Negatif senaryo (kural ihlal ediliyor)
+Sınır değeri (boundary)
+Performans testi (büyük veri seti)
+Regresyon testi (önceki davranış korunuyor)
+
+Bu testler CI/CD sürecinde otomatik çalıştırılmalıdır.
+
+14. Constraint Yaşam Döngüsü
+Draft
+   ↓
+Review
+   ↓
+Approved
+   ↓
+Implemented
+   ↓
+Validated
+   ↓
+Released
+   ↓
+Deprecated
+
+Her değişiklik sürüm numarasıyla izlenmelidir.
+
+15. Constraint Kataloğu Yönetimi
+
+Constraint Library merkezi bir depo olarak yönetilmelidir.
+
+Her kayıt için:
+
+Sahip modül
+Son değiştiren
+Değişiklik tarihi
+Gerekçe
+Etkilenen testler
+
+saklanmalıdır.
+
+📌 DOC-009A-2 Sonucu
+
+Bu belge ile Line Balancing Engine'in kısıt yönetim altyapısı tanımlanmış oldu. Ancak gerçek uygulamada bu kütüphane zamanla yüzlerce kural içerecektir.
