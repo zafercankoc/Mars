@@ -1,0 +1,554 @@
+Harika.
+
+Bugün itibarıyla MARS projesi resmen başladı.
+
+Ve sana bir söz veriyorum:
+
+Bu projeyi yarım bırakmayacağım.
+Bunu gerçekten Siemens, Dassault veya PlanetTogether seviyesinde tasarlanmış bir mühendislik ürünü haline getireceğiz.
+
+Ama bunun için ilk günden disiplinli olacağız.
+
+MARS
+Manufacturing Adaptive Reasoning System
+
+Project Status
+
+STATUS : ACTIVE
+
+Phase : 1
+
+Engineering Specification
+
+Sprint : 0
+
+Issue : #0001
+
+State : IN PROGRESS
+ISSUE-0001
+Project Constitution
+
+(Bu belge yazıldı.)
+
+Durum
+
+✔ APPROVED
+ISSUE-0002
+Manufacturing Domain Language
+
+Durum
+
+✔ APPROVED (Core V1)
+Şimdi
+
+Artık
+
+İlk gerçek mühendislik belgesine
+
+başlıyoruz.
+
+ISSUE-0003
+Manufacturing Object Model
+
+Bence bu proje bundan sonra burada şekillenecek.
+
+Bu belge neden önemli?
+
+Çünkü
+
+kod yazılmadan önce
+
+programın içindeki bütün nesneler tanımlanacak.
+
+Bugün aslında
+
+veritabanı değil,
+
+yazılım değil,
+
+gerçek fabrikanın dijital ikizini oluşturmaya başlayacağız.
+
+OBJECT MODEL
+
+Bir fabrikanın tamamını
+
+nesnelere ayırıyoruz.
+
+En üstten başlayacağız.
+
+Factory
+
+↓
+
+Departments
+
+↓
+
+Lines
+
+↓
+
+Teams
+
+↓
+
+Operators
+
+↓
+
+Machines
+
+↓
+
+Products
+
+↓
+
+Models
+
+↓
+
+Production Orders
+
+↓
+
+Bundles
+
+↓
+
+Operations
+
+↓
+
+Tasks
+
+↓
+
+Events
+
+Bütün proje bunun üzerine kurulacak.
+
+LEVEL-1
+Factory
+
+Factory
+
+en büyük nesnedir.
+
+İçinde hiçbir üretim yapılmaz.
+
+Sadece yönetir.
+
+Factory Properties
+FactoryId
+
+FactoryCode
+
+FactoryName
+
+Country
+
+City
+
+TimeZone
+
+Currency
+
+WorkingCalendar
+
+ShiftStructure
+
+FactoryPolicy
+
+PlanningPolicy
+
+OptimizationPolicy
+
+SimulationPolicy
+
+FactoryHealth
+
+CurrentState
+
+CreatedDate
+
+UpdatedDate
+Factory Functions
+
+Factory
+
+şunları yapabilir.
+
+Create Order
+
+Receive Order
+
+Create Plan
+
+Start Simulation
+
+Calculate Factory Health
+
+Optimize
+
+Replan
+
+Generate KPI
+
+Generate Report
+
+Archive
+Factory Relationships
+Factory
+
+1
+
+↓
+
+N
+
+Departments
+Factory
+
+1
+
+↓
+
+N
+
+Production Orders
+Factory
+
+1
+
+↓
+
+N
+
+Lines
+Factory
+
+1
+
+↓
+
+N
+
+Warehouses
+Factory
+
+1
+
+↓
+
+N
+
+Calendars
+LEVEL-2
+Department
+
+Department
+
+aynı amaca hizmet eden
+
+organizasyondur.
+
+Department Types
+Cutting
+
+Preparation
+
+Assembly
+
+Iron
+
+Quality
+
+Packing
+
+Maintenance
+
+Planning
+
+Warehouse
+Department Properties
+DepartmentId
+
+FactoryId
+
+DepartmentCode
+
+DepartmentName
+
+DepartmentType
+
+Manager
+
+Capacity
+
+Efficiency
+
+CurrentLoad
+
+Status
+
+Location
+Department Relationships
+Department
+
+↓
+
+Lines
+Department
+
+↓
+
+Machines
+Department
+
+↓
+
+Operators
+LEVEL-3
+Production Line
+
+Buraya çok dikkat et.
+
+Çünkü
+
+bizim APS
+
+esas burada çalışacak.
+
+Line
+
+artık
+
+sabit bir kavram değildir.
+
+Bizim sistemimizde
+
+Line
+
+şudur.
+
+Line
+
+=
+
+People
+
++
+
+Machines
+
++
+
+Operation Groups
+
++
+
+Configuration
+
++
+
+Flow
+
+Yani
+
+Hat
+
+insanlardan oluşmaz.
+
+Hat
+
+bir
+
+konfigürasyondur.
+
+Bu çok büyük fark.
+
+Line Properties
+LineId
+
+DepartmentId
+
+LineCode
+
+LineName
+
+LineType
+
+CurrentConfiguration
+
+Capacity
+
+Efficiency
+
+AvailableOperators
+
+AvailableMachines
+
+CurrentStrategy
+
+CurrentConstraint
+
+CurrentHealth
+
+CurrentFlow
+
+CurrentWIP
+
+QueueLength
+
+SetupState
+
+Status
+Line Types
+Preparation
+
+Assembly
+
+Hybrid
+
+Temporary
+
+Virtual
+
+Virtual Line önemli.
+
+Çünkü ileride tek fiziksel hattı, farklı operasyon kümeleriyle sanal olarak planlayabiliriz.
+
+Line States
+Idle
+
+Preparing
+
+Running
+
+Balancing
+
+Waiting
+
+Blocked
+
+Starving
+
+Setup
+
+Maintenance
+
+Closed
+
+Bu durumlar ileride Event Engine tarafından yönetilecek.
+
+Line Capabilities
+
+Hat
+
+şunları yapabilir.
+
+Accept Bundle
+
+Reject Bundle
+
+Balance
+
+Split
+
+Merge
+
+Transfer
+
+Reconfigure
+
+Simulate
+
+Predict
+
+Optimize
+
+Bu
+
+normal APS'de yoktur.
+
+En önemli karar
+
+Bugün
+
+projenin
+
+ilk büyük mimari kararını veriyorum.
+
+Hat
+
+bir kaynak değildir.
+
+Hat
+
+bir
+
+Decision Object'tir.
+
+Yani
+
+APS
+
+hat seçmeyecek.
+
+APS
+
+gerekirse
+
+yeni hat oluşturacak.
+
+Örneğin
+
+Hazırlık
+
++
+
+Montaj B
+
+=
+
+Temporary Line
+
+veya
+
+Montaj A
+
+↓
+
+Split
+
+↓
+
+A1
+
+A2
+
+Böylece sistem, sabit hatlar yerine dinamik üretim konfigürasyonları oluşturabilecek.
+
+🎯 Bugünkü Çıktı
+
+Bugün ilk kez projenin Object Model'inin temelini attık:
+
+Factory
+Department
+Production Line
+
+bunların özelliklerini, ilişkilerini ve davranışlarını tanımladık.
+
+Yarın (Issue-0003 Devamı)
+
+Bir sonraki bölümde aynı ayrıntı seviyesinde şunları tanımlayacağız:
+
+Operator
+Machine
+Skill
+Team
+Work Center
+Capability
+
+Bu nesneler tamamlandığında, artık Manufacturing Physics belgesine geçebilecek sağlam bir temelimiz olacak.
