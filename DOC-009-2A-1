@@ -1,0 +1,487 @@
+MARS tek bir matematiksel model kullanmayacak.
+
+Çünkü gerçek konfeksiyon üretiminde aynı anda;
+
+Hat dengeleme
+Operatör atama
+WIP kontrolü
+Darboğaz giderme
+Operasyon bölme
+Transfer azaltma
+
+tek bir modelde çözülmeye çalışılırsa NP-Hard problem gereksiz yere büyür.
+
+Bunun yerine MARS Hierarchical Multi-Stage Optimization (HMSO) kullanmalıdır.
+
+Yani optimizasyon katmanlara ayrılır.
+
+Stage-1  Feasibility
+        ↓
+Stage-2  Assignment
+        ↓
+Stage-3  Balance
+        ↓
+Stage-4  WIP Optimization
+        ↓
+Stage-5  Local Improvement
+        ↓
+Stage-6  Decision Scoring
+
+Bu yaklaşım hem daha hızlıdır hem de gerçek zamanlı yeniden optimizasyona uygundur.
+
+MARS APS
+DOC-009A-1
+Mathematical Optimization Model
+
+Version: 1.0
+
+Engine: Line Balancing
+
+Solver: Google OR-Tools CP-SAT
+
+Status: Architecture Freeze
+
+1. Optimization Objective
+
+Line Balancing problemi aşağıdaki amaçları aynı anda optimize eder:
+
+Hat dengesini artırmak.
+Operatör verimliliğini artırmak.
+WIP'yi azaltmak.
+Teslim tarihine uyumu artırmak.
+Transferleri azaltmak.
+Operatör değişim maliyetini azaltmak.
+Kalite riskini azaltmak.
+
+Bu nedenle model çok amaçlı (multi-objective) olarak tanımlanır.
+
+2. Sets (Kümeler)
+Sembol	Açıklama
+O	Operatörler
+P	Operasyonlar
+L	Hatlar
+M	Makineler
+T	Zaman dilimleri
+B	Bundle / Flow Unit'ler
+3. Parameters (Parametreler)
+Parametre	Açıklama
+smv
+p
+	​
+
+	Operasyonun dinamik SMV değeri
+eff
+o
+	​
+
+	Operatör verim katsayısı
+skill
+o,p
+	​
+
+	Operatörün operasyon uygunluğu
+fatigue
+o
+	​
+
+	Yorgunluk skoru
+cap
+l
+	​
+
+	Hat kapasitesi
+prio
+p
+	​
+
+	Operasyon önceliği
+queue
+p
+	​
+
+	Kuyruk uzunluğu
+wip
+l
+	​
+
+	Hattaki mevcut WIP
+4. Decision Variables
+X(o,p)
+1 → Operatör o, operasyon p'ye atanır
+
+0 → Atanmaz
+
+Binary.
+
+Y(p,l)
+
+Operasyon hangi hatta çalışacak?
+
+Binary.
+
+Z(o,l)
+
+Operatör hangi hatta bulunacak?
+
+Binary.
+
+H(o,p)
+
+Operatörün bu operasyona ayırdığı süre.
+
+Integer.
+
+Q(p)
+
+Operasyon sonrası bekleme süresi.
+
+Continuous.
+
+Balance(l)
+
+Hat denge skoru.
+
+Continuous.
+
+5. Hard Constraints
+HC-001
+
+Her operasyonun en az bir operatörü olmalıdır.
+
+o∈O
+∑
+	​
+
+X
+o,p
+	​
+
+=1
+HC-002
+
+Bir operatör aynı anda yalnızca bir operasyon yapabilir.
+
+p∈P
+∑
+	​
+
+X
+o,p
+	​
+
+≤1
+HC-003
+
+Yetersiz beceriye sahip operatör atanamaz.
+
+X
+o,p
+	​
+
+≤skill
+o,p
+	​
+
+
+Burada skill ikili uygunluk veya minimum yeterlilik eşiği olarak modellenebilir.
+
+HC-004
+
+Makine kapasitesi aşılamaz.
+
+HC-005
+
+Hat kapasitesi aşılamaz.
+
+HC-006
+
+Öncelik ilişkileri korunmalıdır.
+
+Örneğin:
+
+Kesim
+
+↓
+
+Dikim
+
+↓
+
+Kalite
+
+↓
+
+Paket
+
+Bir sonraki operasyon başlamadan önce öncekisi tamamlanmalıdır.
+
+HC-007
+
+Vardiya süresi aşılamaz.
+
+HC-008
+
+Operatör uygun değilse atanamaz.
+
+HC-009
+
+Makine uygun değilse operasyon yapılamaz.
+
+HC-010
+
+Zorunlu kalite operasyonları atlanamaz.
+
+6. Soft Constraints
+
+Soft Constraint ihlal edilebilir.
+
+Ancak Objective Function ceza puanı alır.
+
+SC-001
+
+Tercih edilmeyen hat.
+
+Penalty:
+
+5
+
+SC-002
+
+Operasyon bölünmesi.
+
+Penalty:
+
+15
+
+SC-003
+
+Hatlar arası transfer.
+
+Penalty:
+
+20
+
+SC-004
+
+Fazla WIP.
+
+Penalty:
+
+30
+
+SC-005
+
+Yorgun operatör.
+
+Penalty:
+
+25
+
+SC-006
+
+Öğrenme eğrisinin dışında atama.
+
+Penalty:
+
+10
+
+7. Objective Function
+
+Toplam amaç fonksiyonu ağırlıklı bir bileşimdir.
+
+maxZ=w
+1
+	​
+
+Balance+w
+2
+	​
+
+Efficiency+w
+3
+	​
+
+Delivery−w
+4
+	​
+
+WIP−w
+5
+	​
+
+Transfer−w
+6
+	​
+
+Risk
+
+Varsayılan ağırlıklar:
+
+Amaç	Ağırlık
+Balance	0.30
+Efficiency	0.20
+Delivery	0.20
+WIP	0.10
+Transfer	0.10
+Risk	0.10
+
+Bu ağırlıklar senaryo bazında değiştirilebilir.
+
+8. Balance Score
+
+Hat denge skoru yalnızca çevrim sürelerine bakılarak hesaplanmamalıdır.
+
+Önerilen bileşenler:
+
+İş yükü dağılımı
+Operatör bekleme oranı
+Makine kullanım dengesi
+WIP dağılımı
+Kritik operasyon yoğunluğu
+
+Sonuç:
+
+0–100
+9. Dynamic SMV Kullanımı
+
+Model statik SMV kullanmaz.
+
+Her operatör için:
+
+DynamicSMV
+
+=
+
+StandardSMV
+
+×
+
+LearningFactor
+
+×
+
+FatigueFactor
+
+×
+
+SkillFactor
+
+Bu katsayılar Derived Data katmanından gelir.
+
+10. Re-Optimization
+
+Her olay tam modeli çözmez.
+
+Örnek:
+
+Olay	Strateji
+Tek operatör devamsızlığı	Lokal yeniden optimizasyon
+Yeni sipariş	Etkilenen hatları yeniden çöz
+Makine arızası	İlgili operasyonları yeniden dağıt
+Vardiya değişimi	Tam çözüm
+
+Bu sayede sistem gerçek zamanlı çalışabilir.
+
+11. Candidate Solution Generation
+
+Solver yalnızca tek plan üretmez.
+
+Hedef:
+
+Plan A
+Plan B
+Plan C
+
+Her aday;
+
+objective değeri,
+constraint ihlali,
+risk skoru,
+güven puanı
+
+ile değerlendirilir.
+
+12. Feasibility Check
+
+Her çözüm uygulanmadan önce aşağıdaki kontrollerden geçer:
+
+Tüm hard constraint'ler sağlandı mı?
+Operatör uygun mu?
+Makine uygun mu?
+Hat kapasitesi yeterli mi?
+WIP limiti aşıldı mı?
+Vardiya sınırları içinde mi?
+
+Başarısız çözümler elenir.
+
+13. Local Improvement (Post Optimization)
+
+İlk çözüm bulunduğunda süreç bitmez.
+
+Ek iyileştirmeler uygulanır:
+
+Operatör takası
+Operasyon yer değiştirme
+Yardımcı operatör ekleme
+Mikro WIP dengeleme
+Transfer azaltma
+
+Bu adım çözüm kalitesini artırırken çözüm süresini fazla etkilemez.
+
+14. Explainable Optimization
+
+Her kararın nedeni saklanmalıdır.
+
+Örnek:
+
+Alan	Açıklama
+DecisionId	Karar kimliği
+ActiveConstraints	Etkin kısıtlar
+ObjectiveWeights	Kullanılan ağırlıklar
+SolverStatus	Çözüm durumu
+ObjectiveValue	Amaç fonksiyonu değeri
+Alternatives	Üretilen aday planlar
+SelectedReason	Seçim gerekçesi
+
+Bu kayıtlar hem kullanıcıya açıklama sunmak hem de geçmiş analizleri yapmak için kullanılır.
+
+15. Solver Parametreleri
+
+Varsayılan öneri:
+
+Parametre	Değer
+MaxSolveTime	30 sn
+NumWorkers	CPU çekirdeği sayısı
+RelativeGapLimit	%1
+RandomSeed	Sabit (tekrarlanabilirlik için)
+LogSearchProgress	Açık (geliştirme), Kapalı (üretim)
+EnumerateAllSolutions	Kapalı (yalnızca ihtiyaç halinde)
+
+Bu değerler yapılandırılabilir olmalıdır.
+
+16. Matematiksel Modelin Tasarım İlkeleri
+Hard ve soft constraint'ler kesin olarak ayrılmalıdır.
+Objective ağırlıkları senaryo bazında değiştirilebilmelidir.
+Dynamic SMV kullanılmalıdır.
+Tam yeniden optimizasyon yerine mümkün olduğunca lokal yeniden optimizasyon tercih edilmelidir.
+Çözüm deterministik ve tekrar üretilebilir olmalıdır.
+Karar açıklanabilir olmalıdır.
+Solver'a bağımlı olmayan soyut bir model korunmalıdır.
+📌 DOC-009A-1 Sonucu
+
+Bu belgeyle birlikte Line Balancing Engine'in matematiksel temeli tanımlanmış oldu. Ancak burada bilinçli olarak genel optimizasyon modeli seviyesinde kaldık.
+
+Bir sonraki mantıklı adım
+
+Bence hemen kod yazmaya geçmemeliyiz. Bir kritik belge daha gerekiyor:
+
+DOC-009A-2 – Constraint Library Specification
+
+Çünkü gerçek bir konfeksiyon APS'sinde 10–15 kısıt değil, yüzlerce kısıt bulunur. Benim tahminim MARS için zamanla:
+
+150–250 Hard Constraint
+300–500 Soft Constraint
+
+tanımlanacak.
+
+Bu kütüphane; kimliklendirme, açıklama, matematiksel tanım, öncelik, etkinleştirme koşulları ve test senaryolarıyla birlikte hazırlanırsa, hem OR-Tools modeli hem de test altyapısı aynı kaynaktan üretilebilir. Bu, uzun vadede bakım ve genişletilebilirlik açısından büyük avantaj sağlayaca
