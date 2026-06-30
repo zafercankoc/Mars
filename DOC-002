@@ -1,0 +1,642 @@
+SPEC-0003
+Manufacturing Object Model
+Chapter 2
+OBJECT-004
+Operator
+
+Burada ilk büyük mimari kararımızı veriyoruz.
+
+Klasik APS
+
+Operatör = İnsan
+
+❌ Yanlış
+
+Bizim sistemimizde
+
+Operatör = Dinamik Üretim Kaynağı
+
+Yani sadece insan değil.
+
+Karar veren sistem için
+
+bir kaynak.
+
+Operator Model
+Operator
+
+Identity
+
+↓
+
+Capability
+
+↓
+
+Skills
+
+↓
+
+Performance
+
+↓
+
+Learning
+
+↓
+
+Health
+
+↓
+
+Availability
+
+↓
+
+Assignments
+
+↓
+
+History
+
+↓
+
+Prediction
+Operator Identity
+OperatorId
+
+EmployeeNo
+
+Name
+
+Department
+
+CurrentLine
+
+EmploymentType
+
+Shift
+
+Status
+Operator Capability
+
+Bu çok önemli.
+
+Normal APS bunu kullanmaz.
+
+Biz kullanacağız.
+
+Capability
+
+Singer
+
+Overlok
+
+Reçme
+
+Pres
+
+Ütü
+
+Kalite
+
+Paket
+
+Transfer
+
+Training
+
+Yani operatör
+
+tek makineye bağlı değildir.
+
+Skill Matrix
+
+Artık en önemli veri yapısına geliyoruz.
+
+Her operatörün
+
+bir Skill Matrix'i vardır.
+
+Örneğin
+
+Operasyon	Skill	Verim
+Kol Tak	95	%112
+Cep	92	%108
+Yaka	40	%71
+Etiket	88	%101
+
+APS
+
+işi
+
+operatöre
+
+buradan verecek.
+
+Skill
+
+Skill
+
+tek sayı değildir.
+
+Biz bunu
+
+vektör yapıyoruz.
+
+Skill
+
+{
+
+Quality
+
+Speed
+
+Experience
+
+Stability
+
+Learning
+
+Risk
+
+}
+
+Örneğin
+
+Kol Tak
+
+Speed
+
+92
+
+Quality
+
+98
+
+Learning
+
+65
+
+Risk
+
+8
+Performance
+
+Performans
+
+günlük değişir.
+
+Performance
+
+CurrentEfficiency
+
+Today'sEfficiency
+
+WeeklyEfficiency
+
+MonthlyEfficiency
+
+BestEfficiency
+
+WorstEfficiency
+
+Trend
+
+Trend
+
+çok önemli.
+
+Çünkü
+
+%90 çalışan biri
+
+yükseliyor olabilir.
+
+Learning
+
+Bu da çok önemli.
+
+Learning
+
+Current Level
+
+Potential
+
+Learning Rate
+
+Experience
+
+Target
+
+Confidence
+
+APS
+
+şunu hesaplayabilir.
+
+Bugün Fatma %85.
+
+2 hafta sonra %97 olacak.
+
+Fatigue
+
+Normal APS'de yok.
+
+Bizde olacak.
+
+Fatigue
+
+Mental
+
+Physical
+
+Machine Repetition
+
+Working Time
+
+Break Need
+
+Örneğin
+
+Fatma
+
+8 saat boyunca
+
+yaka kapattı.
+
+APS
+
+şunu diyebilir.
+
+Operasyon değiştir.
+
+Yoksa
+
+kalite düşecek.
+
+Compatibility
+
+Bu
+
+çok önemli.
+
+Her operatör
+
+her operatörle
+
+aynı verimde çalışmaz.
+
+Örneğin
+
+Operatör	Uyum
+Ayşe	97
+Fatma	94
+Mehmet	52
+
+Takım kurarken
+
+APS
+
+bunu da hesaplayacak.
+
+Operator Availability
+Available
+
+Working
+
+Break
+
+Training
+
+Absent
+
+Transfer
+
+Maintenance Support
+
+Meeting
+Assignment History
+
+Bu veri
+
+AI için kullanılacak.
+
+Operator
+
+↓
+
+Assignment History
+
+↓
+
+Operation History
+
+↓
+
+Performance History
+
+↓
+
+Quality History
+
+↓
+
+Learning History
+Prediction
+
+AI
+
+şunları tahmin edecek.
+
+Tomorrow Efficiency
+
+Quality Risk
+
+Fatigue
+
+Learning
+
+Absence
+
+Transfer Need
+OBJECT-005
+Machine
+
+Makine
+
+pasif değildir.
+
+Makine de
+
+karar nesnesidir.
+
+Machine
+
+Identity
+
+↓
+
+Capability
+
+↓
+
+Configuration
+
+↓
+
+Performance
+
+↓
+
+Maintenance
+
+↓
+
+Availability
+
+↓
+
+Prediction
+Machine Identity
+MachineId
+
+Serial
+
+Type
+
+Brand
+
+Model
+
+Department
+
+Current Line
+Capability
+Singer
+
+Overlok
+
+Reçme
+
+Çift İğne
+
+Lastik
+
+Bant
+
+Otomat
+
+Bartek
+Configuration
+Needle
+
+Gauge
+
+Foot
+
+Attachment
+
+Speed
+
+Thread
+
+Setup
+
+Makine
+
+aynı makine değildir.
+
+Konfigürasyonu
+
+değişebilir.
+
+Performance
+Max Speed
+
+Current Speed
+
+Efficiency
+
+Availability
+
+MTBF
+
+MTTR
+
+OEE
+Maintenance
+Healthy
+
+Need Service
+
+Warning
+
+Critical
+
+Stopped
+Prediction
+
+AI
+
+şunu tahmin edecek.
+
+Failure Probability
+
+Maintenance Date
+
+Efficiency Loss
+
+Setup Time
+OBJECT-006
+Team
+
+Burada
+
+en büyük mimari değişikliği yapıyoruz.
+
+Normal APS
+
+takımı
+
+hesaplamaz.
+
+Bizim sistemimizde
+
+takım
+
+ayrı nesnedir.
+
+Team
+
+Leader
+
+↓
+
+Operators
+
+↓
+
+Skills
+
+↓
+
+Capacity
+
+↓
+
+Compatibility
+
+↓
+
+Performance
+
+↓
+
+Health
+Team Score
+
+Takım
+
+tek kişi değildir.
+
+Skoru vardır.
+
+TeamScore=Skill+Compatibility+Experience+Balance+Learning+Stability
+
+APS
+
+tek operatör
+
+değil
+
+takım optimize edecek.
+
+OBJECT-007
+Work Center
+
+Work Center
+
+aynı makine grubudur.
+
+Singer
+
+↓
+
+12 Makine
+
+↓
+
+5 Operatör
+
+↓
+
+1 Kuyruk
+
+APS
+
+isterse
+
+Work Center
+
+bazında
+
+plan yapabilir.
+
+OBJECT-008
+Capability
+
+Bütün sistemin
+
+ortak veri tipi.
+
+Capability
+
+Operation
+
+↓
+
+Machine
+
+↓
+
+Operator
+
+↓
+
+Tool
+
+↓
+
+Quality
+
+↓
+
+Learning
+
+Her nesne
+
+Capability
+
+taşıyabilir.
+
+📌 Bugünkü En Büyük Mimari Karar
+
+Burada çok önemli bir tasarım kararı alıyorum.
+
+MARS'ın çekirdeği artık 4 temel nesne üzerine kurulacak:
+Operator
+Machine
+Team
+Capability
+
+Bunlar sadece veri tutan tablolar olmayacak; davranış (behavior) ve karar verme yeteneği olan domain nesneleri olacak.
+
+Bu kararın önemli bir sonucu var:
+
+OR-Tools bu nesneleri kullanarak optimizasyon yapacak.
+AI bu nesneler için tahmin üretecek.
+Decision Engine bu nesnelerin durumuna göre karar verecek.
+Event Engine bu nesnelerin durumunu güncelleyecek.
+
+Yani bütün sistem aynı ortak nesne modeli üzerinde çalışacak.
