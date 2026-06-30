@@ -1,0 +1,233 @@
+Burada da seni biraz durduracağım çünkü DOC-005 hakkında çok önemli bir mimari karar vermemiz gerekiyor.
+
+Şu ana kadar yazılanlar
+DOC-001 Domain Language
+        ↓
+DOC-002 Object Model
+        ↓
+DOC-003 Decision Engine
+        ↓
+DOC-004 Manufacturing Physics
+
+Buraya kadar her şey doğru.
+
+Ancak...
+
+Burada yapılan en büyük hata şudur.
+
+Normal APS'ler direkt Mathematical Model'e geçer.
+
+Ben bunu yapmayacağım.
+
+Neden?
+
+Çünkü matematik çözüm üretmez.
+
+Karar modeli çözüm üretir.
+
+Matematik sadece hesaplar.
+
+O yüzden DOC-005'i iki belgeye bölüyoruz.
+DOC-005 Decision Model
+
+ve
+
+DOC-006 Mathematical Optimization Model
+
+Bu ayrım Siemens, Quintiq ve akademik literatürde de önemli bir prensiptir: iş kararı mantığı ile optimizasyon modeli birbirinden ayrılır.
+
+Bundan sonra belge sırası
+DOC-001 Domain Language
+DOC-002 Object Model
+DOC-003 Decision Engine
+DOC-004 Manufacturing Physics
+
+↓
+
+DOC-005 Decision Model
+
+↓
+
+DOC-006 Mathematical Optimization Model
+
+↓
+
+DOC-007 OR-Tools Solver
+
+↓
+
+DOC-008 AI Prediction Engine
+Neden Decision Model gerekiyor?
+
+Çünkü senin APS'in sıradan bir APS değil.
+
+Senin istediğin sistem şunları yapıyor:
+
+Overloklar boş kaldı.
+
+Şimdi ne yapacağım?
+
+Bu matematik değildir.
+
+Bu karardır.
+
+Örneğin
+
+IF
+
+Overlok boş
+
+AND
+
+Singer dolu
+
+AND
+
+Hazırlık operasyonu varsa
+
+↓
+
+Hazırlık operasyonlarını öne çek.
+
+Bu bir karar kuralıdır.
+
+Başka örnek
+
+IF
+
+A Bandı
+
+10 kişi
+
+↓
+
+Bu model
+
+18 kişi istiyor.
+
+↓
+
+2 Tur çalıştır.
+
+Bu da matematik değildir.
+
+Başka
+
+IF
+
+Hazırlık bandı
+
+erken bitirecek
+
+↓
+
+Montajın ilk operasyonlarını hazırlık bandına taşı.
+
+Bu da Decision Model'dir.
+
+İşte burada senin istediğin sistem doğuyor.
+
+Sen bana ilk gün şunu söylemiştin.
+
+Hazırlık bandı üç operasyonu alsın.
+
+Bu
+
+OR-Tools'un vereceği karar değil.
+
+Karar Motorunun oluşturduğu alternatiflerden biridir.
+
+OR-Tools, bu alternatiflerin sonuçlarını optimize eder.
+
+DOC-005'in amacı
+
+Şunu cevaplamak:
+
+APS hangi kararları verebilir?
+
+Biz yaklaşık 150-250 farklı karar tipi tanımlayacağız.
+
+Örneğin:
+
+Hat Yönetimi
+Hat aç
+Hat kapat
+Hat böl
+Hat birleştir
+Geçici hat oluştur
+Operatör
+Operatör taşı
+Operatör değiştir
+Operatör eğit
+Operatör rotasyonu
+Operasyon
+Operasyon böl
+Operasyon birleştir
+Operasyon öne çek
+Operasyon geciktir
+Flow
+Flow Unit böl
+Flow Unit birleştir
+Kuyruğa al
+Öncelik değiştir
+Üretim
+Stoklu çalış
+Tek parça akış
+Parti üretimi
+Hibrit üretim
+Optimizasyon
+Yeniden dengele
+Yeniden sırala
+Setup azalt
+Darboğazı kaydır
+
+Bu kararların her biri:
+
+Ön koşullara,
+Etki analizine,
+Maliyetine,
+Riskine,
+Beklenen kazancına
+
+sahip olacak.
+
+Bundan sonra yazacağımız belgeler
+
+Artık belge isimleri de değişiyor.
+
+Belge	Sayfa
+DOC-005 Decision Model	~400
+DOC-006 Mathematical Optimization	~700
+DOC-007 OR-Tools Solver	~600
+DOC-008 AI Prediction Engine	~400
+DOC-009 Factory State Engine	~350
+DOC-010 Simulation Engine	~300
+Ben artık bir karar daha alıyorum.
+
+Bu proje artık APS olmaktan çıktı.
+
+Bu bir Manufacturing Operating System (MOS).
+
+APS bunun sadece bir modülü.
+
+Burada bir mühendislik önerisi
+
+Şimdiye kadar hazırladığımız belgeler "çekirdek mimari"yi tanımlıyor. Bundan sonraki her belge için şu standardı uygulayacağız:
+
+Her karar tipi şu şablona göre yazılacak:
+
+Decision ID
+Karar Adı
+Amaç
+Tetikleyici Olaylar
+Ön Koşullar
+Kullanılan Veriler
+Hard Constraint'ler
+Soft Constraint'ler
+Aday Kararların Üretilmesi
+OR-Tools'a Aktarılan Değişkenler
+Beklenen KPI Etkisi
+Başarısızlık Senaryoları
+Test Senaryoları
+
+Bu format sayesinde karar motoru, matematiksel model ve kod arasında birebir izlenebilirlik (traceability) sağlayacağız. Büyük ölçekli endüstriyel yazılımlarda bu yaklaşım bakım, test
