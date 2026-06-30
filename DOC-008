@@ -1,0 +1,893 @@
+DOC-008
+Enterprise Data Model (Physical + Logical Schema)
+1. Amaç
+
+Bu belge:
+
+MARS sistemindeki tüm verilerin gerçek relational database (PostgreSQL) yapısını tanımlar.
+
+Bu model:
+
+ORM’e birebir çevrilebilir
+migration üretilebilir
+OR-Tools input oluşturabilir
+AI feature store’a kaynak olur
+2. Tasarım Prensipleri
+2.1 Tek Doğruluk Kaynağı
+Operasyonel veri → PostgreSQL
+Event → Kafka (append-only)
+Analitik → ayrı store
+2.2 Multi-layer model
+Master Data
+→ Production Data
+→ Execution Data
+→ Decision Data
+→ AI Data
+→ Event Data
+2.3 Tenant Model
+
+Her tablo:
+
+factory_id UUID
+
+zorunlu içerir.
+
+3. MASTER DATA SCHEMA
+3.1 Factory
+Factory (
+  id UUID PK,
+  name TEXT,
+  location TEXT,
+  shift_model_id UUID,
+  created_at TIMESTAMP
+)
+3.2 ProductionLine
+ProductionLine (
+  id UUID PK,
+  factory_id UUID FK,
+  name TEXT,
+  type TEXT,
+  capacity INT,
+  wip_limit INT
+)
+3.3 WorkCenter
+WorkCenter (
+  id UUID PK,
+  line_id UUID FK,
+  name TEXT,
+  bottleneck_flag BOOLEAN
+)
+3.4 Machine
+Machine (
+  id UUID PK,
+  workcenter_id UUID FK,
+  type TEXT,
+  status TEXT,
+  oee FLOAT,
+  max_speed FLOAT
+)
+3.5 Operator
+Operator (
+  id UUID PK,
+  factory_id UUID FK,
+  name TEXT,
+  shift_id UUID,
+  efficiency FLOAT,
+  status TEXT
+)
+3.6 Skill
+Skill (
+  id UUID PK,
+  name TEXT,
+  category TEXT
+)
+3.7 OperatorSkill
+OperatorSkill (
+  operator_id UUID FK,
+  skill_id UUID FK,
+  level INT,
+  speed_factor FLOAT,
+  quality_factor FLOAT
+)
+3.8 Product
+Product (
+  id UUID PK,
+  code TEXT,
+  name TEXT,
+  customer_id UUID
+)
+3.9 Operation
+Operation (
+  id UUID PK,
+  product_id UUID FK,
+  name TEXT,
+  sequence INT,
+  smv FLOAT,
+  machine_type TEXT,
+  skill_required INT
+)
+4. PRODUCTION DATA SCHEMA
+4.1 Order
+Order (
+  id UUID PK,
+  factory_id UUID,
+  customer_id UUID,
+  priority INT,
+  due_date TIMESTAMP,
+  status TEXT
+)
+4.2 OrderItem
+OrderItem (
+  id UUID PK,
+  order_id UUID FK,
+  product_id UUID FK,
+  quantity INT
+)
+4.3 FlowUnit
+FlowUnit (
+  id UUID PK,
+  order_item_id UUID FK,
+  current_operation_id UUID,
+  status TEXT,
+  priority INT,
+  split_group_id UUID
+)
+4.4 OperationInstance
+OperationInstance (
+  id UUID PK,
+  flow_unit_id UUID FK,
+  operation_id UUID FK,
+  status TEXT,
+  start_time TIMESTAMP,
+  end_time TIMESTAMP,
+  assigned_operator_id UUID,
+  assigned_machine_id UUID
+)
+4.5 Queue
+Queue (
+  id UUID PK,
+  workcenter_id UUID FK,
+  flow_unit_id UUID FK,
+  position INT
+)
+5. EXECUTION DATA
+5.1 Assignment
+Assignment (
+  id UUID PK,
+  operator_id UUID,
+  operation_instance_id UUID,
+  start_time TIMESTAMP,
+  end_time TIMESTAMP
+)
+5.2 ProductionEvent
+ProductionEvent (
+  id UUID PK,
+  type TEXT,
+  entity_id UUID,
+  timestamp TIMESTAMP,
+  payload JSONB
+)
+5.3 Decision
+Decision (
+  id UUID PK,
+  decision_type TEXT,
+  factory_id UUID,
+  state_hash TEXT,
+  input_snapshot JSONB,
+  output_snapshot JSONB,
+  score FLOAT,
+  created_at TIMESTAMP
+)
+6. SKILL & PERFORMANCE MODEL
+6.1 OperatorPerformance
+OperatorPerformance (
+  id UUID PK,
+  operator_id UUID,
+  operation_id UUID,
+  avg_cycle_time FLOAT,
+  defect_rate FLOAT,
+  fatigue_index FLOAT,
+  learning_rate FLOAT
+)
+6.2 LearningCurve
+LearningCurve (
+  id UUID PK,
+  operator_id UUID,
+  operation_id UUID,
+  iteration INT,
+  cycle_time FLOAT
+)
+7. AI / FEATURE STORE
+7.1 FeatureSnapshot
+FeatureSnapshot (
+  id UUID PK,
+  entity_type TEXT,
+  entity_id UUID,
+  features JSONB,
+  created_at TIMESTAMP
+)
+7.2 PredictionLog
+PredictionLog (
+  id UUID PK,
+  model_name TEXT,
+  input JSONB,
+  output JSONB,
+  confidence FLOAT
+)
+8. INDEX STRATEJİSİ
+Kritik indexler
+flow_unit_id
+operation_instance_id
+operator_id
+machine_id
+factory_id
+timestamp
+Composite Index
+(factory_id, status)
+(workcenter_id, position)
+(flow_unit_id, current_operation_id)
+9. EVENT INTEGRATION
+
+Her tablo event ile sync olur:
+
+DB Write
+→ Event Produced
+→ Kafka
+→ State Update
+→ Analytics
+10. DATA RELATIONSHIP CORE
+Order
+  → OrderItem
+      → FlowUnit
+          → OperationInstance
+              → Assignment
+                  → Operator
+                  → Machine
+11. BU BELGENİN KRİTİK NOKTASI
+
+Bu model olmadan:
+
+OR-Tools input üretilemez
+AI feature store çalışmaz
+real-time decision mümkün olmaz
+📌 SONUÇ
+
+Artık MARS'ın:
+
+matematiği (DOC-007)
+karar sistemi (DOC-005/006)
+fizik kuralları (DOC-004)
+veri modeli (DOC-008)
+
+tamamlandı.
+
+🚀 Sıradaki Doküman
+
+Şimdi gerçek yazılım başlıyor:
+
+DOC-009 – API CONTRACT & SYSTEM INTERFACE SPECIFICATION
+
+Bu belge:
+
+tüm backend endpointlerini
+event API'lerini
+solver API’lerini
+AI API’lerini
+request/response modellerini
+authentication modelini
+
+Claude Code’un doğrudan implement edebileceği formatta tanımlayacak.
+
+İstersen bir sonraki adımda bunu OpenAPI (Swagger) + örnek JSON payload’larla direkt kod üretilebilir seviyeye indirebilirim.
+
+kaldığımız yerden devam et doc-008 i oluşturuyorduk 
+
+Evet. Kaldığımız yer DOC-008 ve bunu tamamlamamız gerekiyor.
+
+Ancak burada çok önemli bir mühendislik kararı alıyorum.
+
+Önceki DOC-008'de doğrudan tablolar yazmaya başladık. Bu profesyonel bir veri modeli dokümanı değil. Bir Enterprise Data Model (EDM) önce kavramsal (Conceptual), sonra mantıksal (Logical), en son fiziksel (Physical) modelden oluşur.
+
+Yani DOC-008 tek bir belge değil, kendi içinde bölümlerden oluşan büyük bir dokümandır.
+
+Ben olsam bunu aşağıdaki gibi düzenlerdim ve artık bu yapı değişmez.
+
+DOC-008 - Enterprise Data Model (EDM)
+Bölüm Yapısı
+DOC-008
+
+Chapter 1
+Data Modeling Principles
+
+Chapter 2
+Entity Catalog
+
+Chapter 3
+Relationships
+
+Chapter 4
+Logical Database Model
+
+Chapter 5
+Physical Database Model
+
+Chapter 6
+Indexes
+
+Chapter 7
+Views
+
+Chapter 8
+Materialized Views
+
+Chapter 9
+Partition Strategy
+
+Chapter 10
+History Tables
+
+Chapter 11
+Event Tables
+
+Chapter 12
+AI Feature Store
+
+Chapter 13
+Data Warehouse
+
+Chapter 14
+Database Performance
+
+Chapter 15
+Migration Strategy
+Bugün başlayacağımız bölüm
+CHAPTER-2
+ENTITY CATALOG
+
+Bu bölüm aslında bütün sistemin sözlüğüdür.
+
+Bir kural koyuyoruz.
+
+Sistemde bulunan her nesne (Entity) burada tanımlanmak zorundadır.
+
+Daha sonra PostgreSQL tabloları bunlardan üretilecektir.
+
+ENTITY-001
+Factory
+Açıklama
+
+Bir üretim tesisini temsil eder.
+
+Bir şirket birden fazla fabrikaya sahip olabilir.
+
+Parent
+
+Yok
+
+Child
+Departments
+Production Lines
+Warehouses
+Calendars
+Employees
+Primary Key
+FactoryId (UUID)
+Attributes
+Alan	Tip
+Name	String
+Code	String
+Country	String
+TimeZone	String
+Currency	String
+Status	Active / Passive
+Relations
+Factory
+
+↓
+
+Department
+
+↓
+
+Production Line
+
+↓
+
+Warehouse
+ENTITY-002
+Department
+
+Üretim alanlarını temsil eder.
+
+Örneğin
+
+Kesim
+Hazırlık
+Montaj
+Kalite
+Ütü
+Paket
+
+Parent
+
+Factory
+
+Child
+
+Production Line
+
+ENTITY-003
+Production Line
+
+Bu entity çok önemlidir.
+
+APS'nin en çok kullandığı nesnelerden biridir.
+
+Attributes
+
+LineId
+
+DepartmentId
+
+Capacity
+
+CurrentLoad
+
+MaxOperators
+
+CurrentOperators
+
+Status
+
+BalanceScore
+
+OEE
+
+Relations
+
+Department
+
+↓
+
+Production Line
+
+↓
+
+Work Center
+ENTITY-004
+Work Center
+
+Bir grup makineyi temsil eder.
+
+Örneğin
+
+Singer Alanı
+
+↓
+
+12 Makine
+
+veya
+
+Overlok Alanı
+
+↓
+
+6 Makine
+ENTITY-005
+Machine
+
+Machine
+
+artık pasif değildir.
+
+APS için aktif kaynaktır.
+
+Attributes
+
+MachineId
+
+SerialNo
+
+MachineType
+
+Brand
+
+Model
+
+Status
+
+CurrentOperation
+
+CurrentOperator
+
+CurrentLine
+
+Efficiency
+
+Health
+
+Relations
+
+WorkCenter
+
+↓
+
+Machine
+
+↓
+
+Assignments
+ENTITY-006
+Operator
+
+Bu entity daha önce Object Model'de tanımlandı.
+
+Burada veri modeli tanımlanıyor.
+
+Attributes
+
+OperatorId
+
+EmployeeNo
+
+Name
+
+CurrentLine
+
+CurrentShift
+
+Status
+
+Efficiency
+
+Fatigue
+
+LearningIndex
+
+SkillScore
+
+Relations
+
+Operator
+
+↓
+
+Skills
+
+↓
+
+Assignments
+
+↓
+
+Performance History
+
+↓
+
+Attendance
+
+↓
+
+Training
+ENTITY-007
+Skill
+
+Bir operasyonu yapabilme yeteneği.
+
+Attributes
+
+SkillId
+
+SkillName
+
+Category
+
+Difficulty
+
+MachineType
+ENTITY-008
+OperatorSkill
+
+En önemli ilişki tablosu.
+
+Burada
+
+Operator
+
+ile
+
+Skill
+
+birleşir.
+
+Attributes
+
+OperatorId
+
+SkillId
+
+Level
+
+Speed
+
+Quality
+
+Experience
+
+LastUsed
+
+LearningRate
+ENTITY-009
+Product
+
+Bir üretim modeli.
+
+Örneğin
+
+Basic Tshirt
+
+Polo
+
+Sweatshirt
+
+Pantolon
+
+Attributes
+
+ProductId
+
+Code
+
+Name
+
+Customer
+
+Season
+
+Collection
+ENTITY-010
+Product Operation
+
+Her modelin operasyon ağacı.
+
+Bu tablo APS için kritik öneme sahiptir.
+
+Attributes
+
+OperationId
+
+ProductId
+
+Sequence
+
+OperationName
+
+MachineType
+
+SMV
+
+SkillRequired
+
+Difficulty
+
+CanSplit
+
+CanParallel
+ENTITY-011
+Operation Dependency
+
+Bu tablo
+
+DAG (Directed Acyclic Graph)
+
+oluşturur.
+
+Cep
+
+↓
+
+Kol
+
+↓
+
+Yaka
+
+Attributes
+
+ParentOperation
+
+ChildOperation
+
+DependencyType
+
+MinimumLag
+
+MaximumLag
+ENTITY-012
+Customer Order
+
+Attributes
+
+OrderId
+
+Customer
+
+Priority
+
+DeliveryDate
+
+OrderDate
+
+Status
+ENTITY-013
+Order Item
+
+Attributes
+
+OrderItemId
+
+OrderId
+
+ProductId
+
+Color
+
+Size
+
+Quantity
+ENTITY-014
+Flow Unit
+
+Bu entity MARS'ın kalbidir.
+
+Bundle yerine
+
+Flow Unit
+
+kullanıyoruz.
+
+Attributes
+
+FlowUnitId
+
+OrderItem
+
+CurrentOperation
+
+CurrentLine
+
+Quantity
+
+Priority
+
+Status
+
+ParentFlow
+
+SplitGroup
+ENTITY-015
+Operation Instance
+
+Gerçek üretimde çalışan operasyon.
+
+Attributes
+
+InstanceId
+
+FlowUnit
+
+Operation
+
+AssignedOperator
+
+AssignedMachine
+
+StartTime
+
+FinishTime
+
+Status
+ENTITY-016
+Decision
+
+APS'nin verdiği her karar.
+
+Attributes
+
+DecisionId
+
+DecisionType
+
+TriggerEvent
+
+DecisionTime
+
+DecisionScore
+
+Status
+
+Applied
+ENTITY-017
+Optimization Run
+
+Her OR-Tools çalışması.
+
+Attributes
+
+RunId
+
+Solver
+
+Duration
+
+ObjectiveValue
+
+Gap
+
+Iterations
+
+Status
+ENTITY-018
+Simulation Run
+
+Attributes
+
+SimulationId
+
+Scenario
+
+StartTime
+
+FinishTime
+
+Result
+
+Risk
+
+FactoryHealth
+ENTITY-019
+Event
+
+MARS Event Sourcing kullandığı için bütün olaylar burada tutulur.
+
+Örnek:
+
+OrderCreated
+MachineStopped
+OperatorMoved
+FlowUnitSplit
+QualityRejected
+DecisionApplied
+ENTITY-020
+Factory State Snapshot
+
+Bu entity gerçek zamanlı sistemin anlık görüntüsüdür.
+
+Her snapshot şunları içerir:
+
+Aktif siparişler
+Aktif Flow Unit'ler
+Hat yükleri
+Operatör dağılımı
+Makine durumları
+WIP
+Darboğazlar
+Factory Health
+📊 Chapter-2 Sonucu
+
+Bu bölüm sonunda sistemin temel 20 çekirdek entity'si tanımlandı.
+
+Ancak bu sadece başlangıçtır. Tam bir Manufacturing Operating System için yaklaşık:
+
+120–150 ana entity
+250–300 ilişki tablosu
+800+ foreign key ilişkisi
+
+olmasını bekliyorum.
+
+Bunları tek seferde yazmak yerine, modül modül ilerleyeceğiz.
+
+Bir sonraki bölüm
+
+DOC-008 / Chapter-3 – Relationship Model
