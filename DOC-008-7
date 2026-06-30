@@ -1,0 +1,383 @@
+MARS APS
+DOC-008
+Chapter-7
+Derived Data & Calculation Model
+
+Version: 1.0
+
+Status: Architecture Freeze
+
+1. Amaç
+
+Bu bölümün amacı:
+
+Ham üretim verilerinden, APS'nin karar verirken kullanacağı türetilmiş (derived) verilerin nasıl hesaplanacağını tanımlamaktır.
+
+Kural:
+
+Hiçbir karar ham veriyle verilmez.
+
+Kararlar daima türetilmiş metriklerle verilir.
+
+2. Veri Katmanları
+
+MARS veriyi dört seviyede işler.
+
+Raw Data
+    ↓
+Normalized Data
+    ↓
+Derived Data
+    ↓
+Decision Data
+
+Örnek:
+
+Operator Scan
+
+↓
+
+Operation History
+
+↓
+
+Learning Curve
+
+↓
+
+Assignment Score
+3. Derived Data Kategorileri
+
+Tüm hesaplanan veriler aşağıdaki sınıflardan birine aittir.
+
+Kod	Kategori	Amaç
+DD-01	Time Metrics	Süre hesapları
+DD-02	Performance Metrics	Performans
+DD-03	Capacity Metrics	Kapasite
+DD-04	Flow Metrics	Akış
+DD-05	Queue Metrics	Kuyruk
+DD-06	Quality Metrics	Kalite
+DD-07	Resource Metrics	Kaynak
+DD-08	Learning Metrics	Öğrenme
+DD-09	Decision Metrics	Karar
+DD-10	Factory Metrics	Fabrika
+4. Time Metrics (DD-01)
+Cycle Time
+FinishTime - StartTime
+Waiting Time
+QueueStart - ArrivalTime
+Transfer Time
+NextOperationArrival - PreviousOperationFinish
+Total Lead Time
+DeliveryTime - OrderReleaseTime
+Effective Working Time
+ShiftDuration
+- BreakTime
+- Downtime
+5. Performance Metrics (DD-02)
+Real SMV
+Average(CycleTime)
+
+Son 30/60/90 tekrar gibi hareketli pencerelerle de hesaplanabilir.
+
+Operator Efficiency
+StandardSMV
+
+──────────────
+
+RealSMV
+Line Efficiency
+Toplam Standart Üretim Süresi
+
+──────────────────────────────
+
+Toplam Kullanılan İş Gücü Süresi
+Machine Utilization
+Running Time
+
+──────────────
+
+Available Time
+6. Capacity Metrics (DD-03)
+Available Capacity
+Operator Capacity
+
++
+
+Machine Capacity
+
+-
+
+Reserved Capacity
+Remaining Capacity
+Daily Capacity
+
+-
+
+Assigned Load
+Capacity Risk
+Required Capacity
+
+──────────────
+
+Available Capacity
+7. Flow Metrics (DD-04)
+Flow Velocity
+Completed Flow Units
+
+──────────────
+
+Hour
+WIP Density
+Current WIP
+
+──────────────
+
+Line Capacity
+Flow Stability
+
+Önerilen formül:
+
+1
+
+──────────────
+
+CycleTime StdDeviation
+
+Standart sapma arttıkça akış kararsızlaşır.
+
+8. Queue Metrics (DD-05)
+Queue Size
+Toplam Bekleyen Flow Unit
+Queue Delay
+Average Waiting Time
+Queue Risk Score
+
+Örnek bileşenler:
+
+Kuyruk uzunluğu
+Ortalama bekleme
+Öncelikli iş oranı
+Darboğaz olasılığı
+
+Bu skor 0–100 arasında normalize edilir.
+
+9. Quality Metrics (DD-06)
+Defect Rate
+Defect Quantity
+
+──────────────
+
+Produced Quantity
+Rework Rate
+Reworked Units
+
+──────────────
+
+Produced Units
+First Pass Yield (FPY)
+İlk Seferde Doğru Ürün
+
+──────────────
+
+Toplam Ürün
+10. Resource Metrics (DD-07)
+Skill Match Score
+
+Bileşenler:
+
+Skill seviyesi
+Deneyim
+Son kullanım tarihi
+Operasyon zorluğu
+
+Sonuç:
+
+0–100
+Machine Match Score
+
+Bileşenler:
+
+Makine tipi
+Setup durumu
+Sağlık puanı
+Uygunluk
+Assignment Score
+
+Bu skor daha sonra Decision Engine tarafından kullanılır.
+
+11. Learning Metrics (DD-08)
+Learning Rate
+
+Önerilen model:
+
+(CurrentSMV
+
+-
+
+PreviousSMV)
+
+──────────────
+
+PreviousSMV
+Learning Stability
+
+Öğrenme eğrisindeki dalgalanma.
+
+Standart sapma ile hesaplanır.
+
+Experience Score
+
+Bileşenler:
+
+Aynı operasyondaki tekrar sayısı
+Aynı modelde çalışma sayısı
+Son kullanım tarihi
+12. Decision Metrics (DD-09)
+Decision Confidence
+
+Bileşenler:
+
+Veri kalitesi
+Solver Gap
+Tahmin doğruluğu
+Constraint ihlali
+Decision Risk
+
+Bileşenler:
+
+Kapasite riski
+Operatör riski
+Teslimat riski
+Kalite riski
+Decision Gain
+Before KPI
+
+↓
+
+After KPI
+
+↓
+
+Improvement
+13. Factory Metrics (DD-10)
+Factory Health Score
+
+Önerilen ağırlıklı yapı:
+
+Bileşen	Önerilen Ağırlık
+OEE	%20
+Hat Dengesi	%20
+Teslimat Performansı	%15
+Kalite	%15
+WIP	%10
+Operatör Kullanımı	%10
+Makine Kullanımı	%10
+
+Toplam:
+
+0–100
+
+Bu ağırlıklar sistem ayarlarından değiştirilebilir.
+
+Factory Stability
+
+Bileşenler:
+
+Çevrim süresi değişkenliği
+Günlük çıktı değişkenliği
+Operatör devamsızlığı
+Makine arızaları
+14. Derived Data Yenileme Stratejisi
+
+Her metrik aynı sıklıkta hesaplanmaz.
+
+Veri	Yenilenme
+Cycle Time	Her operasyon tamamlandığında
+Queue Size	Gerçek zamanlı
+WIP	Gerçek zamanlı
+Efficiency	5 dakikada bir
+Learning Curve	Günlük
+Factory Health	5 dakikada bir
+Prediction Accuracy	Günlük
+Decision Gain	Karar tamamlandıktan sonra
+15. Derived Data Yaşam Döngüsü
+Raw Event
+    ↓
+Validation
+    ↓
+Aggregation
+    ↓
+Calculation
+    ↓
+Normalization
+    ↓
+Persistence
+    ↓
+Decision Engine
+16. Solver İçin Zorunlu Derived Veriler
+
+Karar motoru ham tablo okumaz.
+
+En az aşağıdaki türetilmiş verileri kullanır:
+
+Current Factory State
+Available Operator Score
+Available Machine Score
+Dynamic SMV
+Learning Score
+Fatigue Score
+Queue Risk
+Flow Stability
+Capacity Remaining
+Factory Health
+17. Hesaplama Motoru Mimarisi
+
+Her hesaplama bağımsız bir servis olarak çalışır.
+
+Event Bus
+    │
+    ├── Time Metrics Engine
+    ├── Performance Engine
+    ├── Capacity Engine
+    ├── Flow Engine
+    ├── Learning Engine
+    ├── Quality Engine
+    ├── Factory Health Engine
+    └── Decision Metrics Engine
+
+Bu sayede yeni metrikler sisteme eklendiğinde mevcut hesaplamalar etkilenmez.
+
+18. Tasarım İlkeleri
+Ham veri hiçbir zaman üzerine yazılmaz.
+Türetilmiş veri her zaman yeniden hesaplanabilir olmalıdır.
+Her metrik, hangi ham verilerden üretildiğini (lineage) saklamalıdır.
+Hesaplamalar deterministik olmalıdır; aynı girdi aynı sonucu üretmelidir.
+Ağırlıklar ve eşik değerleri kod içinde sabit olmayıp yapılandırılabilir olmalıdır.
+📌 Chapter-7 Sonucu
+
+Bu bölümle birlikte MARS'ın hesaplama katmanı tanımlandı. Artık sistem sadece veriyi depolayan değil, veriyi anlamlandıran bir yapıya sahip.
+
+Ancak Bence Bundan Sonra Daha Kritik Bir Konu Var
+
+Buraya kadar hâlâ "veri nasıl saklanır ve hesaplanır?" sorusunu çözdük.
+
+Asıl APS'nin kalbi ise bundan sonra başlıyor:
+
+Bu hesaplanan metrikler kullanılarak karar nasıl verilecek?
+
+Bu nedenle DOC-008'in bir sonraki bölümü bence klasik "Views" veya "Indexes" olmamalı.
+
+Önerim:
+
+DOC-008 / Chapter-8 – Decision Feature Model
+
+Bu bölümde her optimizasyon algoritmasının kullandığı giriş özellikleri (features) tanımlanır. Örneğin:
+
+Hat dengeleme hangi 40–60 özelliği kullanır?
+Operatör ataması hangi skorları okur?
+WIP optimizasyonu hangi metriklere bakar?
+Darboğaz tahmini hangi verilerle yapılır?
+AI modellerine hangi feature set'leri beslenir?
+
+Bu bölüm tamamlandığında, OR-Tools, AI modelleri ve Decision Engine aynı "özellik dili"ni konuşmaya başlayacak. Bu da sistemin matematiksel çekirdeğini oluşturan en önemli adımlardan biridi
