@@ -1,0 +1,309 @@
+MARS - Software Design Specification (SDS)
+DOC-003
+Decision Engine Specification
+
+Version: 1.0
+
+Status: Draft
+
+Priority: Critical
+
+Dependencies:
+
+DOC-001 Manufacturing Domain Language
+DOC-002 Manufacturing Object Model
+1. Amaç
+
+Decision Engine, MARS sisteminin merkezidir.
+
+Görevi:
+
+Fabrikanın mevcut durumunu (Factory State) analiz ederek, tüm üretim kaynakları için en uygun kararları üretmek ve bu kararları uygulanabilir bir üretim planına dönüştürmektir.
+
+Decision Engine hiçbir zaman doğrudan optimizasyon yapmaz.
+
+Optimizasyon problemlerini OR-Tools'a iletir, tahmin ihtiyaçlarını AI katmanına yönlendirir ve gelen sonuçlardan uygulanabilir kararı seçer.
+
+2. Giriş Verileri (Inputs)
+
+Decision Engine her çalıştığında aşağıdaki verileri eksiksiz almalıdır.
+
+2.1 Factory State
+Aktif siparişler
+Aktif Flow Unit'ler
+Hat durumları
+Operatör durumları
+Makine durumları
+WIP
+Kuyruklar
+Takvim
+Bakım planı
+Kalite durumu
+2.2 Business Rules
+
+Örnek:
+
+Termin gecikemez
+Aynı model mümkün olduğunca aynı hatta devam etsin
+Kritik müşteri önceliklidir
+Fazla mesai sınırı
+Hazırlık bandı kapasitesi
+2.3 Constraint List
+
+Hard Constraints
+
+Operasyon sırası değişmez
+Makine uygunluğu
+Operatör yetkinliği
+Takvim
+Malzeme uygunluğu
+
+Soft Constraints
+
+Aynı takım birlikte çalışsın
+Setup azalsın
+Öğrenme devam etsin
+Hat dengesi korunsun
+3. Decision Cycle
+
+Decision Engine sürekli çalışan bir döngüdür.
+
+Event
+
+↓
+
+Factory State Güncelle
+
+↓
+
+Decision Required?
+
+↓
+
+Hayır → Bekle
+
+↓
+
+Evet
+
+↓
+
+Decision Builder
+
+↓
+
+Constraint Builder
+
+↓
+
+OR-Tools
+
+↓
+
+Candidate Plans
+
+↓
+
+AI Evaluation
+
+↓
+
+Decision Score
+
+↓
+
+Best Plan
+
+↓
+
+Execution
+4. Decision Türleri
+
+Kararlar öncelik sırasına göre değerlendirilir.
+
+D1 - Hat Seçimi
+
+Karar:
+
+Flow Unit hangi hatta gidecek?
+
+D2 - Hazırlık Paylaştırma
+
+Hazırlık bandı hangi operasyonları üstlenecek?
+
+D3 - Operasyon Bölme
+
+Bir operasyon iki hatta bölünebilir mi?
+
+D4 - Bundle Split
+
+Flow Unit kaç parçaya ayrılmalı?
+
+D5 - Hat Birleştirme
+
+İki hat geçici olarak tek hat gibi çalışmalı mı?
+
+D6 - Operatör Atama
+
+Her operatör hangi operasyonu yapacak?
+
+D7 - Makine Atama
+
+Makine seçimi
+
+D8 - Öğrenme Kararı
+
+Tecrübeli operatör mü?
+
+Yoksa eğitim amaçlı operatör mü?
+
+D9 - Replan
+
+Plan tamamen yeniden oluşturulmalı mı?
+
+D10 - Fazla Mesai
+
+Mesai açılmalı mı?
+
+5. Decision Priority Matrix
+Öncelik	Karar
+1	Güvenlik
+2	Kalite
+3	Termin
+4	Akış Sürekliliği
+5	WIP
+6	Hat Dengesi
+7	Setup
+8	Operatör Öğrenmesi
+9	Karlılık
+
+Bu sıra sistem genelinde sabittir.
+
+6. Decision Pipeline
+
+Her karar aynı işlem hattından geçer.
+
+Need Detection
+
+↓
+
+Data Collection
+
+↓
+
+Constraint Loading
+
+↓
+
+Optimization Request
+
+↓
+
+Simulation
+
+↓
+
+Risk Analysis
+
+↓
+
+Scoring
+
+↓
+
+Approval
+
+↓
+
+Execution
+7. Decision Score
+
+Her aday plan tek bir puan alır.
+
+Genel form:
+
+Score=
+i=1
+∑
+n
+	​
+
+w
+i
+	​
+
+×KPI
+i
+	​
+
+
+Örnek KPI'lar:
+
+Termin başarısı
+Hat dengeleme skoru
+WIP skoru
+Setup maliyeti
+Operatör uygunluğu
+Kalite riski
+Kâr katkısı
+
+Ağırlıklar (w_i) sistem ayarlarından yönetilebilir.
+
+8. Decision Log
+
+Her karar kayıt altına alınır.
+
+Alanlar:
+
+DecisionId
+EventId
+Timestamp
+Trigger
+Alternatives
+SelectedPlan
+Score
+AppliedBy
+ExecutionResult
+
+Bu kayıtlar daha sonra AI eğitiminde kullanılacaktır.
+
+9. Hata Yönetimi
+
+Karar üretilemezse sistem aşağıdaki sırayla hareket eder:
+
+Hard constraint ihlali raporlanır.
+Soft constraint gevşetme stratejileri denenir.
+Yeniden optimizasyon yapılır.
+Hâlâ çözüm yoksa kullanıcı onayı istenir.
+10. Diğer Modüllerle İlişkiler
+Modül	Rolü
+Factory State	Girdi sağlar
+OR-Tools Solver	Matematiksel çözüm üretir
+AI Engine	Tahmin ve risk analizi yapar
+Simulation Engine	Aday planları simüle eder
+Execution Engine	Kararı uygular
+Event Engine	Yeni olayları üretir
+Bu belgenin tamamlanma kriterleri
+
+Bu belge tamamlandığında şu soruların cevabı net olmalıdır:
+
+Decision Engine ne zaman çalışır?
+Hangi verileri kullanır?
+Hangi kararları verebilir?
+Kararları hangi sırayla değerlendirir?
+OR-Tools ile nasıl iletişim kurar?
+AI hangi aşamada devreye girer?
+Karar nasıl puanlanır?
+Karar nasıl uygulanır?
+📌 Son Not (Mimari Karar)
+
+Burada önemli bir mühendislik kuralı koyuyorum:
+
+Decision Engine içinde iş kuralları (Business Rules) ile optimizasyon modeli birbirinden tamamen ayrılacak.
+
+Yani:
+
+İş kuralları değiştiğinde matematiksel model değişmeyecek.
+Matematiksel model geliştirildiğinde iş kuralları etkilenmeyecek.
+
+Bu ayrım, sistemi uzun yıllar bakım yapılabilir ve ölçeklenebilir tutmak için kritik öneme sahiptir.
