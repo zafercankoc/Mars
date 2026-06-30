@@ -1,0 +1,399 @@
+MARS APS
+DOC-009A
+Line Balancing Engine
+
+Version: 1.0
+
+Status: Architecture Freeze
+
+Priority: CRITICAL
+
+1. Purpose
+1.1 Objective
+
+Line Balancing Engine'in amacı;
+
+Bir üretim hattındaki operatörleri, operasyonları ve iş yükünü gerçek zamanlı olarak optimize ederek en yüksek üretim verimliliğini elde etmektir.
+
+Engine;
+
+yeni hat kurabilir,
+mevcut hattı dengeleyebilir,
+dinamik yeniden dengeleme yapabilir,
+darboğaz oluşmadan önlem alabilir,
+operatör değişimini optimize edebilir.
+2. Scope
+
+Bu motor aşağıdaki senaryoları kapsar.
+
+Kod	Senaryo
+LB-001	Yeni hat oluşturma
+LB-002	Mevcut hattı yeniden dengeleme
+LB-003	Operatör ayrılması
+LB-004	Yeni operatör eklenmesi
+LB-005	Makine arızası
+LB-006	Sipariş değişikliği
+LB-007	Acil sipariş
+LB-008	Model değişimi
+LB-009	Verim düşmesi
+LB-010	Vardiya değişimi
+3. Engine Responsibility
+
+Bu motor yalnızca aşağıdaki kararlardan sorumludur.
+
+✓ Operatör dağılımı
+
+✓ Operasyon dağılımı
+
+✓ Hat yükü
+
+✓ WIP dengesi
+
+✓ İş paylaşımı
+
+✓ Yardımcı operatör
+
+✓ Operasyon bölme
+
+✓ Operasyon birleştirme
+
+Yapmayacağı işler
+
+✗ Üretim sıralaması
+
+✗ Makine bakım planı
+
+✗ Satın alma
+
+✗ ERP işlemleri
+
+4. Input Model
+Factory Context
+Factory
+    ↓
+Production Line
+    ↓
+Work Center
+    ↓
+Operations
+Order Context
+Order
+↓
+
+Product
+
+↓
+
+Operation List
+
+↓
+
+Target Quantity
+
+↓
+
+Due Date
+Operator Context
+Operator
+
+↓
+
+Skill
+
+↓
+
+Learning
+
+↓
+
+Fatigue
+
+↓
+
+Availability
+
+↓
+
+Efficiency
+Machine Context
+Machine
+
+↓
+
+Capability
+
+↓
+
+Health
+
+↓
+
+Status
+Live Production Context
+Current WIP
+
+↓
+
+Queue
+
+↓
+
+Flow
+
+↓
+
+Bottleneck
+5. Input Features
+
+Bu motor yaklaşık 90–120 feature kullanacaktır.
+
+Operator
+Availability Score
+Skill Score
+Fatigue Score
+Learning Score
+Collaboration Score
+Experience Score
+Efficiency Score
+Operation
+Dynamic SMV
+Priority
+Difficulty
+Criticality
+Line
+Current Balance
+Current Capacity
+Current WIP
+Stability
+Machine
+Availability
+Health
+Compatibility
+Factory
+Factory Health
+Resource Availability
+6. Decision Variables
+
+Karar değişkenleri matematiksel modelin temelidir.
+
+Kod	Değişken	Açıklama
+X(o,p)	Binary	Operatör o, operasyon p'ye atanır mı?
+Y(p,l)	Binary	Operasyon p, hat l üzerinde yürütülür mü?
+Z(o,l)	Binary	Operatör o, hat l'de çalışır mı?
+H(o,p)	Integer	Operatörün operasyona ayırdığı süre
+B(l)	Continuous	Hat denge skoru
+W(p)	Continuous	Operasyon bekleme süresi
+7. Constraint Library
+
+Her constraint benzersiz bir kimliğe sahiptir.
+
+LB-C001
+
+Bir operasyona aynı anda en fazla bir ana operatör atanabilir.
+
+LB-C002
+
+Bir operatör aynı anda iki operasyon yapamaz.
+
+LB-C003
+
+Skill seviyesi yetersiz operatör atanamaz.
+
+LB-C004
+
+Makine uygun değilse operasyon yapılamaz.
+
+LB-C005
+
+Öncelik ilişkileri bozulamaz.
+
+LB-C006
+
+Hat kapasitesi aşılmaz.
+
+LB-C007
+
+Operatör vardiyası dışında görev alamaz.
+
+LB-C008
+
+Dinlenme süresi ihlal edilemez.
+
+LB-C009
+
+Maksimum WIP limiti aşılmaz.
+
+LB-C010
+
+Yorgunluk eşiği aşılmış operatöre yeni kritik operasyon atanamaz.
+
+8. Soft Constraints
+
+İhlal edilebilir ancak ceza puanı uygulanır.
+
+Kod	Constraint	Penalty
+LB-S001	Operatör tercih ettiği hatta çalışmıyor	5
+LB-S002	Yardımcı operatör gerekiyor	10
+LB-S003	Fazla transfer	15
+LB-S004	Operasyon bölündü	20
+LB-S005	Hat dengesi bozuldu	50
+
+Bu cezalar Objective Function içinde kullanılır.
+
+9. Objective Functions
+
+Line Balancing tek amaçlı değildir.
+
+Çok amaçlı optimizasyon uygulanacaktır.
+
+Varsayılan ağırlıklar:
+
+Amaç	Ağırlık
+Hat Dengesi	%30
+Operatör Verimi	%20
+Teslim Performansı	%20
+WIP Minimizasyonu	%10
+Transfer Minimizasyonu	%10
+Kalite Riski	%10
+
+Ağırlıklar senaryoya göre değiştirilebilir.
+
+10. Optimization Pipeline
+Event
+    ↓
+Context Builder
+    ↓
+Feature Resolver
+    ↓
+Constraint Builder
+    ↓
+Objective Builder
+    ↓
+Solver
+    ↓
+Candidate Plans
+    ↓
+Decision Scoring
+    ↓
+Simulation
+    ↓
+Execution
+11. Solver Strategy
+
+Problem büyüklüğüne göre farklı çözücüler seçilir.
+
+Problem Boyutu	Strateji
+Küçük (<30 operatör)	OR-Tools CP-SAT
+Orta (30–100 operatör)	OR-Tools CP-SAT + Heuristics
+Büyük (>100 operatör)	Hybrid (Heuristic → CP-SAT)
+Gerçek zamanlı	Incremental Re-optimization
+
+Bu seçim otomatik yapılmalıdır.
+
+12. Re-Optimization Strategy
+
+Her olay tam optimizasyon gerektirmez.
+
+Olay	Strateji
+Operatör mola verdi	Lokal yeniden dengeleme
+Operatör ayrıldı	Etkilenen bölgeyi yeniden optimize et
+Makine arızası	İlgili operasyonları yeniden dağıt
+Yeni sipariş	Kısmi veya tam optimizasyon
+Vardiya değişimi	Tam optimizasyon
+
+Bu yaklaşım, karar süresini önemli ölçüde azaltır.
+
+13. Output Model
+
+Motorun çıktısı yalnızca atama listesi değildir.
+
+Balance Plan
+│
+├── Operator Assignments
+├── Operation Assignments
+├── Estimated Line Efficiency
+├── Estimated Output
+├── WIP Forecast
+├── Bottleneck Prediction
+├── Required Transfers
+├── Confidence Score
+└── Explanation
+14. Explainability
+
+Her plan neden seçildiğini açıklamalıdır.
+
+Örnek:
+
+Hat A yeniden dengelendi. Operatör Ayşe, Overlok operasyonuna atandı çünkü bu operasyonda son 60 üretimde ortalama çevrim süresi %11 daha düşük, yeterlilik seviyesi 5/5 ve bu değişiklik hat denge skorunu 84'ten 93'e yükseltti. Beklenen WIP %9 azalacak, teslim riski değişmeyecek.
+
+Bu açıklamalar otomatik üretilmelidir.
+
+15. Performance Targets
+İşlem	Hedef
+Lokal yeniden dengeleme	< 2 saniye
+30 operatörlü tam dengeleme	< 10 saniye
+100 operatörlü tam dengeleme	< 30 saniye
+Aday plan oluşturma	En az 3 alternatif
+Bellek kullanımı	< 2 GB (100 operatör senaryosu)
+16. API Sözleşmesi
+
+Motorun girişi:
+
+POST /decision/line-balancing/run
+
+Çıkışı:
+
+BalancePlanId
+SolverStatus
+ObjectiveValue
+ConstraintViolations
+CandidatePlans
+RecommendedPlan
+ExplainabilityReport
+
+Ayrıca olay tabanlı kullanım için:
+
+line-balancing.requested
+line-balancing.completed
+line-balancing.failed
+
+event'leri yayınlanmalıdır.
+
+17. Test Senaryoları
+
+Minimum doğrulama seti:
+
+Tek hat / 10 operatör
+Çok hat / ortak operatör havuzu
+Kritik makine arızası
+Acil sipariş eklenmesi
+Operatör devamsızlığı
+Vardiya değişimi
+Düşük beceri seviyesi
+Yüksek WIP
+Aynı anda birden fazla tetikleyici olay
+
+Her senaryoda KPI değişimi ve çözüm süresi raporlanmalıdır.
+
+18. Başarı Kriterleri (Acceptance Criteria)
+
+Bir Line Balancing çalıştırması başarılı sayılabilmesi için:
+
+Tüm zorunlu kısıtlar sağlanmalıdır.
+Hedef fonksiyon değeri iyileşmelidir.
+Çözüm süresi tanımlanan SLA içinde olmalıdır.
+Karar açıklaması üretilebilmelidir.
+Plan uygulanabilir olmalıdır.
+Sonuç tekrar üretilebilir (reproducible) olmalıdır.
+📌 Bu Doküman Hakkında Bir Mimari Öneri
+
+Buraya kadar olan tasarım çok güçlü bir temel oluşturuyor. Ancak hat dengelemenin asıl değeri matematiksel modeldedir. Şu anda DOC-009A, motorun mimarisini tanımlıyor; fakat henüz şu kritik bileşenleri ayrıntılı olarak tanımlamadık:
+
+Karar değişkenlerinin kesin matematiksel tanımları
+Amaç fonksiyonlarının denklemleri
+Hard ve soft constraint denklemleri
+Çok amaçlı optimizasyonun ağırlıklandırma yöntemi
+OR-Tools CP-SAT modelinin değişken ve constraint eşlemesi
+Çözüm sonrası iyileştirme (local search) stratejileri
+
+Bence bunlar aynı belge içinde değil, DOC-009A-1 – Mathematical Optimization Model adlı ayrı bir teknik ek olarak hazırlanmalı. Böylece yazılım mimarisi ile matematiksel model ayrılır ve geliştiriciler ile optimizasyon uzmanları aynı proje üzerinde daha net çalışabilir. Bu belge, OR-Tools modelinin neredeyse satır satır kodlanabilecek seviyedeki teknik tanımını içermelidir.
