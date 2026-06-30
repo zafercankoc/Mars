@@ -1,0 +1,497 @@
+OC-008 / Chapter-6 – Manufacturing Intelligence Data Model
+
+Bu isim çok daha doğru.
+
+MARS APS
+DOC-008
+Chapter-6
+Manufacturing Intelligence Data Model
+
+Version 1.0
+
+1. Amaç
+
+Bu bölümün amacı:
+
+APS'nin yalnızca mevcut duruma göre değil,
+
+geçmiş davranışlara göre de karar verebilmesini sağlayan veri modelini oluşturmaktır.
+
+Bu katman sayesinde sistem;
+
+öğrenir,
+tahmin eder,
+karşılaştırır,
+önerir.
+2. Manufacturing Intelligence Katmanları
+
+Bu katman 10 alt sistemden oluşur.
+
+Performance Intelligence
+
+↓
+
+Skill Intelligence
+
+↓
+
+Learning Intelligence
+
+↓
+
+Fatigue Intelligence
+
+↓
+
+Flow Intelligence
+
+↓
+
+Bottleneck Intelligence
+
+↓
+
+Line Intelligence
+
+↓
+
+Decision Intelligence
+
+↓
+
+Prediction Intelligence
+
+↓
+
+Factory Intelligence
+3. Performance Intelligence
+Amaç
+
+Standart SMV yerine gerçek performansı saklamak.
+
+Entity
+
+OperatorPerformance
+
+Alanlar:
+
+Alan	Açıklama
+OperatorId	Operatör
+OperationId	Operasyon
+AvgCycleTime	Ortalama çevrim süresi
+BestCycleTime	En iyi süre
+WorstCycleTime	En kötü süre
+StdDeviation	Değişkenlik
+DefectRate	Hata oranı
+SampleCount	Ölçüm sayısı
+Confidence	Güven seviyesi
+
+APS artık:
+
+"Bu operasyon 0.62 dakika"
+
+demez.
+
+Şunu der:
+
+"Ali bu operasyonu ortalama 0.58 dakika yapıyor."
+
+4. Learning Intelligence
+
+Konfeksiyonun en önemli problemi.
+
+Bir operatör
+
+ilk gün
+
+ile
+
+gün
+
+aynı hızda çalışmaz.
+
+Entity
+
+LearningCurve
+
+Alanlar:
+
+Alan	Açıklama
+OperatorId	Operatör
+OperationId	Operasyon
+RepetitionCount	Tekrar sayısı
+CurrentSMV	Güncel süre
+ImprovementRate	İyileşme oranı
+PlateauPoint	Doyum noktası
+
+APS
+
+şunu öğrenir.
+
+100 tekrar
+
+↓
+
+%17 hızlandı.
+5. Fatigue Intelligence
+
+Bu özellik piyasadaki çoğu APS'de yoktur.
+
+Entity
+
+FatigueProfile
+
+Alanlar:
+
+OperatorId
+FatigueScore
+ConsecutiveHours
+OvertimeHours
+BreakCompliance
+HeatExposure
+StandingDuration
+
+APS
+
+şunu hesaplayabilir.
+
+Bugün
+
+7 saat çalıştı.
+
+↓
+
+Verim
+
+%6 düştü.
+6. Skill Intelligence
+
+Normal sistemlerde
+
+Skill vardır.
+
+Bizde
+
+Skill Graph vardır.
+
+Entity
+
+SkillGraph
+
+Singer
+
+↓
+
+Reçme
+
+↓
+
+Overlok
+
+↓
+
+Lastik
+
+Her geçiş
+
+bir maliyet taşır.
+
+Örneğin:
+
+Geçiş	Maliyet
+Singer → Singer	0
+Singer → Reçme	1
+Singer → Overlok	3
+Singer → Kalite	5
+
+APS
+
+en düşük geçiş maliyetini bulur.
+
+7. Operator Collaboration Intelligence
+
+Bu bence MARS'ın en özgün özelliklerinden biri olabilir.
+
+Her operatör
+
+her operatörle
+
+aynı verimde çalışmaz.
+
+Entity
+
+OperatorPairPerformance
+
+Alanlar:
+
+OperatorA
+OperatorB
+ModelsWorked
+AvgEfficiency
+AvgDefect
+CommunicationScore
+SupportScore
+
+Örnek:
+
+Ali + Mehmet
+
+↓
+
+%92
+Ali + Ahmet
+
+↓
+
+%84
+
+APS
+
+ekip oluştururken bunu dikkate alabilir.
+
+8. Dynamic SMV
+
+En önemli yeniliklerden biri.
+
+Normal ERP
+
+tek SMV saklar.
+
+MARS
+
+çoklu SMV saklar.
+
+Entity
+
+DynamicSMV
+
+Alanlar:
+
+OperationId
+MachineType
+OperatorLevel
+FabricType
+BundleSize
+Season
+AvgSMV
+
+Aynı operasyon
+
+kumaşa göre
+
+değişebilir.
+
+9. Bottleneck Intelligence
+
+Darboğaz
+
+tek seferlik değildir.
+
+Entity
+
+BottleneckHistory
+
+Alanlar:
+
+LineId
+WorkCenterId
+StartTime
+EndTime
+LostMinutes
+RootCause
+ResolvedBy
+
+APS
+
+şunu öğrenebilir.
+
+Pazartesi
+
+↓
+
+Overlok
+
+hep darboğaz oluyor.
+10. Flow Intelligence
+
+APS
+
+Flow Unit'lerin
+
+nasıl hareket ettiğini öğrenir.
+
+Entity
+
+FlowPattern
+
+Alanlar:
+
+ProductId
+AvgQueueTime
+AvgTransferTime
+AvgWaitingTime
+AvgProcessingTime
+AvgWIP
+
+Bu sayede
+
+simülasyon daha gerçekçi olur.
+
+11. Line Intelligence
+
+Hatın karakterini öğrenir.
+
+Entity
+
+LineProfile
+
+Alanlar:
+
+LineId
+AvgEfficiency
+AvgBalance
+BestProductTypes
+PreferredOperators
+MaxStableWIP
+SetupSensitivity
+
+Örneğin:
+
+A Bandı
+
+↓
+
+Küçük partilerde
+
+çok başarılı.
+12. Decision Intelligence
+
+APS
+
+verdiği kararları unutmamalıdır.
+
+Entity
+
+DecisionOutcome
+
+Alanlar:
+
+DecisionId
+BeforeKPIs
+AfterKPIs
+Success
+UserOverride
+Explanation
+
+Bu sayede sistem kendi kararlarının etkisini ölçebilir.
+
+13. Prediction Intelligence
+
+Her tahmin saklanır.
+
+Entity
+
+PredictionHistory
+
+Alanlar:
+
+PredictionType
+PredictedValue
+ActualValue
+ErrorRate
+Confidence
+ModelVersion
+
+Bu model doğruluğunu sürekli ölçmeye yarar.
+
+14. Factory Intelligence
+
+Fabrikanın uzun dönem davranışı.
+
+Entity
+
+FactoryProfile
+
+Alanlar:
+
+AvgDailyOutput
+AvgEfficiency
+AvgDelay
+AvgBalance
+AvgAttendance
+StabilityScore
+ImprovementTrend
+
+APS
+
+tek bir hattı değil,
+
+tüm fabrikanın gelişimini görebilir.
+
+15. Intelligence Katmanları Arasındaki İlişki
+OperatorPerformance
+        │
+        ▼
+LearningCurve
+        │
+        ▼
+FatigueProfile
+        │
+        ▼
+SkillGraph
+        │
+        ▼
+OperatorPairPerformance
+        │
+        ▼
+DynamicSMV
+        │
+        ▼
+FlowPattern
+        │
+        ▼
+LineProfile
+        │
+        ▼
+DecisionOutcome
+        │
+        ▼
+FactoryProfile
+
+Bu katmanlar birbirini besler ve zamanla daha doğru kararlar üretilmesini sağlar.
+
+16. Bu Bölümün MARS'a Katkısı
+
+Bu bölüm sayesinde MARS artık yalnızca "planlayan" bir APS değil, öğrenen bir üretim sistemi olur.
+
+Örneğin klasik APS:
+
+Operasyon X = 0.75 dakika
+
+der.
+
+MARS ise:
+
+"Bu operasyonun standart süresi 0.75 dakika. Ancak Ali son 60 üretimde bunu ortalama 0.61 dakikada yaptı, bugün yorgunluk puanı nedeniyle tahmini süresi 0.65 dakika. Mehmet ile aynı hatta çalışırsa ekip verimi %3 artıyor. Bu nedenle Ali ve Mehmet'i aynı hatta öneriyorum."
+
+Bu yaklaşım, gerçek üretim ortamındaki karar kalitesini ciddi biçimde artırabilir.
+
+📌 Bence Burada Bir Sonraki Adım
+
+Buraya kadar veriyi tanımladık. Ancak bu verilerin nasıl hesaplanacağı henüz tanımlanmadı.
+
+Bu yüzden DOC-008 / Chapter-7 bence "Views" değil, daha değerli bir konu olmalı:
+
+Derived Data & Calculation Model
+
+Bu bölümde şu soruların cevabı matematiksel olarak tanımlanmalı:
+
+Fatigue Score nasıl hesaplanır?
+Learning Rate nasıl güncellenir?
+Dynamic SMV hangi formülle üretilir?
+Collaboration Score nasıl hesaplanır?
+Factory Health Score nasıl oluşur?
+Stability Score nasıl hesaplanır?
+Balance Score hangi alt metriklerden oluşur?
+
+Yani artık ham veriden zekâ üreten formülleri tanımlamaya başlayacağız. Bence MARS'ın gerçek rekabet avantajı bu hesaplama katmanında ortaya çıkacak.
