@@ -1,0 +1,774 @@
+Harika. İşte burası artık projenin en önemli bölümlerinden biri.
+
+Ancak burada yine profesyonel tarafta bir düzeltme yapmak istiyorum.
+
+Relationship Model sadece "hangi tablo hangisine bağlı" değildir.
+
+Gerçek bir APS'de ilişki modeli 5 katmandan oluşur.
+
+Physical Relationship
+
+↓
+
+Business Relationship
+
+↓
+
+Production Relationship
+
+↓
+
+Decision Relationship
+
+↓
+
+State Relationship
+
+İşte MARS'ı güçlü yapacak şey de bu.
+
+MARS APS
+DOC-008
+CHAPTER-3
+Relationship Model
+
+Version 1.0
+
+1. Relationship Felsefesi
+
+MARS'ta ilişkiler yalnızca Foreign Key değildir.
+
+Her ilişki aşağıdaki özelliklere sahiptir.
+
+Source
+
+↓
+
+Target
+
+↓
+
+Cardinality
+
+↓
+
+Business Rule
+
+↓
+
+Decision Impact
+
+↓
+
+Update Strategy
+
+Yani ilişki sadece veri değil.
+
+APS'nin karar mekanizmasının parçasıdır.
+
+LEVEL-1
+Organizational Relationships
+R-001
+
+Factory
+
+↓
+
+Department
+
+1 Factory
+
+↓
+
+N Department
+
+Business Rule
+
+Department
+
+Factory olmadan yaşayamaz.
+
+Decision Impact
+
+APS
+
+departman bazında plan yapabilir.
+
+R-002
+
+Department
+
+↓
+
+Production Line
+
+1
+
+↓
+
+N
+
+Bir departmanın
+
+birden fazla hattı olabilir.
+
+Örneğin
+
+Montaj
+
+↓
+
+A Bandı
+
+↓
+
+B Bandı
+
+↓
+
+C Bandı
+
+APS
+
+önce
+
+Department
+
+sonra
+
+Line
+
+kararı verir.
+
+R-003
+
+Production Line
+
+↓
+
+Work Center
+
+1
+
+↓
+
+N
+
+Örneğin
+
+A Bandı
+
+↓
+
+Overlok
+
+↓
+
+Singer
+
+↓
+
+Reçme
+
+↓
+
+Kalite
+LEVEL-2
+Resource Relationships
+R-010
+
+WorkCenter
+
+↓
+
+Machine
+
+1
+
+↓
+
+N
+
+APS
+
+hangi makinenin
+
+hangi WorkCenter'da olduğunu bilir.
+
+R-011
+
+Machine
+
+↓
+
+MachineType
+
+N
+
+↓
+
+1
+
+Makine tipi
+
+ortaktır.
+
+R-012
+
+Operator
+
+↓
+
+Skill
+
+N
+
+↓
+
+N
+
+Bu ilişki
+
+OperatorSkill
+
+tablosuyla kurulur.
+
+Decision Impact
+
+APS
+
+atama yaparken
+
+ilk baktığı ilişki budur.
+
+R-013
+
+Operator
+
+↓
+
+Production Line
+
+N
+
+↓
+
+1
+
+Ama
+
+dinamiktir.
+
+Gün içinde değişebilir.
+
+Bu yüzden
+
+History
+
+tablosu tutulur.
+
+LEVEL-3
+Product Relationships
+R-020
+
+Product
+
+↓
+
+Operation
+
+1
+
+↓
+
+N
+
+Bir model
+
+birçok operasyondan oluşur.
+
+R-021
+
+Operation
+
+↓
+
+Machine Type
+
+N
+
+↓
+
+1
+R-022
+
+Operation
+
+↓
+
+Skill
+
+N
+
+↓
+
+1
+R-023
+
+Operation
+
+↓
+
+Operation
+
+N
+
+↓
+
+N
+
+Ama
+
+Graph
+
+ilişkisidir.
+
+Örneğin
+
+Kol
+
+↓
+
+Omuz
+
+↓
+
+Yaka
+
+Bu
+
+Foreign Key
+
+değildir.
+
+Bu
+
+Directed Graph
+
+tır.
+
+APS
+
+topological sorting
+
+buradan üretir.
+
+LEVEL-4
+Order Relationships
+R-030
+
+Customer
+
+↓
+
+Order
+
+1
+
+↓
+
+N
+R-031
+
+Order
+
+↓
+
+Order Item
+
+1
+
+↓
+
+N
+R-032
+
+Order Item
+
+↓
+
+Flow Unit
+
+1
+
+↓
+
+N
+
+Örneğin
+
+1000 adet
+
+↓
+
+20 Bundle
+
+↓
+
+20 Flow Unit
+
+APS
+
+Flow Unit
+
+ile çalışır.
+
+Sipariş
+
+ile değil.
+
+LEVEL-5
+Execution Relationships
+R-040
+
+Flow Unit
+
+↓
+
+Operation Instance
+
+1
+
+↓
+
+N
+
+Bir
+
+Flow Unit
+
+birçok operasyon
+
+geçirir.
+
+R-041
+
+Operation Instance
+
+↓
+
+Assignment
+
+1
+
+↓
+
+N
+
+Çünkü
+
+aynı operasyon
+
+farklı kişilere
+
+gidebilir.
+
+Örneğin
+
+Pass-1
+
+↓
+
+Ali
+Pass-2
+
+↓
+
+Ahmet
+R-042
+
+Assignment
+
+↓
+
+Operator
+
+N
+
+↓
+
+1
+R-043
+
+Assignment
+
+↓
+
+Machine
+
+N
+
+↓
+
+1
+LEVEL-6
+Planning Relationships
+R-050
+
+Production Plan
+
+↓
+
+Plan Item
+
+1
+
+↓
+
+N
+R-051
+
+Plan Item
+
+↓
+
+Flow Unit
+
+1
+
+↓
+
+N
+R-052
+
+Plan Item
+
+↓
+
+Production Line
+
+N
+
+↓
+
+1
+
+APS
+
+hangi işi
+
+hangi banda verdiğini
+
+buradan bilir.
+
+LEVEL-7
+Decision Relationships
+R-060
+
+Decision
+
+↓
+
+Decision Type
+
+R-061
+
+Decision
+
+↓
+
+Factory State
+
+R-062
+
+Decision
+
+↓
+
+Optimization Run
+
+R-063
+
+Decision
+
+↓
+
+Simulation Run
+
+Kararın
+
+hangi solver
+
+tarafından üretildiği
+
+burada tutulur.
+
+LEVEL-8
+Optimization Relationships
+R-070
+
+Optimization Run
+
+↓
+
+Constraint
+
+R-071
+
+Optimization Run
+
+↓
+
+Objective
+
+R-072
+
+Optimization Run
+
+↓
+
+Solver Result
+
+R-073
+
+Solver Result
+
+↓
+
+KPI
+
+Bu ilişkiler
+
+AI'nin
+
+öğrenmesini sağlar.
+
+LEVEL-9
+State Relationships
+
+MARS'ın
+
+en önemli katmanı.
+
+R-080
+
+Factory State
+
+↓
+
+Line State
+
+↓
+
+Operator State
+
+↓
+
+Machine State
+
+↓
+
+Queue State
+
+↓
+
+Flow State
+
+↓
+
+WIP State
+
+↓
+
+Quality State
+
+↓
+
+Inventory State
+
+APS
+
+her kararda
+
+bu state graphını okur.
+
+LEVEL-10
+Event Relationships
+R-090
+
+Event
+
+↓
+
+Entity
+
+R-091
+
+Event
+
+↓
+
+Decision
+
+R-092
+
+Event
+
+↓
+
+Snapshot
+
+R-093
+
+Event
+
+↓
+
+History
+
+Bütün değişiklikler
+
+Event üzerinden ilerler.
+
+İlişki Tipleri
+
+MARS sadece klasik SQL ilişkileri kullanmaz.
+
+Tür	Kullanım Alanı
+1:1	Kimlik bilgileri
+1:N	Organizasyon, Sipariş
+N:N	Skill, Operatör
+Graph	Operasyon bağımlılıkları
+Temporal	Zaman içindeki değişimler
+Event	Olay geçmişi
+Snapshot	Anlık sistem durumu
+Hierarchical	Fabrika yapısı
+Network	Flow Unit hareketleri
+APS Açısından En Kritik 10 İlişki
+
+Bunlar, karar motorunun her optimizasyon çalıştırmasında ilk okuyacağı ilişkilerdir:
+
+Öncelik	İlişki	Neden Kritik?
+1	Operator ↔ Skill	Doğru operatörü seçmek için.
+2	Product ↔ Operation	Üretim rotasını oluşturmak için.
+3	Operation ↔ Operation (Graph)	Operasyon önceliklerini korumak için.
+4	Flow Unit ↔ Operation Instance	Her Flow Unit'in üretim durumunu izlemek için.
+5	Operation Instance ↔ Assignment	Hangi operatör ve makinenin hangi işi yaptığını bilmek için.
+6	Production Line ↔ Work Center	Hat içindeki fiziksel akışı modellemek için.
+7	Work Center ↔ Machine	Kaynak kapasitesini hesaplamak için.
+8	Decision ↔ Factory State	Kararın hangi fabrika durumunda alındığını izlemek için.
+9	Optimization Run ↔ Solver Result	Farklı çözümleri karşılaştırmak için.
+10	Event ↔ Snapshot	Geçmişe dönük analiz ve yeniden oynatma (replay) için.
+⚠️ Burada Bence Eksik Olan ve Eklememiz Gereken İlişkiler
+
+Konfeksiyon özelinde, seni diğer APS sistemlerinden ayıracak ilişkiler henüz veri modeline eklenmedi. Bunlar:
+
+Operator ↔ Operator (yardım edebilir, birbirinin yerine geçebilir, aynı ekipte çalışır).
+Operation ↔ Operation için tek tip bağımlılık yerine farklı bağımlılık türleri (Finish-to-Start, Start-to-Start, minimum bekleme, maksimum bekleme, aynı istasyonda olmalı vb.).
+Flow Unit ↔ Flow Unit (aynı partinin parçaları, birlikte hareket etmeli veya ayrılabilir).
+Machine ↔ Machine (alternatif makine, yedek makine, aynı setup grubundaki makineler).
+Production Line ↔ Production Line (operatör paylaşımı yapabilen, birbirine iş transfer edebilen hatlar).
+Operation ↔ Skill ilişkisini tek seviyeli değil, "minimum seviye", "tercih edilen seviye" ve "uzman seviye" olarak modellemek.
+
+Bu ilişkiler, senin ilk günden beri anlattığın "A bandından B bandına operatör çek", "hazırlık bandı montajın yükünü alsın", "overlok boş kalmadan yeni işi hazırlasın" gibi kararların matematiksel olarak ifade edilebilmesi için gereklidir.
+
+Bence bir sonraki bölüm olan DOC-008 / Chapter-4 – Logical Database Model, artık sadece tabloları değil; kolonları, veri tiplerini, primary key'leri, foreign key'leri, unique constraint'leri ve normalizasyon seviyelerini tek tek tanımlamalı. O bölüm tamamlandığında PostgreSQL şeması otomatik üretilebilecek olgunluğa ulaşmış olacağız.
