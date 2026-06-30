@@ -1,0 +1,483 @@
+DOC-005
+Decision Catalog
+
+Bu belge MARS'ın beynidir.
+
+1. Belgenin Amacı
+
+Bu belge, sistemin verebileceği bütün kararları tanımlar.
+
+MARS hiçbir zaman bu listenin dışında karar veremez.
+
+Yani;
+
+AI yeni karar icat edemez.
+
+OR-Tools yeni karar icat edemez.
+
+Karar kataloğunda olmayan hiçbir aksiyon uygulanamaz.
+
+2. Karar Hiyerarşisi
+
+Bütün kararlar 9 ana gruba ayrılır.
+
+Strategic
+
+↓
+
+Tactical
+
+↓
+
+Operational
+
+↓
+
+Real-Time
+
+Bizim APS
+
+çoğunlukla
+
+Operational
+
+ve
+
+Real-Time
+
+kararları verecek.
+
+3. Decision Tree
+Decision
+
+│
+
+├── Planning
+
+├── Assignment
+
+├── Flow
+
+├── Balance
+
+├── Resource
+
+├── Production
+
+├── Quality
+
+├── Maintenance
+
+└── Recovery
+
+Buradan sonra her kararın kimliği olacak.
+
+D-1000
+Planning Decisions
+D-1001
+Create Production Plan
+
+Amaç
+
+Yeni sipariş için üretim planı oluşturmak.
+
+Tetikleyici
+
+Yeni Sipariş
+
+Çıktı
+
+Production Plan
+
+KPI
+
+Termin
+
+↓
+
+Kapasite
+
+↓
+
+Karlılık
+D-1002
+Replan
+
+Amaç
+
+Mevcut planı yeniden oluşturmak.
+
+Tetikleyici
+
+Makine Arızası
+
+↓
+
+Operatör Yokluğu
+
+↓
+
+Termin Değişikliği
+
+↓
+
+Yeni Sipariş
+D-1003
+Freeze Plan
+
+Planın belirli kısmını kilitle.
+
+APS
+
+dokunamaz.
+
+D-1004
+
+Rolling Horizon
+
+İlk
+
+2 gün
+
+kilitli.
+
+Sonraki
+
+5 gün
+
+optimize edilir.
+
+D-2000
+Assignment Decisions
+D-2001
+
+Assign Line
+
+Flow Unit
+
+hangi hatta gidecek?
+
+D-2002
+
+Assign Operator
+
+Operasyonu
+
+hangi operatör yapacak?
+
+D-2003
+
+Assign Machine
+
+Makine seç.
+
+D-2004
+
+Assign Team
+
+Takımı seç.
+
+D-2005
+
+Assign Shift
+
+Vardiya seç.
+
+D-3000
+Flow Decisions
+
+Bu grup
+
+senin istediğin APS'nin
+
+çekirdeğidir.
+
+D-3001
+
+Split Flow Unit
+
+Bundle böl.
+
+D-3002
+
+Merge Flow Unit
+
+Tekrar birleştir.
+
+D-3003
+
+Transfer Flow
+
+Başka banda taşı.
+
+D-3004
+
+Queue Flow
+
+Beklet.
+
+D-3005
+
+Fast Track
+
+Öncelikli geçir.
+
+D-3006
+
+Preparation Pull
+
+Hazırlık bandı
+
+gelecek operasyonları
+
+öne çeksin.
+
+Bu, senin ilk gün tarif ettiğin senaryolardan biridir.
+
+D-3007
+
+Assembly Pull
+
+Montaj
+
+hazırlıktan
+
+iş çeksin.
+
+D-3008
+
+Dynamic Push
+
+İş
+
+otomatik
+
+ileri gönderilsin.
+
+D-4000
+Balance Decisions
+
+En önemli grup.
+
+D-4001
+
+Balance Line
+
+Hat dengele.
+
+D-4002
+
+Split Operation
+
+Operasyonu
+
+iki kişiye böl.
+
+D-4003
+
+Merge Operation
+
+Operasyonları
+
+birleştir.
+
+D-4004
+
+Rotate Operators
+
+Operatör rotasyonu.
+
+D-4005
+
+Move Operator
+
+Operatör taşı.
+
+D-4006
+
+Temporary Team
+
+Geçici ekip oluştur.
+
+D-4007
+
+Virtual Line
+
+Sanal hat oluştur.
+
+D-4008
+
+Two Pass Production
+
+Tam da senin örneğin.
+
+15 Operasyon
+
+↓
+
+10 Kişi
+
+↓
+
+İlk Tur
+
+↓
+
+10 Operasyon
+
+↓
+
+İkinci Tur
+
+↓
+
+5 Operasyon
+D-4009
+
+Preparation Allocation
+
+Hazırlık
+
+ilk
+
+4 operasyonu
+
+alsın.
+
+D-4010
+
+Dynamic Balance
+
+Her Event'te
+
+yeniden dengele.
+
+D-5000
+Resource Decisions
+
+D-5001
+
+Makine değiştir.
+
+D-5002
+
+Makine ekle.
+
+D-5003
+
+Makine çıkar.
+
+D-5004
+
+Setup yap.
+
+D-5005
+
+Setup ertele.
+
+D-6000
+Production Decisions
+
+Stoklu üret.
+
+Siparişe göre üret.
+
+Parti üret.
+
+Tek parça akış.
+
+Hibrit üretim.
+
+D-7000
+Quality Decisions
+
+Ek kontrol.
+
+Kalite operatörü ekle.
+
+Tekrar üret.
+
+Tamir.
+
+D-8000
+Maintenance Decisions
+
+Bakım öne çek.
+
+Makine değiştir.
+
+Yedek makine kullan.
+
+D-9000
+Recovery Decisions
+
+En kritik grup.
+
+Makine durursa.
+
+Operatör gelmezse.
+
+Elektrik kesilirse.
+
+Malzeme gecikirse.
+
+Kalite reddederse.
+
+Sistem otomatik
+
+Recovery Plan
+
+oluşturur.
+
+Decision Metadata
+
+Her karar aşağıdaki standart yapıya sahip olacak:
+
+Alan	Açıklama
+Decision ID	Benzersiz kimlik
+Name	Karar adı
+Category	Planning, Flow, Balance vb.
+Trigger	Kararı başlatan olay
+Preconditions	Çalışma ön koşulları
+Required Data	Kullanılan veriler
+Hard Constraints	İhlal edilemeyen kurallar
+Soft Constraints	Tercih edilen kurallar
+Objective	Etkilediği amaç fonksiyonları
+Candidate Generator	Alternatifleri nasıl üretir
+Solver Mapping	OR-Tools modeline eşlemesi
+Risk	Uygulama riski
+Rollback	Geri alma stratejisi
+Bu Belgenin Sonucu
+
+Bu belgeyle birlikte MARS'ın verebileceği kararlar standartlaştırılmış oldu.
+
+Artık hiçbir modül doğrudan aksiyon almayacak.
+
+İş akışı şu olacak:
+
+Event
+        │
+        ▼
+Decision Catalog
+        │
+        ▼
+Decision Engine
+        │
+        ▼
+OR-Tools Solver
+        │
+        ▼
+Simulation
+        │
+        ▼
+Execution
+
+Bu ayrım çok önemlidir; çünkü gelecekte yeni karar tipleri eklemek istediğimizde matematiksel modeli veya kodun diğer bölümlerini değiştirmeden sadece kataloğu genişletebileceğiz.
+
+📌 Bundan Sonraki Belge
+
+Sıradaki belge artık projenin matematiksel kalbi olacak:
+
+DOC-006 – Mathematical Optimization Model
+
+Bu belge yaklaşık yüzlerce formül, karar değişkeni, kümeler, kısıtlar ve amaç fonksiyonlarından oluşacak. Yazılımın değil, OR-Tools'un çözeceği matematiksel evreni tanımlayacağız. Buradan sonra yazılacak her kod satırı bu modele dayanacak. Bu, MARS'ın gerçekten hesap yapmaya başladığı nokta olacak.
