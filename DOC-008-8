@@ -1,0 +1,548 @@
+MARS APS
+DOC-008
+Chapter-8
+Decision Feature Model
+
+Version: 1.0
+
+Status: Architecture Freeze
+
+1. Amaç
+
+Bu bölümün amacı:
+
+Decision Engine, Solver ve AI modellerinin kullanacağı tüm karar özelliklerini (Decision Features) standartlaştırmaktır.
+
+Bu model sayesinde:
+
+OR-Tools
+AI
+Rule Engine
+Simulation Engine
+
+aynı veri dilini konuşacaktır.
+
+2. Feature Mimarisi
+
+Her feature aşağıdaki yapıya sahiptir.
+
+Feature
+
+↓
+
+Category
+
+↓
+
+Calculation
+
+↓
+
+Normalization
+
+↓
+
+Weight
+
+↓
+
+Decision Usage
+
+Bir feature;
+
+ham veri değildir.
+tablo değildir.
+kolon değildir.
+
+Karar girdisidir.
+
+3. Feature Katmanları
+
+MARS'ta yaklaşık 250–400 feature olacaktır.
+
+Bunlar 15 kategoriye ayrılır.
+
+Kod	Feature Grubu
+DF-01	Operator Features
+DF-02	Skill Features
+DF-03	Machine Features
+DF-04	Operation Features
+DF-05	Flow Features
+DF-06	Queue Features
+DF-07	Line Features
+DF-08	Capacity Features
+DF-09	Quality Features
+DF-10	Time Features
+DF-11	Learning Features
+DF-12	Risk Features
+DF-13	Factory Features
+DF-14	Decision Features
+DF-15	Prediction Features
+DF-01 Operator Features
+
+Karar motorunun en fazla kullandığı grup.
+
+OF-001
+
+Operator Availability Score
+
+0–100
+
+Operatör gerçekten atanabilir mi?
+
+Bileşenler:
+
+Devamsızlık
+Vardiya
+Mola
+İzin
+Mevcut görev
+OF-002
+
+Operator Efficiency Score
+
+Gerçek üretim performansı.
+
+OF-003
+
+Learning Score
+
+Ne kadar hızlı öğreniyor?
+
+OF-004
+
+Fatigue Score
+
+Yorgunluk.
+
+OF-005
+
+Skill Match Score
+
+Operasyona uygunluk.
+
+OF-006
+
+Experience Score
+
+Benzer operasyon tecrübesi.
+
+OF-007
+
+Operator Stability
+
+Performans değişkenliği.
+
+OF-008
+
+Collaboration Score
+
+Takım uyumu.
+
+OF-009
+
+Attendance Reliability
+
+İşe devam güvenilirliği.
+
+OF-010
+
+Operator Flexibility
+
+Kaç farklı operasyon yapabiliyor?
+
+DF-02 Skill Features
+
+Skill Level
+
+Skill Similarity
+
+Skill Transition Cost
+
+Skill Learning Speed
+
+Skill Scarcity
+
+Skill Criticality
+
+Skill Utilization
+
+Skill Risk
+
+DF-03 Machine Features
+
+Machine Availability
+
+Machine Health
+
+Machine Utilization
+
+Setup Time Score
+
+Maintenance Risk
+
+Compatibility Score
+
+Speed Score
+
+Failure Probability
+
+DF-04 Operation Features
+
+Operation Complexity
+
+Operation Difficulty
+
+Operation Priority
+
+Dynamic SMV
+
+Dependency Count
+
+Critical Path Score
+
+Parallelization Score
+
+Splittability Score
+
+DF-05 Flow Features
+
+Flow Velocity
+
+Waiting Score
+
+Transfer Score
+
+Flow Stability
+
+Flow Density
+
+Flow Risk
+
+Flow Priority
+
+Flow Delay
+
+DF-06 Queue Features
+
+Queue Size
+
+Queue Time
+
+Queue Growth Rate
+
+Queue Volatility
+
+Queue Priority Mix
+
+Queue Saturation
+
+DF-07 Line Features
+
+Line Balance Score
+
+Line Efficiency
+
+Line Stability
+
+Operator Density
+
+Machine Density
+
+Transfer Flexibility
+
+Setup Sensitivity
+
+WIP Pressure
+
+DF-08 Capacity Features
+
+Remaining Capacity
+
+Future Capacity
+
+Capacity Risk
+
+Reserve Capacity
+
+Shift Capacity
+
+Skill Capacity
+
+Machine Capacity
+
+DF-09 Quality Features
+
+Defect Risk
+
+Rework Risk
+
+Quality Stability
+
+FPY Score
+
+Operator Quality Score
+
+Machine Quality Score
+
+DF-10 Time Features
+
+Due Date Risk
+
+Slack Time
+
+Lead Time
+
+Remaining Time
+
+Schedule Pressure
+
+Time Buffer
+
+DF-11 Learning Features
+
+Learning Velocity
+
+Plateau Score
+
+Skill Growth
+
+Knowledge Freshness
+
+Training Need
+
+DF-12 Risk Features
+
+Delay Risk
+
+Capacity Risk
+
+Machine Risk
+
+Operator Risk
+
+Supplier Risk
+
+Quality Risk
+
+Factory Risk
+
+DF-13 Factory Features
+
+Factory Health
+
+Factory Stability
+
+Resource Balance
+
+Load Distribution
+
+Energy Efficiency
+
+Maintenance Readiness
+
+Overall Readiness
+
+DF-14 Decision Features
+
+Decision Confidence
+
+Decision Cost
+
+Decision Gain
+
+Decision Explainability
+
+Decision Stability
+
+Decision Repeatability
+
+DF-15 Prediction Features
+
+Prediction Confidence
+
+Prediction Error
+
+Forecast Accuracy
+
+Trend Score
+
+Seasonality Score
+
+Anomaly Score
+
+4. Feature Hesaplama Akışı
+
+Her feature aynı yaşam döngüsünü izler.
+
+Raw Event
+      │
+      ▼
+Validation
+      │
+      ▼
+Aggregation
+      │
+      ▼
+Feature Calculation
+      │
+      ▼
+Normalization
+      │
+      ▼
+Feature Store
+      │
+      ▼
+Decision Engine
+5. Feature Normalizasyonu
+
+Karar motorunda farklı ölçeklerdeki değerler doğrudan kullanılmaz.
+
+Örnek:
+
+SMV → dakika
+Queue → adet
+Efficiency → %
+
+Bunların tamamı ortak skorlara dönüştürülür.
+
+Standart aralık:
+
+0
+
+↓
+
+100
+
+Bazı AI modellerinde ise:
+
+0
+
+↓
+
+1
+
+kullanılabilir.
+
+6. Feature Metadata
+
+Her feature aşağıdaki metadata'yı taşır.
+
+Alan	Açıklama
+FeatureCode	Benzersiz kod
+Name	Ad
+Description	Açıklama
+Category	Grup
+Unit	Birim
+CalculationVersion	Hesaplama sürümü
+RefreshPolicy	Güncellenme sıklığı
+OwnerModule	Üreten modül
+Consumers	Kullanan modüller
+
+Bu sayede hangi kararın hangi feature sürümünü kullandığı izlenebilir.
+
+7. Feature Set'leri
+
+Her optimizasyon aynı feature'ları kullanmaz.
+
+Örnek:
+
+Motor	Yaklaşık Feature Sayısı
+Hat Dengeleme	70–100
+Operatör Atama	80–120
+WIP Optimizasyonu	40–60
+Darboğaz Analizi	30–50
+Üretim Sıralama	60–90
+AI Tahmin Modelleri	150–250
+
+Bu yapı, her algoritmanın sadece ihtiyaç duyduğu veriyi almasını sağlar.
+
+8. Feature Governance
+
+Feature'lar geliştirildikçe sürümlenir.
+
+Örneğin:
+
+OF-004 Fatigue Score
+
+v1.0
+
+↓
+
+v1.1
+
+↓
+
+v2.0
+
+Karar geçmişi her zaman hangi sürümün kullanıldığını saklar.
+
+9. MARS'ın Rekabet Avantajı
+
+Çoğu APS sistemi doğrudan tablo alanlarını solver'a gönderir.
+
+MARS ise:
+
+Ham veriyi toplar.
+Türetilmiş metrikleri üretir.
+Standardize edilmiş feature'ları oluşturur.
+Solver ve AI sadece bu feature'larla çalışır.
+
+Bu ayrım sayesinde;
+
+algoritmalar değişebilir,
+veri tabanı değişebilir,
+AI modeli değişebilir,
+
+ama karar dili değişmez.
+
+Bu, sistemi uzun yıllar sürdürülebilir ve genişletilebilir kılar.
+
+📌 Chapter-8 Sonucu
+
+Bu bölüm tamamlandığında MARS'ın Decision Feature Language tanımlanmış oldu.
+
+Artık:
+
+veri modeli,
+hesaplama modeli,
+karar girdileri
+
+birbirinden ayrılmış durumda.
+
+Bu, kurumsal APS sistemlerinde görülen en önemli mimari katmanlardan biridir.
+
+🚨 Ancak Şimdi Çok Kritik Bir Eşiğe Geldik
+
+Şimdiye kadar oluşturduğumuz tüm bölümler şu soruyu cevapladı:
+
+"Karar vermek için hangi bilgiler gerekir?"
+
+Artık cevaplamamız gereken soru farklı:
+
+"Karar verme süreci nasıl işler?"
+
+Bu artık veri modelinin konusu değil; karar mimarisinin konusudur.
+
+Bu nedenle benim önerim, DOC-008'i burada kapatmak.
+
+Çünkü bundan sonrası artık veritabanı değil, Decision Engine Architecture dokümanıdır.
+
+Bence sıradaki belge DOC-009 olmalı ve adı şu olmalı:
+
+DOC-009 – Decision Engine Architecture
+
+Burada şunları tasarlayacağız:
+
+Event → Decision akışı
+Rule Engine
+OR-Tools entegrasyonu
+Çok aşamalı solver pipeline'ı
+AI destekli karar katmanı
+Constraint yönetimi
+Objective yönetimi
+Decision Orchestrator
+Explainable Decision (neden bu karar verildi?)
+Rollback ve yeniden optimizasyon mekanizması
+
+Bana göre MARS'ın gerçek çekirdeği bu belgeyle başlayacak. Bu noktadan sonra artık "veri modeli"nden çıkıp doğrudan APS'nin beynini inşa etmeye başlayacağız.
