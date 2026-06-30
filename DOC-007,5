@@ -1,0 +1,371 @@
+DOC-008 Dynamic Flow Balancing Model'i yazmayacağım.
+
+Çünkü fark ettiğim çok kritik bir eksik var.
+
+Şu anda elimizde ne var?
+DOC-001 Domain
+DOC-002 Object Model
+DOC-003 Factory State
+DOC-004 Manufacturing Physics
+DOC-005 Decision Catalog
+DOC-006 Decision Engine
+DOC-007 Mathematical Model
+
+Her şey güzel.
+
+Ama...
+
+Çok önemli bir şey eksik.
+
+Veri modeli (Data Model).
+
+Sen sürekli şunu söylüyorsun.
+
+APS karar versin.
+
+Peki neye bakarak?
+
+Mesela;
+
+Bu operatör
+
+hangi tablo?
+
+Bu operasyon
+
+hangi tablo?
+
+Hazırlık bandı
+
+hangi obje?
+
+Flow Unit
+
+hangi entity?
+
+SMV
+
+nerede tutuluyor?
+
+Skill Matrix
+
+hangi tabloda?
+
+Bunların hiçbirini tanımlamadık.
+
+Yani matematik var.
+
+Ama matematiğin besleneceği veri modeli yok.
+
+Profesyonel APS geliştirilirken sıra şöyledir:
+
+Business
+
+↓
+
+Object Model
+
+↓
+
+Decision Model
+
+↓
+
+DATA MODEL   ← BURASI EKSİK
+
+↓
+
+Mathematical Model
+
+↓
+
+Code
+Bu yüzden sıradaki belge değişiyor.
+DOC-008
+Enterprise Data Model (EDM)
+
+Bu belge projenin en önemli belgesi olacak.
+
+Çünkü Claude Code bundan sonra bütün kodu buna göre yazacak.
+
+İçinde ne olacak?
+
+Yaklaşık 120-180 tablo olacak.
+
+Örneğin;
+
+Master Data
+Factory
+
+Department
+
+ProductionLine
+
+WorkCenter
+
+Machine
+
+Operator
+
+Skill
+
+Shift
+
+Calendar
+
+Holiday
+
+Operation
+
+OperationGroup
+
+MachineType
+
+Product
+
+Model
+
+Style
+
+Customer
+
+Supplier
+Production
+Order
+
+OrderItem
+
+Bundle
+
+FlowUnit
+
+Route
+
+OperationSequence
+
+ProductionPlan
+
+ProductionStep
+
+WIP
+
+Transfer
+
+Queue
+
+LineLoad
+
+Skill
+OperatorSkill
+
+OperatorHistory
+
+LearningCurve
+
+PerformanceHistory
+
+EfficiencyHistory
+
+FatigueHistory
+
+APS
+Decision
+
+DecisionType
+
+DecisionHistory
+
+OptimizationRun
+
+SolverRun
+
+Constraint
+
+Objective
+
+Scenario
+
+Simulation
+
+AI
+Prediction
+
+PredictionHistory
+
+TrainingData
+
+FeatureStore
+
+ModelVersion
+
+InferenceLog
+
+Quality
+Defect
+
+Repair
+
+Inspection
+
+QualityPoint
+
+Maintenance
+Maintenance
+
+Breakdown
+
+Downtime
+
+MachineHealth
+
+Analytics
+KPI
+
+OEE
+
+Efficiency
+
+FactoryHealth
+
+BalanceScore
+
+Ama sadece tablo olmayacak.
+
+Her tablo için;
+
+PK
+
+FK
+
+Index
+
+Constraint
+
+Trigger
+
+View
+
+Materialized View
+
+Partition
+
+Archive Policy
+
+tanımlanacak.
+
+Sonra
+
+ER Diagram
+
+oluşturacağız.
+
+Yaklaşık
+
+150 tablo
+
+↓
+
+600 ilişki
+
+oluşacak.
+
+Bundan sonra ne olacak?
+
+İşte burada proje gerçekten yazılabilir hale gelecek.
+
+Çünkü;
+
+Database
+
+↓
+
+API
+
+↓
+
+Backend
+
+↓
+
+Solver
+
+↓
+
+AI
+
+↓
+
+Frontend
+
+hepsi aynı veri modelini kullanacak.
+
+Ben olsam burada durur ve şu belgeyi yazardım.
+DOC-008
+
+Enterprise Data Model
+
+Yaklaşık 400-500 sayfalık bir teknik doküman olur.
+
+Bundan sonraki sıra
+DOC-008 Enterprise Data Model
+
+↓
+
+DOC-009 Database Physical Design
+
+↓
+
+DOC-010 API Contract
+
+↓
+
+DOC-011 Solver Interface
+
+↓
+
+DOC-012 AI Interface
+
+↓
+
+DOC-013 Backend Architecture
+
+↓
+
+DOC-014 Frontend Architecture
+📌 Ben olsaydım burada bir karar daha alırdım.
+
+Artık proje "belge yazma" aşamasını da bitirirdim.
+
+Çünkü bundan sonra en verimli yaklaşım, belgeleri tek tek yazmak yerine doğrudan gerçek repository oluşturmaktır.
+
+Yani:
+
+mars/
+│
+├── docs/
+│   ├── DOC-001.md
+│   ├── DOC-002.md
+│   ├── ...
+│
+├── database/
+│   ├── schema/
+│   ├── migrations/
+│   └── seed/
+│
+├── backend/
+├── solver/
+├── ai/
+├── frontend/
+└── infrastructure/
+
+Ve her belge yazıldığında, karşılığında gerçek kod, SQL şeması veya API sözleşmesi de oluşturulur.
+
+Bence artık proje "dokümantasyon ağırlıklı" değil, "specification-driven development" aşamasına geçmeli.
+
+Yani her spesifikasyonun sonunda şu üç çıktı zorunlu olmalı:
+
+SQL şeması
+API sözleşmesi (OpenAPI)
+Claude Code'un doğrudan uygulayacağı görev listesi
+
+Bu noktadan sonra proje, fikir ve tasarım olmaktan çıkar; adım adım çalışan bir üretim yazılımına dönüşür. Bu da seni doğrudan geliştirme sürecine taşır.
