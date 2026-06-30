@@ -1,0 +1,391 @@
+MARS APS
+DOC-009A-3
+Objective Function Library
+
+Version: 1.0
+
+Engine: Line Balancing Engine
+
+Status: Architecture Freeze
+
+1. Amaç
+
+Bu dokümanın amacı, Line Balancing Engine tarafından kullanılan tüm amaç fonksiyonlarını standart bir formatta tanımlamaktır.
+
+Her Objective;
+
+benzersiz kimliğe sahiptir,
+versiyonlanır,
+farklı senaryolarda etkinleştirilebilir,
+ağırlıkları değiştirilebilir,
+bağımsız test edilir.
+2. Objective Hiyerarşisi
+Objective Library
+│
+├── Primary Objectives
+├── Secondary Objectives
+├── Penalty Objectives
+├── KPI Objectives
+└── Scenario Objectives
+3. Objective Kimliklendirme
+
+Standart format:
+
+LB-OBJ-001
+
+Örnekler:
+
+LB-OBJ-001
+LB-OBJ-002
+LB-OBJ-015
+LB-OBJ-104
+4. Objective Şablonu
+
+Her amaç fonksiyonu aşağıdaki alanlara sahiptir.
+
+Alan	Açıklama
+ObjectiveId	Kimlik
+Name	Ad
+Description	Açıklama
+Category	Primary / Secondary / KPI
+Formula	Matematiksel ifade
+Weight	Varsayılan ağırlık
+Normalization	0–100 veya 0–1
+Direction	Max / Min
+Activation Profile	Senaryo
+Version	Sürüm
+5. Primary Objectives
+
+Bunlar optimizasyonun temel hedefleridir.
+
+LB-OBJ-001
+Maximize Line Balance
+
+Amaç
+
+Hat yükünü mümkün olduğunca dengeli dağıtmak.
+
+Yön
+
+MAX
+
+Varsayılan ağırlık
+
+0.30
+LB-OBJ-002
+Maximize Operator Efficiency
+
+Amaç
+
+Operatörlerin gerçek verimliliğini artırmak.
+
+Yön
+
+MAX
+
+Ağırlık
+
+0.20
+
+LB-OBJ-003
+Maximize Delivery Performance
+
+Amaç
+
+Teslim tarihine uyumu artırmak.
+
+Yön
+
+MAX
+
+Ağırlık
+
+0.20
+
+LB-OBJ-004
+Minimize WIP
+
+Amaç
+
+Hat içindeki bekleyen işi azaltmak.
+
+Yön
+
+MIN
+
+Ağırlık
+
+0.10
+
+LB-OBJ-005
+Minimize Transfers
+
+Hatlar arası transferleri azaltmak.
+
+Yön
+
+MIN
+
+Ağırlık
+
+0.10
+
+LB-OBJ-006
+Minimize Quality Risk
+
+Yön
+
+MIN
+
+Ağırlık
+
+0.10
+
+6. Secondary Objectives
+
+Bu hedefler yalnızca gerekli olduğunda etkinleşir.
+
+LB-OBJ-020
+
+Makine kullanımını dengele.
+
+LB-OBJ-021
+
+Operatör öğrenmesini hızlandır.
+
+LB-OBJ-022
+
+Yorgunluğu azalt.
+
+LB-OBJ-023
+
+Enerji tüketimini azalt.
+
+LB-OBJ-024
+
+Hat değişimlerini azalt.
+
+LB-OBJ-025
+
+Setup süresini azalt.
+
+7. KPI Objectives
+
+Bu amaçlar doğrudan fabrika KPI'larını hedefler.
+
+Objective	KPI
+LB-OBJ-100	OEE
+LB-OBJ-101	Hat Verimliliği
+LB-OBJ-102	Teslim Performansı
+LB-OBJ-103	WIP
+LB-OBJ-104	İlk Seferde Doğru Üretim (FPY)
+LB-OBJ-105	Operatör Kullanımı
+LB-OBJ-106	Makine Kullanımı
+8. Penalty Objectives
+
+Hard constraint ihlal edilemez.
+
+Ancak soft constraint'ler ceza puanına dönüşür.
+
+Toplam ceza:
+
+Penalty =
+Σ (Violation × PenaltyWeight)
+
+Örnek:
+
+İhlal	Ceza
+Transfer	15
+Operasyon Bölme	20
+Öğrenme Eğrisi Dışı Atama	10
+Yorgun Operatör	25
+
+Bu değerler Objective Score'dan düşülür.
+
+9. Composite Objective
+
+Toplam amaç fonksiyonu:
+
+Score =
+Σ (ObjectiveWeight × ObjectiveScore)
+− Σ (PenaltyWeight × Penalty)
+
+Her Objective önce normalize edilir.
+
+Böylece farklı ölçeklerdeki metrikler birlikte değerlendirilebilir.
+
+10. Normalization Strategy
+
+Her metrik ortak ölçeğe çevrilir.
+
+Ölçek	Destek
+0–100	Varsayılan
+0–1	AI Modelleri
+Z-Score	Analitik
+Min-Max	Alternatif
+
+Varsayılan yöntem:
+
+Min-Max Normalization
+
+11. Objective Profilleri
+
+Aynı sistem farklı üretim senaryolarında farklı hedefler kullanabilir.
+
+Normal Üretim
+Amaç	Ağırlık
+Hat Dengesi	30
+Verimlilik	20
+Teslim	20
+WIP	10
+Transfer	10
+Kalite	10
+Acil Sipariş
+Amaç	Ağırlık
+Teslim	45
+Hat Dengesi	20
+Verimlilik	15
+Kalite	10
+WIP	5
+Transfer	5
+Eğitim Hattı
+Amaç	Ağırlık
+Öğrenme	35
+Kalite	20
+Hat Dengesi	20
+Teslim	10
+WIP	10
+Transfer	5
+
+Bu profiller yapılandırılabilir olmalıdır.
+
+12. Çok Amaçlı Optimizasyon Stratejileri
+
+MARS üç farklı yaklaşımı destekler.
+
+Weighted Sum
+
+Varsayılan yöntem.
+
+Avantajı:
+
+hızlı,
+OR-Tools ile uyumlu,
+gerçek zamanlı kullanım için uygun.
+Lexicographic Optimization
+
+Öncelik sırası tanımlanır.
+
+Örnek:
+
+Teslim tarihi
+Hat dengesi
+WIP
+Transfer
+
+Üst sıradaki amaç iyileştirilmeden alt sıraya geçilmez.
+
+Pareto Optimization
+
+Çok kritik analizler için.
+
+Çıktı:
+
+Plan A
+Plan B
+Plan C
+Pareto Frontier
+
+Kullanıcı veya üst seviye karar motoru tercih yapabilir.
+
+13. Objective Aktivasyon Kuralları
+
+Her Objective her zaman aktif değildir.
+
+Örnek:
+
+Objective	Normal	Acil	Simülasyon
+Line Balance	✔	✔	✔
+Learning	✖	✖	✔
+Energy	✔	✖	✔
+Delivery	✔	✔	✔
+14. Objective Çakışmaları
+
+Amaçlar bazen birbirine zıt olabilir.
+
+Örnekler:
+
+Verimlilik ↑ ↔ Öğrenme ↓
+Teslim ↑ ↔ Transfer ↓
+WIP ↓ ↔ Makine Kullanımı ↓
+
+Bu nedenle sistem;
+
+Çakışmaları kaydeder.
+Kullanılan ağırlıkları raporlar.
+Karar açıklamasına bu etkileri ekler.
+15. Objective Yaşam Döngüsü
+Draft
+   ↓
+Review
+   ↓
+Approved
+   ↓
+Implemented
+   ↓
+Validated
+   ↓
+Released
+   ↓
+Deprecated
+
+Her değişiklik sürüm ve gerekçe bilgisiyle izlenir.
+
+16. Objective Performans Analizi
+
+Her optimizasyon çalışmasından sonra aşağıdaki bilgiler kaydedilir.
+
+Alan	Açıklama
+Objective Set	Kullanılan hedef profili
+Objective Values	Her hedefin elde ettiği skor
+Penalty Score	Toplam ceza
+Composite Score	Nihai skor
+Solver Time	Çözüm süresi
+Improvement	Önceki plana göre iyileşme
+
+Bu veriler gelecekte AI destekli ağırlık optimizasyonu için kullanılabilir.
+
+17. Tasarım İlkeleri
+Amaç fonksiyonları kısıtlardan bağımsız yönetilmelidir.
+Her amaç normalize edilmelidir.
+Ağırlıklar kod içinde sabit olmamalıdır.
+Birden fazla optimizasyon stratejisi desteklenmelidir.
+Sonuçlar açıklanabilir ve izlenebilir olmalıdır.
+Yeni hedefler mevcut yapıyı bozmadan eklenebilmelidir.
+📌 DOC-009A-3 Sonucu
+
+Bu belge ile Line Balancing Engine'in "iyi çözüm" tanımı standartlaştırılmış oldu. Artık sistem yalnızca uygulanabilir planlar üretmekle kalmayacak, aynı zamanda farklı üretim stratejilerine göre en uygun planı seçebilecek.
+
+Bir sonraki kritik belge
+
+Artık matematiksel modelin üç temel ayağını tamamladık:
+
+DOC-009A-1: Mathematical Optimization Model
+DOC-009A-2: Constraint Library Specification
+DOC-009A-3: Objective Function Library
+
+Bundan sonra en mantıklı adım DOC-009A-4 – OR-Tools CP-SAT Implementation Specification olacaktır.
+
+Bu belge artık mimari değil, doğrudan geliştiricinin uygulayacağı teknik tasarımı içerir:
+
+CP-SAT modelinin sınıf yapısı,
+değişken oluşturma stratejileri,
+constraint'lerin modele dönüştürülmesi,
+objective builder,
+solver konfigürasyonu,
+çözüm callback'leri,
+warm start ve incremental optimization,
+performans optimizasyonları,
+pseudo-code ve modül arayüzleri.
+
+Bu belge tamamlandığında Line Balancing Engine, uygulama geliştirme aşamasına hazır hale gelir
