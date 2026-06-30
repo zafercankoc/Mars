@@ -1,0 +1,628 @@
+ARS Software Design Specification
+DOC-004
+Manufacturing Physics Specification
+
+Version: 1.0
+
+Status: Draft
+
+Priority: Critical
+
+Dependencies
+
+DOC-001 Domain Language
+DOC-002 Object Model
+DOC-003 Decision Engine
+1. Belgenin Amacı
+
+Manufacturing Physics, üretimin değiştirilemez fiziksel kurallarını tanımlar.
+
+Bu kurallar;
+
+kullanıcı tarafından değiştirilemez,
+AI tarafından değiştirilemez,
+APS tarafından ihlal edilemez.
+
+APS sadece bu fizik kurallarının içinde en iyi çözümü arar.
+
+2. Manufacturing Physics'in Temel Kanunları
+
+Bu belgeye göre üretim aşağıdaki temel kanunlara tabidir.
+
+LAW-001
+Conservation of Flow (Akışın Korunumu)
+
+Bir ürün yoktan oluşamaz.
+
+Bir ürün kaybolamaz.
+
+Bir ürün sadece;
+
+bekler,
+taşınır,
+işlenir,
+bölünür,
+birleşir,
+tamamlanır.
+
+Matematiksel olarak
+
+Input=Output+WIP
+
+Örneğin
+
+Kesimden
+
+100 adet çıktıysa
+
+Hazırlık
+
+100 adet almalıdır.
+
+98 alamaz.
+
+105 alamaz.
+
+Bu
+
+APS'nin
+
+en temel kuralıdır.
+
+LAW-002
+Operation Order
+
+Operasyon sırası değiştirilemez.
+
+Örneğin
+
+Cep Dik
+
+↓
+
+Kol Tak
+
+↓
+
+Yaka
+
+↓
+
+Etiket
+
+APS
+
+şunu yapamaz.
+
+Kol
+
+↓
+
+Cep
+
+Operasyon grafiği
+
+Directed Acyclic Graph (DAG)
+
+olarak tanımlanacaktır.
+
+LAW-003
+Resource Capacity
+
+Bir kaynak
+
+aynı anda
+
+yalnızca
+
+bir operasyon yapabilir.
+
+Makine
+
+aynı saniyede
+
+iki farklı bundle işleyemez.
+
+Operatör
+
+aynı anda
+
+iki farklı makinede çalışamaz.
+
+Formül
+
+∑x
+ijt
+	​
+
+≤1
+LAW-004
+Time Continuity
+
+Zaman ileri akar.
+
+APS
+
+geçmişe plan yapamaz.
+
+Her operasyon
+
+başlangıç
+
+ve
+
+bitiş
+
+zamanına sahiptir.
+
+Start<Finish
+LAW-005
+Precedence
+
+Bir operasyon
+
+önceki operasyon bitmeden başlayamaz.
+
+Finish(A)≤Start(B)
+
+Bu
+
+CP-SAT
+
+için
+
+Interval Constraint olacaktır.
+
+LAW-006
+Machine Compatibility
+
+Her operasyon
+
+yalnızca
+
+uygun makinede çalışabilir.
+
+Örneğin
+
+Overlok
+
+↓
+
+Singer
+
+↓
+
+Reçme
+
+APS
+
+Singer operasyonunu
+
+Overlok makinesine
+
+veremez.
+
+LAW-007
+Skill Compatibility
+
+Operatör
+
+operasyonu
+
+yapabiliyor olmalıdır.
+
+Skill
+
+eşik değeri
+
+örneğin
+
+70
+
+altındaysa
+
+atanamaz.
+
+Formül
+
+Skill
+ij
+	​
+
+≥SkillThreshold
+LAW-008
+Queue Formation
+
+Kaynak doluysa
+
+kuyruk oluşur.
+
+Queue
+
+sonsuz değildir.
+
+Her hattın
+
+maksimum
+
+WIP
+
+kapasitesi vardır.
+
+Queue≤MaxQueue
+LAW-009
+Bottleneck Propagation
+
+Darboğaz
+
+sadece
+
+kendisini etkilemez.
+
+Darboğaz
+
+arkasını
+
+bloklar.
+
+Önünü
+
+bekletir.
+
+Bu nedenle
+
+darboğaz
+
+graph üzerinde yayılır.
+
+LAW-010
+Starvation
+
+Makine
+
+iş bekliyorsa
+
+Starvation oluşur.
+
+Makine
+
+çalışmıyorsa
+
+verim
+
+0'dır.
+
+APS
+
+Starvation'u
+
+minimuma indirecektir.
+
+LAW-011
+Blocking
+
+Sonraki operasyon
+
+doluyken
+
+önceki operasyon
+
+boşaltılamaz.
+
+Bu nedenle
+
+WIP
+
+artar.
+
+LAW-012
+Cycle Time
+
+Her operasyonun
+
+Cycle Time'ı vardır.
+
+CT=SMV×Difficulty×Learning×Efficiency
+
+SMV
+
+tek başına
+
+gerçek süre değildir.
+
+LAW-013
+Line Capacity
+
+Hat kapasitesi
+
+en yavaş
+
+operasyona bağlıdır.
+
+Capacity=
+BottleneckCycle
+WorkingTime
+	​
+
+LAW-014
+Balance Law
+
+Hat dengesi
+
+maksimum çevrim süresine göre belirlenir.
+
+Balance=
+n×MaxCT
+∑CT
+	​
+
+
+Hedef
+
+%95+
+
+LAW-015
+Setup Loss
+
+Model değişince
+
+Setup oluşur.
+
+Setup
+
+kapasite kaybıdır.
+
+Capacity
+′
+=Capacity−Setup
+LAW-016
+Learning Effect
+
+Operatör
+
+aynı işi yaptıkça
+
+çevrim süresi azalır.
+
+Öğrenme eğrisi
+
+T
+n
+	​
+
+=T
+1
+	​
+
+×n
+−b
+
+Burada:
+
+T
+n
+	​
+
+: n'inci tekrarın süresi
+T
+1
+	​
+
+: ilk tekrarın süresi
+b: öğrenme katsayısı
+LAW-017
+Fatigue Effect
+
+Uzun süre
+
+aynı operasyon
+
+↓
+
+Verim düşer.
+
+↓
+
+Kalite düşer.
+
+↓
+
+Risk artar.
+
+LAW-018
+Transfer Cost
+
+Hat değiştirmek
+
+ücretsiz değildir.
+
+Transfer
+
+zaman
+
+ve
+
+risk oluşturur.
+
+LAW-019
+Parallel Processing
+
+Bağımsız operasyonlar
+
+aynı anda yapılabilir.
+
+Örnek:
+
+Cep Hazırlama
+
+||
+
+Etiket Hazırlama
+
+APS bunu
+
+otomatik
+
+bulacaktır.
+
+LAW-020
+Split & Merge
+
+Flow Unit
+
+parçalara ayrılabilir.
+
+Sonra
+
+tekrar birleşebilir.
+
+Bu
+
+stoklu üretimin
+
+temelidir.
+
+LAW-021
+Conservation of Operators
+
+Bir operatör
+
+aynı vardiyada
+
+tek hattın
+
+aktif üyesidir.
+
+Transfer
+
+bir olaydır.
+
+LAW-022
+Factory Health
+
+Her karar
+
+Factory Health'i
+
+arttırmalıdır.
+
+Factory Health
+
+tek KPI değildir.
+
+Alt KPI'lar
+
+Termin
+Akış
+Denge
+Kalite
+Karlılık
+WIP
+OEE
+Öğrenme
+Esneklik
+LAW-023
+No Local Optimization
+
+En kritik kanunlardan biri.
+
+APS
+
+bir hattı
+
+maksimum yapamaz.
+
+APS
+
+fabrikayı
+
+maksimum yapar.
+
+Örnek
+
+A hattı
+
+%100
+
+çalışıyor.
+
+Ama
+
+B hattı
+
+duruyor.
+
+Bu
+
+iyi çözüm
+
+değildir.
+
+APS
+
+Global Optimum
+
+arar.
+
+LAW-024
+Decision Consistency
+
+Aynı State
+
+aynı kararları
+
+üretmelidir.
+
+Deterministik
+
+çalışmalıdır.
+
+LAW-025
+Continuous Replanning
+
+Her Event
+
+↓
+
+State
+
+↓
+
+Decision
+
+↓
+
+Optimization
+
+↓
+
+Execution
+
+döngüsünü tetikler.
+
+Bu Belgenin Çıktısı
+
+Manufacturing Physics, MARS'ın değiştirilemez üretim yasalarını tanımlar.
+
+Bundan sonra yazılacak hiçbir algoritma, hiçbir optimizasyon modeli ve hiçbir AI kararı bu kuralları ihlal edemez.
+
+📌 Bir sonraki belge (kritik geçiş)
+
+Buraya kadar yazdıklarımız "ne doğrudur?" sorusunu cevapladı.
+
+Sıradaki belge artık "nasıl hesaplanır?" sorusunu cevaplayacak.
+
+DOC-005 – Mathematical Optimization Model
+
+Bu belge, MARS'ın matematiksel çekirdeği olacak ve şunları tanımlayacak:
+
+Karar değişkenleri (Decision Variables)
+Parametreler
+Kümeler (Sets)
+Hard Constraints
+Soft Constraints
+Amaç fonksiyonları (Objective Functions)
+Çok amaçlı optimizasyon (Multi-objective Optimization)
+Google OR-Tools CP-SAT modeline birebir dönüşecek matematiksel formülasyon
+
+Bu belge tamamlandığında, elimizde ilk kez doğrudan çözücüye (solver) aktarılabilecek eksiksiz bir optimizasyon modeli olacak. Bu, projenin yazılım geliştirme aşamasına geçişindeki en önemli kilometre taşıdır.
