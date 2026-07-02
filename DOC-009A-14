@@ -1,0 +1,332 @@
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Line Balancing Engine'in fonksiyonel doğruluğunu, matematiksel doğruluğunu, teknik uygunluğunu ve üretim ortamına uygunluğunu doğrulamak amacıyla uygulanacak Validation (Geçerleme) ve Verification (Doğrulama) süreçlerini tanımlar.
+
+1.2 Definitions
+Verification
+
+Sistem doğru şekilde geliştirildi mi?
+
+Question
+
+Are we building the system correctly?
+
+Validation
+
+Geliştirilen sistem üretim ihtiyacını gerçekten karşılıyor mu?
+
+Question
+
+Are we building the right system?
+
+Chapter 2 – Scope
+
+Bu doküman aşağıdaki bileşenlerin doğrulanmasını kapsar.
+
+Kod	Component
+VV-001	Mathematical Model
+VV-002	Constraint Library
+VV-003	Objective Library
+VV-004	CP-SAT Solver
+VV-005	Optimization Algorithms
+VV-006	Heuristic Library
+VV-007	Explainability
+VV-008	Audit
+VV-009	Incremental Optimization
+VV-010	Failure Recovery
+Chapter 3 – Validation Strategy
+
+Validation dört seviyede gerçekleştirilir.
+
+Seviye	Açıklama
+Business Validation	İş kurallarının doğrulanması
+Production Validation	Gerçek üretim senaryoları
+KPI Validation	Performans doğrulaması
+User Validation	Kullanıcı kabulü
+Chapter 4 – Verification Strategy
+
+Verification aşağıdaki seviyelerde uygulanır.
+
+Seviye	Açıklama
+Code Verification	Kod doğruluğu
+Algorithm Verification	Algoritma doğruluğu
+Mathematical Verification	Matematiksel model doğruluğu
+Solver Verification	Solver doğruluğu
+Integration Verification	Modüller arası doğrulama
+Chapter 5 – Requirement Traceability Matrix (RTM)
+
+Her gereksinim test ve doğrulama ile ilişkilendirilmelidir.
+
+Requirement	Module	Test Case	Status
+REQ-001	Constraint Engine	TC-001	Verified
+REQ-002	Solver	TC-024	Verified
+REQ-003	Assignment	TC-035	Verified
+REQ-004	Audit	TC-071	Verified
+Chapter 6 – Mathematical Verification
+
+Doğrulanacak alanlar:
+
+Decision Variables
+Constraint Formulation
+Objective Functions
+Penalty Calculations
+Feasible Region
+Optimization Result
+
+Her matematiksel ifade referans örneklerle karşılaştırılır.
+
+Chapter 7 – Constraint Verification
+
+Her constraint aşağıdaki durumlarda test edilir.
+
+Valid Input
+Invalid Input
+Boundary Value
+Maximum Value
+Minimum Value
+Empty Dataset
+
+Beklenen sonuçlar dokümante edilir.
+
+Chapter 8 – Objective Verification
+
+Doğrulanan objective fonksiyonları:
+
+Efficiency
+Balance
+WIP
+Throughput
+Cost
+Overtime
+Idle Time
+Quality
+
+Her objective için beklenen skor ile hesaplanan skor karşılaştırılır.
+
+Chapter 9 – Solver Verification
+
+Kontrol edilen başlıklar:
+
+Feasible Solution
+Optimal Solution
+Timeout Handling
+Warm Start
+Incremental Solving
+Multi-thread Execution
+Deterministic Execution
+Chapter 10 – Algorithm Verification
+
+Doğrulanan algoritmalar:
+
+Greedy
+CP-SAT
+Tabu Search
+Genetic Algorithm
+Variable Neighborhood Search
+Large Neighborhood Search
+Repair Algorithms
+
+Her algoritma için:
+
+Doğruluk
+Kararlılık
+Tekrarlanabilirlik
+Performans
+
+ölçülür.
+
+Chapter 11 – Data Validation
+
+Kontrol edilen veri alanları:
+
+Operators
+Operations
+Machines
+Skills
+Orders
+Calendars
+Production Lines
+Working Shifts
+Resources
+
+Doğrulama kuralları:
+
+Null kontrolü
+Veri tipi kontrolü
+Referans bütünlüğü
+Aralık kontrolü
+Tekrarlı kayıt kontrolü
+Chapter 12 – Integration Verification
+
+Doğrulanan entegrasyonlar:
+
+MES
+ERP
+HR
+Machine Data
+Quality System
+Warehouse
+Calendar Service
+
+Kontroller:
+
+Veri bütünlüğü
+Senkronizasyon
+Hata yönetimi
+Gecikme süreleri
+Chapter 13 – Explainability Validation
+
+Doğrulanacak özellikler:
+
+Karar açıklaması oluşturuldu mu?
+Constraint açıklamaları doğru mu?
+Objective katkıları hesaplandı mı?
+Confidence Score üretildi mi?
+Kullanıcı açıklaması oluşturuldu mu?
+Chapter 14 – Audit Verification
+
+Kontrol edilir:
+
+Decision ID
+Snapshot
+Candidate Plans
+Timeline
+Solver Log
+User Action
+Version History
+
+Hiçbir kayıt kaybolmamalıdır.
+
+Chapter 15 – Failure Recovery Validation
+
+Test edilen senaryolar:
+
+Solver Timeout
+Machine Failure
+Operator Absence
+Missing Data
+Constraint Conflict
+Integration Failure
+
+Her durumda sistem kontrollü şekilde çalışmaya devam etmelidir.
+
+Chapter 16 – Incremental Optimization Validation
+
+Doğrulama kriterleri:
+
+Sadece etkilenen alan optimize edilir.
+Frozen Zone korunur.
+Mevcut plan minimum düzeyde değişir.
+Performans hedefleri sağlanır.
+Chapter 17 – Performance Validation
+
+Kontrol edilen KPI'lar:
+
+KPI	Hedef
+Solution Time	SLA içinde
+Constraint Satisfaction	%100 (Hard)
+Objective Improvement	Beklenen değer
+Memory Usage	Limit altında
+CPU Usage	Kabul edilebilir
+Stability	Tekrarlanabilir
+Chapter 18 – User Acceptance Validation (UAT)
+
+İş birimi tarafından doğrulanacak senaryolar:
+
+Hat dengeleme
+Operatör atama
+Acil sipariş
+Devamsızlık
+Makine arızası
+Vardiya değişikliği
+Manuel müdahale
+
+Her senaryo için kullanıcı onayı alınmalıdır.
+
+Chapter 19 – Verification Reports
+
+Her doğrulama sonunda aşağıdaki rapor oluşturulur.
+
+Alan
+Verification ID
+Date
+Version
+Module
+Tester
+Result
+Findings
+Corrective Actions
+Chapter 20 – Validation Reports
+
+Her validation süreci sonunda aşağıdaki bilgiler raporlanır.
+
+Validation Scope
+Test Dataset
+Business Scenario
+Expected Result
+Actual Result
+Acceptance Status
+Approved By
+Approval Date
+Chapter 21 – Acceptance Criteria
+
+Line Balancing Engine doğrulanmış kabul edilmesi için:
+
+Tüm gereksinimler RTM üzerinde doğrulanmış olmalıdır.
+Hard Constraint ihlali bulunmamalıdır.
+Objective fonksiyonları beklenen sonucu üretmelidir.
+Solver deterministik davranmalıdır.
+Explainability kayıtları eksiksiz olmalıdır.
+Audit kayıtları eksiksiz oluşturulmalıdır.
+Failure Recovery mekanizmaları doğrulanmalıdır.
+Incremental Optimization başarıyla çalışmalıdır.
+Performans hedefleri karşılanmalıdır.
+Kullanıcı kabul testleri tamamlanmış olmalıdır.
+Chapter 22 – Validation & Verification Workflow
+Requirements
+      │
+      ▼
+Design Verification
+      │
+      ▼
+Implementation Verification
+      │
+      ▼
+Component Validation
+      │
+      ▼
+Integration Validation
+      │
+      ▼
+System Validation
+      │
+      ▼
+Performance Validation
+      │
+      ▼
+User Acceptance Test
+      │
+      ▼
+Production Approval
+Chapter 23 – Deliverables
+
+Bu süreç sonunda aşağıdaki çıktılar oluşturulur:
+
+Verification Report
+Validation Report
+Requirement Traceability Matrix (RTM)
+Test Evidence
+Performance Report
+Defect List
+Corrective Action Log
+Final Approval Report
+Chapter 24 – Document Completion Criteria
+
+Bu doküman tamamlanmış kabul edilmesi için:
+
+Tüm doğrulama süreçleri tanımlanmış olmalıdır.
+Validation ve Verification ayrımı net olarak belirtilmiş olmalıdır.
+Gereksinim izlenebilirliği sağlanmalıdır.
+Kabul kriterleri tanımlanmış olmalıdır.
+Nihai onay süreci dokümante edilmiş olmalıdır.
