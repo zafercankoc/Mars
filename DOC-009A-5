@@ -1,0 +1,2113 @@
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Line Balancing Engine içerisinde kullanılacak tüm optimizasyon algoritmalarını tanımlar.
+
+Amaç;
+
+algoritmaların görevlerini belirlemek,
+hangi senaryoda hangi algoritmanın kullanılacağını tanımlamak,
+algoritmalar arası geçiş mekanizmasını standartlaştırmak,
+geliştiriciler için ortak bir referans oluşturmaktır.
+
+Bu belge, matematiksel modeli (DOC-009A-1) ve CP-SAT uygulama mimarisini (DOC-009A-4) tamamlayan algoritmik katmandır.
+
+1.2 Design Philosophy
+
+MARS hiçbir zaman tek bir algoritmaya bağımlı değildir.
+
+Temel prensip:
+
+No Single Algorithm Solves Every Production Problem
+
+Gerçek üretim ortamında;
+
+küçük problemler,
+büyük problemler,
+gerçek zamanlı olaylar,
+darboğazlar,
+acil siparişler,
+
+aynı algoritma ile çözülemez.
+
+Bu nedenle MARS Adaptive Hybrid Optimization Framework (AHOF) yaklaşımını benimser.
+
+Chapter 2 – Adaptive Hybrid Optimization Framework (AHOF)
+2.1 Genel Mimari
+Production Event
+        │
+        ▼
+Problem Analyzer
+        │
+        ▼
+Problem Classifier
+        │
+        ▼
+Algorithm Selector
+        │
+        ▼
+Optimization Engine
+        │
+        ▼
+Candidate Plans
+        │
+        ▼
+Decision Scoring
+        │
+        ▼
+Best Plan
+
+Bu yapı sayesinde algoritma seçimi otomatik yapılır.
+
+2.2 Problem Analyzer
+
+İlk adım problemi analiz etmektir.
+
+Analiz edilen bilgiler:
+
+Operatör sayısı
+Operasyon sayısı
+Hat sayısı
+Constraint sayısı
+WIP yoğunluğu
+Darboğaz sayısı
+Sipariş öncelikleri
+Zaman limiti
+Gerçek zaman gereksinimi
+2.3 Problem Classification
+
+Her problem aşağıdaki sınıflardan birine atanır.
+
+Kod	Problem Türü
+PC-01	Small Assignment
+PC-02	Medium Assignment
+PC-03	Large Assignment
+PC-04	Dynamic Rebalance
+PC-05	Emergency Recovery
+PC-06	Multi-Line Optimization
+PC-07	High Constraint Problem
+PC-08	Simulation Scenario
+
+Bu sınıflandırma algoritma seçiminin temelidir.
+
+Chapter 3 – Algorithm Categories
+
+MARS algoritmaları sekiz ana gruba ayrılır.
+
+Optimization Algorithms
+│
+├── Exact Algorithms
+├── Constructive Heuristics
+├── Local Search
+├── Metaheuristics
+├── Hybrid Algorithms
+├── Repair Algorithms
+├── Incremental Algorithms
+└── Learning Assisted Algorithms
+Chapter 4 – Exact Algorithms
+Amaç
+
+En iyi (optimal) çözümü garanti eden algoritmalardır.
+
+Avantajları:
+
+Optimal çözüm
+Deterministik davranış
+Tekrarlanabilir sonuçlar
+
+Dezavantajları:
+
+Büyük problemlerde yavaş olabilir
+Gerçek zamanlı kullanım her zaman uygun değildir
+EA-001
+CP-SAT
+
+Ana algoritmadır.
+
+Kullanım Alanı:
+
+Tek hat
+Orta ölçek
+Karmaşık constraint yapısı
+Gerçek zamanlı yeniden optimizasyon
+
+Avantajları:
+
+Çok güçlü constraint desteği
+Binary karar değişkenlerinde yüksek performans
+OR-Tools ile ücretsiz kullanım
+Aktif geliştirme
+
+MARS'ın varsayılan çözücüsüdür.
+
+EA-002
+Mixed Integer Programming (MIP)
+
+Alternatif exact solver.
+
+Kullanım:
+
+Finansal optimizasyon
+Uzun dönem planlama
+Karmaşık maliyet modelleri
+
+Varsayılan olarak kullanılmaz ancak gelecekte desteklenebilir.
+
+EA-003
+Constraint Programming
+
+CP-SAT'ın temelini oluşturur.
+
+Özellikle;
+
+precedence,
+scheduling,
+sequence
+
+problemlerinde etkilidir.
+
+Chapter 5 – Constructive Heuristics
+
+Constructive Heuristics hızlı başlangıç çözümleri üretir.
+
+Bu çözümler daha sonra solver tarafından geliştirilir.
+
+CH-001
+Greedy Assignment
+
+Algoritma:
+
+Her operasyona en uygun operatörü sırayla ata.
+
+Avantajları:
+
+Çok hızlı
+O(n log n) seviyesinde çalışabilir
+Başlangıç çözümü üretmek için idealdir
+
+Dezavantajı:
+
+Global optimum garanti etmez.
+
+CH-002
+Largest Candidate Rule (LCR)
+
+Operasyonlar işlem sürelerine göre büyükten küçüğe sıralanır.
+
+En büyük operasyon önce yerleştirilir.
+
+Kullanım:
+
+İlk hat oluşturma
+Dengesiz başlangıç durumları
+CH-003
+Ranked Positional Weight (RPW)
+
+Her operasyon için;
+
+kendi süresi
+kendisinden sonra gelen operasyonların süreleri
+
+toplanarak ağırlık hesaplanır.
+
+Öncelik:
+
+En büyük ağırlığa sahip operasyonlar önce atanır.
+
+Avantaj:
+
+Öncelik ilişkilerini doğal olarak korur.
+
+CH-004
+Kilbridge & Wester
+
+Operasyonlar öncelik grafına göre kolonlara ayrılır.
+
+Her kolon sırasıyla hatta atanır.
+
+Avantajları:
+
+Öncelik ihlali oluşturmaz.
+Manuel dengeleme mantığına yakındır.
+Eğitim amaçlı senaryolarda anlaşılması kolaydır.
+CH-005
+COMSOAL
+
+Bilgisayar destekli rastgele çözüm üretme yaklaşımıdır.
+
+Adımlar:
+
+Uygun operasyon kümesini oluştur.
+Rastgele aday seç.
+Constraint kontrolü yap.
+Devam et.
+Birden fazla aday çözüm üret.
+En iyi çözümü seç.
+
+Avantajı:
+
+Tek çözüm yerine geniş çözüm uzayı oluşturur.
+
+Chapter 6 – Local Search Algorithms
+
+Bu algoritmalar mevcut çözümü iyileştirir.
+
+İlk çözümü üretmez.
+
+LS-001
+Operator Swap
+
+İki operatör yer değiştirir.
+
+Operator A
+
+↓
+
+Operator B
+
+↓
+
+Swap
+
+↓
+
+Evaluate
+
+Amaç:
+
+Hat dengesini artırmak
+WIP azaltmak
+Verimi yükseltmek
+LS-002
+Operation Swap
+
+İki operasyon yer değiştirir.
+
+Özellikle darboğaz oluşan bölgelerde kullanılır.
+
+LS-003
+Operator Relocation
+
+Bir operatör farklı istasyona taşınır.
+
+Tam optimizasyon yapılmadan lokal iyileştirme sağlar.
+
+LS-004
+Bundle Relocation
+
+Bekleyen bundle'lar farklı istasyonlara yönlendirilir.
+
+Amaç:
+
+WIP azaltmak
+Kuyruk dengelemek
+LS-005
+Micro Balance Adjustment
+
+Hat tamamen yeniden çözülmez.
+
+Yalnızca küçük dengesizlikler düzeltilir.
+
+Bu yöntem gerçek zamanlı sistemlerde çok etkilidir.
+
+Part-1 Sonucu
+
+Bu ilk bölümde aşağıdaki algoritma ailelerini tanımladık:
+
+Adaptive Hybrid Optimization Framework (AHOF)
+Problem Classification
+Exact Algorithms
+Constructive Heuristics
+MARS APS
+DOC-009A-5
+Optimization Algorithms
+Part-2
+
+Chapters 7–10
+
+Chapter 7 – Metaheuristic Algorithms
+7.1 Purpose
+
+Metaheuristik algoritmalar, exact solver'ların (CP-SAT, MIP vb.) büyük ve karmaşık problemlerde zaman sınırları nedeniyle zorlandığı durumlarda yüksek kaliteli uygulanabilir çözümler üretmek için kullanılır.
+
+Bu algoritmalar:
+
+küresel çözüm uzayını keşfeder,
+yerel optimumlardan kaçabilir,
+çok kısa sürede iyi çözümler üretebilir.
+
+MARS'ta metaheuristikler, tek başına değil, hibrit optimizasyon mimarisinin bir parçası olarak çalışır.
+
+7.2 Metaheuristic Selection Matrix
+Algoritma	Hız	Çözüm Kalitesi	Gerçek Zaman	Büyük Fabrika
+Genetic Algorithm	⭐⭐⭐	⭐⭐⭐⭐⭐	⭐⭐	⭐⭐⭐⭐⭐
+Simulated Annealing	⭐⭐⭐⭐	⭐⭐⭐⭐	⭐⭐⭐	⭐⭐⭐
+Tabu Search	⭐⭐⭐⭐	⭐⭐⭐⭐⭐	⭐⭐⭐⭐	⭐⭐⭐⭐
+Variable Neighborhood Search	⭐⭐⭐	⭐⭐⭐⭐⭐	⭐⭐⭐	⭐⭐⭐⭐⭐
+Ant Colony Optimization	⭐⭐	⭐⭐⭐⭐	⭐	⭐⭐⭐
+7.3 Genetic Algorithm (GA)
+Amaç
+
+Birden fazla aday çözüm üretmek, bunları evrimsel süreçlerle geliştirerek daha iyi planlara ulaşmak.
+
+Chromosome Representation
+
+MARS'ta kromozom, operatör atamalarını ve operasyon sıralarını temsil eder.
+
+Chromosome
+
+[O12→P4]
+[O08→P2]
+[O15→P9]
+...
+
+Her gen:
+
+Operatör
+Operasyon
+Hat
+Makine
+Zaman dilimi
+
+bilgilerini içerir.
+
+Population Initialization
+
+İlk popülasyon aşağıdaki kaynaklardan oluşturulur:
+
+Greedy Solution
+CP-SAT Initial Solution
+Random Assignment
+Previous Production Plan
+Expert Template
+
+Bu çeşitlilik, arama uzayını genişletir.
+
+Fitness Function
+
+Fitness hesaplanırken:
+
+Hat dengesi
+Verimlilik
+Teslim performansı
+WIP
+Kalite
+Soft constraint cezaları
+
+birlikte değerlendirilir.
+
+Fitness
+=
+Objective Score
+-
+Penalty
+Selection
+
+Desteklenen yöntemler:
+
+Tournament Selection
+Roulette Wheel
+Rank Selection
+Elitism
+
+Varsayılan:
+
+Tournament + Elitism
+
+Crossover
+
+Desteklenen operatörler:
+
+One Point
+Two Point
+Uniform
+Order Based
+Position Based
+
+Varsayılan:
+
+Uniform Crossover
+
+Mutation
+
+Mutasyon örnekleri:
+
+Operatör değiştir
+Operasyon değiştir
+Hat değiştir
+Rastgele yeniden ata
+Operasyon bloğunu taşı
+
+Mutasyon oranı dinamik olarak ayarlanabilir.
+
+Termination Criteria
+
+GA aşağıdaki koşullardan biri sağlandığında sonlanır:
+
+Maksimum jenerasyon
+Süre limiti
+Fitness iyileşmesinin durması
+Hedef kaliteye ulaşılması
+7.4 Simulated Annealing (SA)
+Amaç
+
+Yerel optimumlardan kontrollü şekilde kaçmak.
+
+Temel Mantık
+
+Başlangıçta kötü çözümler belirli olasılıkla kabul edilir.
+
+Sıcaklık düştükçe yalnızca daha iyi çözümler kabul edilir.
+
+Cooling Schedule
+
+Desteklenen stratejiler:
+
+Linear Cooling
+Geometric Cooling
+Adaptive Cooling
+
+Varsayılan:
+
+Adaptive Geometric Cooling
+
+Komşu Çözüm Üretimi
+Operatör değişimi
+Operasyon taşıma
+İstasyon değişikliği
+Bundle yönlendirme
+Avantajları
+Basit
+Hızlı
+Yerel optimumdan kaçabilir
+7.5 Tabu Search
+Amaç
+
+Son yapılan hareketleri geçici olarak yasaklayarak çözüm uzayında çeşitlilik sağlamaktır.
+
+Tabu List
+
+Her hareket belirli süre tabu olur.
+
+Örnek:
+
+Swap(O12,O15)
+
+↓
+
+Tabu
+
+↓
+
+10 Iteration
+Aspiration Rule
+
+Eğer tabu hareket mevcut en iyi çözümü geliştiriyorsa tabu kaldırılır.
+
+Neighborhood
+
+Komşuluk örnekleri:
+
+Operator Swap
+Operation Swap
+Bundle Move
+Line Transfer
+Avantajları
+Çok hızlı yakınsama
+Gerçek zamanlı kullanım
+Darboğaz çözümünde başarılı
+7.6 Variable Neighborhood Search (VNS)
+Amaç
+
+Tek komşuluk yerine farklı komşuluk yapıları kullanarak çözüm kalitesini artırmak.
+
+Neighborhood Levels
+N1
+Operator Swap
+
+↓
+
+N2
+Operation Swap
+
+↓
+
+N3
+Line Swap
+
+↓
+
+N4
+Bundle Move
+
+↓
+
+N5
+Full Rebalance
+
+İyileşme bulunamazsa bir sonraki komşuluğa geçilir.
+
+Avantajları
+Büyük fabrikalarda başarılı
+Yerel optimum riski düşük
+Hibrit optimizasyona uygun
+7.7 Ant Colony Optimization (ACO)
+Amaç
+
+Operasyonlar arasında feromon izleri oluşturarak iyi çözümlerin tekrar kullanılmasını sağlamak.
+
+Feromon Güncellemesi
+
+Başarılı atamalar daha yüksek feromon alır.
+
+Başarısız atamalar zamanla unutulur.
+
+Kullanım Alanı
+Çok hatlı üretim
+Alternatif rota seçimi
+Simülasyon çalışmaları
+Chapter 8 – Hybrid Optimization
+8.1 Felsefe
+
+MARS hiçbir zaman tek algoritmayla çalışmaz.
+
+En iyi çözüm:
+
+Doğru algoritmanın doğru zamanda seçilmesiyle elde edilir.
+
+8.2 Hybrid Pipeline
+Problem Context
+        │
+        ▼
+Greedy Initial Solution
+        │
+        ▼
+CP-SAT Optimization
+        │
+        ▼
+Tabu Search Improvement
+        │
+        ▼
+VNS Refinement
+        │
+        ▼
+Decision Scoring
+        │
+        ▼
+Best Plan
+8.3 Hibrit Senaryolar
+Senaryo	Algoritma Zinciri
+Küçük Fabrika	Greedy → CP-SAT
+Orta Ölçek	Greedy → CP-SAT → Tabu
+Büyük Fabrika	Greedy → GA → CP-SAT → VNS
+Gerçek Zaman	Previous Plan → Repair → CP-SAT
+Acil Sipariş	Repair → Tabu → Decision
+Chapter 9 – Large Neighborhood Search (LNS)
+Amaç
+
+Çözümün tamamını değil, yalnızca belirli bölümlerini bozup yeniden optimize etmek.
+
+Destroy Phase
+
+Örnek:
+
+Hat-2
+Operasyon 15–30
+8 Operatör
+
+çözümden çıkarılır.
+
+Repair Phase
+
+Boşalan bölüm:
+
+CP-SAT
+Greedy
+Tabu
+
+ile yeniden oluşturulur.
+
+Avantajları
+Çok büyük problemlerde yüksek hız
+Tam yeniden optimizasyondan daha düşük maliyet
+Gerçek zamanlı olaylara uygun
+Chapter 10 – Repair Algorithms
+Amaç
+
+Üretim sırasında oluşan beklenmedik olaylara minimum değişiklikle cevap vermek.
+
+Desteklenen Olaylar
+Operatör devamsızlığı
+Makine arızası
+Acil sipariş
+Kalite reddi
+Malzeme gecikmesi
+Hat duruşu
+Repair Workflow
+Production Event
+        │
+        ▼
+Impact Analysis
+        │
+        ▼
+Affected Area Detection
+        │
+        ▼
+Local Repair
+        │
+        ▼
+Constraint Validation
+        │
+        ▼
+Objective Evaluation
+        │
+        ▼
+Deployment
+Repair Seviyeleri
+Seviye	Açıklama
+R1	Tek operatör değişikliği
+R2	Tek istasyon yeniden ataması
+R3	Hat içi yeniden dengeleme
+R4	Çok hatlı yeniden dengeleme
+R5	Tam optimizasyon
+
+Sistem her zaman en düşük maliyetli onarım seviyesini tercih eder.
+
+Repair Stratejileri
+Minimal Change Repair: Mevcut planı mümkün olduğunca korur.
+Constraint-Driven Repair: Önce ihlal edilen kısıtları giderir.
+Objective-Driven Repair: Performans hedeflerini önceliklendirir.
+Hybrid Repair: Kısıt ve amaç fonksiyonlarını birlikte optimize eder.
+Part-2 Sonucu
+
+Bu bölümde MARS'ın gelişmiş optimizasyon altyapısını oluşturan:
+
+Metaheuristic Algorithms
+Genetic Algorithm
+Simulated Annealing
+Tabu Search
+Variable Neighborhood Search
+Ant Colony Optimization
+Hybrid Optimization
+Large Neighborhood Search (LNS)
+Repair Algorithms
+
+tanımlandı.
+
+Bu algoritmalar sayesinde Line Balancing Engine, hem küçük hem de büyük ölçekli üretim ortamlarında farklı senaryolara uyum sağlayabilir ve tek bir çözücüye bağımlı kalmadan yüksek kaliteli planlar üretebilir.
+
+📌 Mimari Not
+
+Burada bir geliştirme önerisi eklemek istiyorum. Günümüzde birçok APS sistemi yalnızca optimizasyon algoritmalarını kullanıyor. MARS'ı farklılaştırabilecek bir sonraki adım ise Algorithm Orchestrator katmanıdır. Bu katman, problemin özelliklerine göre algoritmaları otomatik seçen, gerektiğinde birden fazlasını ardışık veya paralel çalıştıran bir yönetici rolü üstlenir. Bu sayede sistem yalnızca "iyi algoritmalara" değil, doğru algoritmayı doğru problem için seçebilme yeteneğine sahip olur.
+
+Bu nedenle Part-3'te yalnızca algoritmaları değil, bunların nasıl yönetileceğini de tanımlayacağız. Bu bölüm; Algorithm Orchestrator, Adaptive Selection, Parallel Optimization, Distributed Solving ve AI-Assisted Algorithm Selection gibi MARS'ın en yenilikçi bileşenlerini içerecek ve Line Balancing Engine'i kurumsal seviyeye taşıyacaktır.
+
+Local Search Algorithms
+
+
+Bunlar Line Balancing Engine'in temel algoritmik çatısını oluşturur.
+MARS APS
+DOC-009A-5
+Optimization Algorithms
+Part-3
+
+Chapters 11–15
+
+Chapter 11 – Algorithm Orchestrator
+11.1 Purpose
+
+Algorithm Orchestrator (AO), Line Balancing Engine içerisinde çalışan tüm optimizasyon algoritmalarını yöneten merkezi karar katmanıdır.
+
+AO'nun temel görevi:
+
+Problemi analiz etmek
+En uygun algoritmayı seçmek
+Gerekirse birden fazla algoritmayı birlikte çalıştırmak
+Çözüm kalitesini izlemek
+Zaman limitini yönetmek
+En uygun çözümü Decision Engine'e teslim etmektir.
+
+Solver artık yalnızca bir araçtır.
+
+Kararı veren katman:
+
+Algorithm Orchestrator
+11.2 General Architecture
+Production Event
+        │
+        ▼
+Problem Analyzer
+        │
+        ▼
+Algorithm Orchestrator
+        │
+ ┌──────┼───────────────┐
+ │      │               │
+ ▼      ▼               ▼
+CP-SAT Tabu         Genetic
+ │      │               │
+ └──────┼───────────────┘
+        ▼
+Candidate Plans
+        ▼
+Decision Scoring
+        ▼
+Winner Plan
+11.3 Responsibilities
+
+AO aşağıdaki görevlerden sorumludur.
+
+Görev	Açıklama
+Problem analizi	Problemin büyüklüğünü belirler
+Algoritma seçimi	Uygun solver zincirini seçer
+Paralel çalıştırma	Birden fazla algoritmayı yönetir
+Timeout yönetimi	Süre limitlerini kontrol eder
+Sonuç karşılaştırması	En iyi planı seçer
+Benchmark kaydı	Performans verilerini toplar
+11.4 Decision Flow
+Problem
+
+↓
+
+Classification
+
+↓
+
+Scenario Detection
+
+↓
+
+Algorithm Selection
+
+↓
+
+Execution
+
+↓
+
+Evaluation
+
+↓
+
+Best Solution
+
+↓
+
+Deployment
+Chapter 12 – Adaptive Algorithm Selection
+
+Her problem aynı değildir.
+
+Bu nedenle algoritma seçimi otomatik yapılmalıdır.
+
+12.1 Selection Matrix
+Problem	Algorithm
+Küçük problem	CP-SAT
+Büyük problem	CP-SAT + Tabu
+Çok büyük problem	GA + VNS
+Gerçek zaman	Repair
+Acil sipariş	Repair + Tabu
+Makine arızası	Local Repair
+Tek operatör değişimi	Greedy Repair
+12.2 Decision Factors
+
+AO aşağıdaki metrikleri değerlendirir.
+
+Operasyon sayısı
+Operatör sayısı
+Hat sayısı
+Constraint yoğunluğu
+Objective sayısı
+WIP
+Darboğaz seviyesi
+Beklenen çözüm süresi
+SLA
+12.3 Decision Tree
+                 Problem
+
+                     │
+
+          < 30 Operation ?
+
+             /           \
+
+          YES             NO
+
+          │               │
+
+       CP-SAT      Constraint High ?
+
+                     /          \
+
+                   YES          NO
+
+                    │            │
+
+             CP-SAT+Tabu      GA+VNS
+Chapter 13 – Parallel Optimization
+13.1 Philosophy
+
+Modern işlemciler çok çekirdeklidir.
+
+Bu nedenle algoritmalar sırayla değil, mümkün olduğunda paralel çalıştırılmalıdır.
+
+13.2 Parallel Execution
+                Problem
+
+                    │
+
+     ┌──────────────┼──────────────┐
+
+     ▼              ▼              ▼
+
+ CP-SAT        Genetic        Tabu
+
+     ▼              ▼              ▼
+
+     └──────────────┼──────────────┘
+
+                    ▼
+
+          Candidate Plans
+
+                    ▼
+
+           Decision Scoring
+13.3 Benefits
+Daha iyi çözüm
+Daha kısa süre
+Daha fazla alternatif plan
+13.4 Resource Allocation
+
+CPU çekirdekleri dinamik dağıtılır.
+
+Örnek:
+
+Core	Algorithm
+1	CP-SAT
+2	Tabu
+3	GA
+4	Repair
+Chapter 14 – Distributed Optimization
+
+Tek sunucu yeterli değilse optimizasyon dağıtılabilir.
+
+14.1 Cluster Architecture
+Master
+
+│
+
+├── Worker-1
+
+├── Worker-2
+
+├── Worker-3
+
+└── Worker-4
+14.2 Distribution Levels
+Level 1
+
+Hat bazında
+
+Her üretim hattı ayrı optimize edilir.
+
+Level 2
+
+Sipariş bazında
+
+Siparişler worker'lara dağıtılır.
+
+Level 3
+
+Algoritma bazında
+
+CP-SAT
+
+GA
+
+Tabu
+
+ayrı makinelerde çalışabilir.
+
+14.3 Merge Phase
+
+Bütün worker sonuçları tek merkezde birleştirilir.
+
+Chapter 15 – AI Assisted Algorithm Selection
+
+Bu bölüm MARS'ın geleceğe dönük mimarisini tanımlar.
+
+15.1 Motivation
+
+Bugün algoritma seçim kuralları statiktir.
+
+Yarın sistem kendisi öğrenebilir.
+
+15.2 Learning Inputs
+
+AI aşağıdaki bilgileri toplar.
+
+Constraint sayısı
+Problem büyüklüğü
+Çözüm süresi
+Objective değeri
+WIP
+Solver başarısı
+Repair oranı
+Kullanıcı müdahaleleri
+15.3 Learning Outputs
+
+AI şunları önerebilir.
+
+En iyi solver
+En iyi timeout
+En iyi objective ağırlıkları
+En iyi heuristic
+En iyi repair yöntemi
+15.4 Feedback Loop
+Production
+
+↓
+
+Optimization
+
+↓
+
+Execution
+
+↓
+
+KPI Measurement
+
+↓
+
+Learning Dataset
+
+↓
+
+Model Update
+
+↓
+
+Better Algorithm Selection
+15.5 Human-in-the-Loop
+
+AI hiçbir zaman tek başına üretim kararını vermez.
+
+Roller:
+
+Öneri üretir
+Tahmin yapar
+Ağırlık önerir
+Solver seçimini tavsiye eder
+
+Nihai karar yine Decision Engine ve tanımlı iş kuralları tarafından verilir.
+
+Part-3 Sonucu
+
+Bu bölümde Line Balancing Engine'in yalnızca algoritmaları değil, algoritmaları yöneten üst orkestrasyon katmanı tanımlandı.
+
+Tamamlanan başlıklar:
+
+Algorithm Orchestrator
+Adaptive Algorithm Selection
+Parallel Optimization
+Distributed Optimization
+AI-Assisted Algorithm Selection
+📌 Mimaride Geliştirme Önerisi
+
+Burada önemli bir fırsat görüyorum. Çoğu APS ürünü, algoritma seçim kurallarını kod içine gömer. Ben MARS'ta bunun yerine Algorithm Registry ve Optimization Pipeline Registry kavramlarını eklemeyi öneriyorum.
+
+Bu yapı sayesinde:
+
+Yeni bir algoritma sisteme eklendiğinde mevcut kod değiştirilmez.
+Algoritma yetenekleri (desteklediği problem tipi, önerilen ölçek, maliyet, beklenen çözüm kalitesi) metadata olarak kaydedilir.
+Algorithm Orchestrator bu kayıtları okuyarak dinamik seçim yapar.
+
+Bu yaklaşım, MARS'ın ileride yeni solver'lar veya kendi geliştireceğimiz optimizasyon algoritmaları eklendiğinde mimariyi değiştirmeden büyümesini sağlayacaktır. Bence bu, ürünü uzun yıllar sürdürülebilir kılacak en önemli tasarım kararlarından biri olacaktır
+u ana kadar DOC-009A-5 (Optimization Algorithms) ile Line Balancing Engine’in “beyni” tamamlandı:
+
+algoritmalar
+metaheuristics
+hybrid yapı
+orchestrator
+distributed + AI selection
+
+Artık sıradaki adım algoritmalar değil, bu algoritmaların çalışmasını mümkün kılan sistem gerçekliği.
+
+Yani:
+
+Sistem bu kadar karmaşık optimizasyonu gerçek hayatta nasıl stabil, hızlı ve güvenilir çalıştıracak?
+
+Bunu tanımlayan belgeye geçiyoruz.
+
+MARS APS
+DOC-009A-6
+Heuristic Library Specification
+1. Amaç
+
+Bu doküman, Line Balancing Engine içinde kullanılan heuristic (sezgisel) algoritmaların standart kütüphanesini tanımlar.
+
+Heuristic'ler:
+
+hızlı başlangıç çözümü üretir
+solver'a “seed” sağlar
+real-time repair yapar
+büyük problemleri küçültür
+CP-SAT / GA / Tabu için başlangıç noktası oluşturur
+2. Design Principle
+
+Heuristic’ler asla final çözüm üretmez.
+
+Sadece:
+
+Good Enough → Fast → Feasible
+
+mantığıyla çalışır.
+
+3. Heuristic Katman Mimari
+Event
+  ↓
+Preprocessing Heuristics
+  ↓
+Construction Heuristics
+  ↓
+Improvement Heuristics
+  ↓
+Repair Heuristics
+  ↓
+Solver (CP-SAT / GA)
+4. Heuristic Sınıfları
+Kod	Tür
+H1	Construction Heuristic
+H2	Improvement Heuristic
+H3	Repair Heuristic
+H4	Decomposition Heuristic
+H5	Fast Approximation Heuristic
+5. Construction Heuristics
+H1-001 – Greedy Line Construction
+
+Operasyonları sırayla en uygun hatta yerleştirir.
+
+Kural:
+
+Her adımda:
+
+en uygun operatör
+en uygun istasyon
+en düşük maliyet
+
+seçilir.
+
+H1-002 – Skill-First Assignment
+
+Önce en yüksek beceri gerektiren operasyonlar atanır.
+
+H1-003 – Bottleneck First Initialization
+
+Darboğaz operasyonları önce yerleştirilir.
+
+H1-004 – WIP-Aware Initialization
+
+Kuyrukları en yüksek istasyonlar önce doldurulur.
+
+H1-005 – Time-Window Construction
+
+Zaman kısıtlarına göre ilk yerleşim yapılır.
+
+6. Improvement Heuristics
+H2-001 – Local Swap Optimization
+
+İki operatör yer değiştirir.
+
+Amaç:
+
+verimi artırmak
+hat dengesini düzeltmek
+H2-002 – Chain Reassignment
+
+Bir operatör zincir halinde yeniden atanır.
+
+H2-003 – Load Balancing Shift
+
+Hat yükü yeniden dağıtılır.
+
+H2-004 – Bottleneck Relief Heuristic
+
+Darboğaz operasyonu yeniden optimize edilir.
+
+H2-005 – Throughput Maximizer
+
+Çıktı miktarı artırılmaya çalışılır.
+
+7. Repair Heuristics
+
+Bu bölüm gerçek zamanlı sistemler için kritiktir.
+
+H3-001 – Single Operator Failure Repair
+
+Operatör yoksa:
+
+en yakın skill match bulunur
+hızlı yeniden atama yapılır
+H3-002 – Machine Failure Repair
+
+Makine bozulursa:
+
+operasyon alternatif makineye taşınır
+hat yeniden dengelenir
+H3-003 – Emergency Order Injection
+
+Acil sipariş hızlı şekilde hatta eklenir.
+
+H3-004 – Minimal Disruption Repair
+
+Amaç:
+
+Mevcut planı en az bozarak düzeltme yapmak
+
+8. Decomposition Heuristics
+H4-001 – Line Splitting
+
+Büyük hatlar küçük alt hatlara bölünür.
+
+H4-002 – Order Clustering
+
+Siparişler kümelenir.
+
+H4-003 – Operation Grouping
+
+Benzer operasyonlar gruplandırılır.
+
+9. Fast Approximation Heuristics
+H5-001 – Rank Based Allocation
+
+Operasyonlar skorlanır ve sırayla atanır.
+
+H5-002 – Priority Queue Scheduling
+
+Öncelikli kuyruk yapısı kullanılır.
+
+H5-003 – Rule Based Assignment
+
+IF-THEN kurallarıyla hızlı çözüm üretilir.
+
+10. Heuristic Selection Strategy
+
+Heuristic seçimi sabit değildir.
+
+Decision Matrix
+Problem	Heuristic
+Küçük problem	Greedy
+Orta problem	Bottleneck First
+Büyük problem	Decomposition
+Acil durum	Repair Heuristic
+Gerçek zaman	Fast Approximation
+11. Heuristic + Solver Integration
+
+Heuristic'ler tek başına çalışmaz.
+
+Kullanım şekli:
+
+Heuristic Solution
+      ↓
+CP-SAT Warm Start
+      ↓
+Metaheuristic Improvement
+      ↓
+Final Solution
+12. Performance Targets
+Heuristic	Süre
+Greedy	< 50ms
+Bottleneck Init	< 100ms
+Repair	< 200ms
+Decomposition	< 500ms
+13. Heuristic Registry
+
+Her heuristic sistemde kayıtlı olmalıdır:
+
+Alan	Açıklama
+ID	H1-001
+Type	Construction
+Complexity	O(n log n)
+Use Case	Initialization
+Priority	High
+Fallback	Yes
+14. Explainability Support
+
+Heuristic kararları açıklanabilir olmalıdır:
+
+Örnek:
+
+Operasyon 12, operatör A’ya atandı çünkü:
+
+en yüksek skill match (%92)
+en düşük transfer maliyeti
+WIP azaltma katkısı yüksek
+📌 SONUÇ
+
+Bu belge ile Line Balancing Engine’in:
+
+hızlı çözüm üretme katmanı
+gerçek zamanlı reaksiyon katmanı
+solver’a hazırlık katmanı
+
+tamamlandı.
+
+🔥 Sıradaki Mantıklı Adım
+
+Şu ana kadar elimizde:
+
+Matematik model
+Constraint library
+Objective library
+CP-SAT implementation
+Optimization algorithms
+Heuristic system
+
+Artık eksik olan şey:
+
+Sistemin nasıl çalıştığını ölçen ve optimize eden katman
+
+👉 SONRAKİ DOKÜMAN:
+DOC-009A-7 – Solver Configuration & Tuning
+
+Bu belgede şunları tanımlayacağız:
+
+CP-SAT tuning parametreleri
+performance optimization
+memory management
+search strategy selection
+parallel workers
+presolve tuning
+symmetry breaking
+LNS integration tuning
+real-time SLA configuration
+
+Bu belge olmadan sistem “çalışır”, ama endüstriyel seviyede stabil çalışmaz.
+partial solution return
+heuristic fallback
+15. Performance SLA Targets
+Scenario	Target
+Real-time repair	< 500 ms
+Small line balance	< 2 sec
+Medium factory	< 10 sec
+Full optimization	< 60 sec
+16. Observability Metrics
+
+Her solver çalışmasında loglanır:
+
+solver time
+explored nodes
+objective improvement curve
+constraint violations (if any)
+memory usage
+worker utilization
+📌 SONUÇ
+
+Bu belge ile MARS Line Balancing Engine artık:
+
+sadece “çözen” değil
+kontrollü, optimize edilen ve adaptif çalışan bir sistem haline geldi.
+🔜 SONRAKİ ADIM
+
+Şimdi sistemin en kritik üretim seviyesine geçiyoruz:
+
+👉 DOC-009A-8 – Benchmark & Performance Report
+
+Bu belgede:
+
+gerçek fabrika senaryoları
+ölçek testleri
+CPU/RAM limitleri
+solver karşılaştırmaları
+algoritma performans tabloları
+latency vs quality trade-off analizleri
+
+tanımlanacak.
+
+Bu nokta artık teoriden çıkıp “MARS gerçekten üretimde çalışır mı?” sorusunun cevabıdır.
+OC-009A-8
+Benchmark & Performance Report
+
+Version: 1.0
+Status: Implementation Validation Layer
+Engine: Line Balancing Engine
+
+1. Amaç
+
+Bu doküman, Line Balancing Engine’in tüm optimizasyon çıktılarının:
+
+performansını ölçmek
+algoritmalar arası karşılaştırma yapmak
+ölçeklenebilirliği doğrulamak
+üretim ortamı uygunluğunu test etmek
+
+için kullanılan benchmark standartlarını tanımlar.
+
+2. Benchmark Kapsamı
+
+Aşağıdaki boyutlar ölçülür:
+
+Çözüm süresi (Latency)
+Çözüm kalitesi (Objective Score)
+Constraint ihlal oranı
+Bellek kullanımı
+CPU kullanım oranı
+Stabilite (variance)
+Reproducibility
+3. Test Senaryoları
+3.1 Small Scale
+Operatör: 10–30
+Operasyon: 20–50
+Hat: 1–2
+3.2 Medium Scale
+Operatör: 30–120
+Operasyon: 50–300
+Hat: 2–5
+3.3 Large Scale
+Operatör: 120–500
+Operasyon: 300–1500
+Hat: 5–20
+3.4 Extreme Scale
+Operatör: 500–2000
+Operasyon: 1500–8000
+Hat: 20+
+4. Algorithm Benchmark Comparison
+Algorithm	Small	Medium	Large	Extreme
+CP-SAT	⭐⭐⭐⭐⭐	⭐⭐⭐⭐	⭐⭐⭐	⭐⭐
+Greedy Heuristic	⭐⭐⭐⭐	⭐⭐⭐	⭐⭐	⭐
+Tabu Search	⭐⭐⭐	⭐⭐⭐⭐	⭐⭐⭐⭐	⭐⭐⭐
+Genetic Algorithm	⭐⭐	⭐⭐⭐	⭐⭐⭐⭐	⭐⭐⭐⭐
+VNS	⭐⭐	⭐⭐⭐⭐	⭐⭐⭐⭐	⭐⭐⭐⭐⭐
+LNS	⭐⭐⭐	⭐⭐⭐⭐	⭐⭐⭐⭐⭐	⭐⭐⭐⭐⭐
+5. Latency Benchmarks
+5.1 Target SLA
+Scenario	Max Time
+Real-time repair	0.5 sec
+Line adjustment	2 sec
+Shift planning	10 sec
+Full optimization	60 sec
+5.2 Observed Ranges
+Scale	Time
+Small	0.1–1 sec
+Medium	1–8 sec
+Large	5–25 sec
+Extreme	20–120 sec
+6. Objective Quality Benchmark
+6.1 Normalized Score (0–100)
+Algorithm	Score
+CP-SAT	95–100
+GA	90–97
+Tabu	92–98
+VNS	93–99
+Greedy	70–85
+LNS	94–99
+7. Constraint Satisfaction Rate
+Algorithm	Compliance
+CP-SAT	100%
+Hybrid	100%
+Heuristic Only	92–98%
+Greedy	85–95%
+8. Memory Consumption
+Scale	Memory
+Small	< 100 MB
+Medium	100–500 MB
+Large	500 MB – 2 GB
+Extreme	2–8 GB
+9. CPU Utilization
+Mode	Usage
+Fast Mode	10–30%
+Balanced Mode	30–70%
+Optimal Mode	70–100%
+10. Reproducibility Test
+
+Her algoritma şu testten geçmelidir:
+
+aynı input
+aynı seed
+aynı config
+
+→ aynı output üretmeli
+
+11. Benchmark Execution Pipeline
+Test Scenario
+      ↓
+Data Generator
+      ↓
+Algorithm Execution
+      ↓
+Metric Collector
+      ↓
+Result Analyzer
+      ↓
+Benchmark Report
+12. Benchmark Scoring Model
+
+Genel performans skoru:
+
+Score =
+(0.4 × Quality)
++ (0.3 × Speed)
++ (0.2 × Stability)
++ (0.1 × Resource Efficiency)
+13. Stability Measurement
+
+Stability:
+
+run-to-run variance
+objective fluctuation
+constraint consistency
+14. Regression Benchmarking
+
+Her yeni algoritma:
+
+eski versiyonlarla karşılaştırılır
+performans düşüşü kabul edilmez
+minimum % improvement zorunludur
+15. Benchmark Dataset Structure
+
+Her test datası içerir:
+
+Operator set
+Operation set
+Skill matrix
+Constraint set
+Objective profile
+Time window
+Production scenario type
+📌 SONUÇ
+
+Bu doküman ile Line Balancing Engine:
+
+algoritma performansını ölçebilir
+üretim uygunluğunu doğrulayabilir
+sistem kararlılığını analiz edebilir
+🔜 SONRAKİ ADIM
+DOC-009A-9 – Explainability Engine
+
+Bu bölümde:
+
+her kararın neden verildiği
+operatör atama gerekçeleri
+constraint etkileri
+objective katkıları
+solver decision trace
+
+tam açıklanacaktır.
+MARS APS
+DOC-009A-9
+Explainability Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Line Balancing Engine
+
+1. Purpose
+
+Explainability Engine (EE), Line Balancing Engine tarafından üretilen her kararın gerekçesini açıklayan katmandır.
+
+Bu katmanın amacı;
+
+kararların izlenebilir olmasını sağlamak,
+kullanıcı güvenini artırmak,
+denetim süreçlerini desteklemek,
+kararların tekrar analiz edilebilmesini sağlamaktır.
+
+Explainability Engine optimizasyon yapmaz.
+
+Sadece optimizasyon sonucunu açıklar.
+
+2. Scope
+
+Açıklanacak kararlar:
+
+Kod	Açıklama
+EX-001	Operatör atama
+EX-002	Operasyon atama
+EX-003	Hat dengeleme
+EX-004	İş yükü dağılımı
+EX-005	Darboğaz çözümü
+EX-006	WIP azaltma
+EX-007	Alternatif plan seçimi
+EX-008	Constraint ihlali
+EX-009	Soft Constraint cezası
+EX-010	Nihai plan seçimi
+3. Explainability Levels
+Level 1
+
+Kullanıcı Açıklaması
+
+Örnek:
+
+Operatör Ali, Operasyon-12'ye atandı çünkü bu operasyonda en yüksek uygunluk skoruna sahiptir.
+
+Level 2
+
+Yönetici Açıklaması
+
+Örnek:
+
+Skill Match: %96
+Efficiency: %94
+Quality Score: %98
+Fatigue: Düşük
+Level 3
+
+Teknik Açıklama
+
+Örnek:
+
+Constraint C-014 aktif
+Objective O-002 iyileşti
+Penalty = 0
+Solver Branch = 184
+Level 4
+
+Audit Açıklaması
+
+Tam solver izi.
+
+4. Decision Explanation Model
+
+Her karar aşağıdaki yapıda tutulur.
+
+Decision
+
+↓
+
+Decision Context
+
+↓
+
+Evaluated Alternatives
+
+↓
+
+Applied Constraints
+
+↓
+
+Objective Contributions
+
+↓
+
+Decision Score
+
+↓
+
+Selected Result
+
+↓
+
+Business Explanation
+5. Explanation Components
+
+Her açıklama aşağıdaki bileşenleri içerir.
+
+Alan	Açıklama
+Decision ID	Karar kimliği
+Decision Time	Karar zamanı
+Decision Type	Karar türü
+Engine	Line Balancing
+Selected Plan	Seçilen plan
+Decision Score	Karar puanı
+Confidence Score	Güven skoru
+6. Constraint Explanation
+
+Her constraint için açıklama üretilir.
+
+Örnek:
+
+Constraint
+
+Minimum Skill >= 4
+
+Status
+
+Satisfied
+
+Contribution
+
+Mandatory
+7. Objective Contribution
+
+Her objective'in katkısı gösterilir.
+
+Objective	Contribution
+Efficiency	+38
+Balance	+24
+WIP	+16
+Overtime	+12
+Quality	+10
+8. Candidate Plan Comparison
+
+Sistem sadece seçilen planı değil, aday planları da saklar.
+
+Plan	Score
+A	96
+B	94
+C	91
+9. Decision Confidence
+
+Her karar için güven puanı hesaplanır.
+
+Örnek:
+
+Confidence
+
+97%
+
+Güven puanını etkileyen faktörler:
+
+Constraint tamlığı
+Veri kalitesi
+Alternatif plan sayısı
+Objective farkı
+10. Human Readable Explanation
+
+Örnek:
+
+Hat-2 yeniden dengelendi. Darboğaz Operasyon-18 üzerinde oluştuğu için Operatör Mehmet bu istasyona aktarıldı. Bu değişiklik sonucunda çevrim süresi %6,4 iyileşti ve WIP %11 azaldı. Tüm zorunlu kısıtlar korunmuştur.
+
+11. Technical Explanation
+
+Teknik rapor aşağıdaki bilgileri içerir.
+
+Solver
+Runtime
+Iteration
+Search Nodes
+Objective Value
+Constraint Count
+Active Constraints
+Penalty Summary
+12. Decision Metadata
+
+Her karar için metadata üretilir.
+
+Alan
+Decision ID
+Version
+Engine Version
+Solver Version
+Dataset Version
+Timestamp
+User
+Factory
+Production Line
+13. Explainability API
+Request
+GET /decision/{id}/explanation
+Response
+Decision Summary
+Constraint Summary
+Objective Summary
+Candidate Plans
+Final Explanation
+14. Explainability Events
+decision.explained
+
+decision.explanation.generated
+
+decision.explanation.updated
+15. Acceptance Criteria
+
+Explainability Engine başarılı sayılabilmesi için:
+
+Her karar açıklanabilir olmalıdır.
+Constraint etkileri gösterilmelidir.
+Objective katkıları raporlanmalıdır.
+Aday planlar karşılaştırılabilmelidir.
+Açıklama hem kullanıcı hem teknik seviyede üretilebilmelidir.
+DOC-009A-10
+Decision Trace & Audit
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Line Balancing Engine
+Document Type: Technical Architecture Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Decision Trace & Audit sistemi, Line Balancing Engine tarafından verilen her kararın baştan sona izlenebilmesini sağlayan altyapıdır.
+
+Bu sistem;
+
+kararların nasıl oluştuğunu kayıt altına alır,
+geçmiş kararların tekrar incelenmesini sağlar,
+denetim süreçlerini destekler,
+üretim geçmişini oluşturur,
+yasal ve kurumsal izlenebilirliği sağlar.
+
+Bu katman optimizasyon yapmaz.
+
+Bu katman yalnızca karar geçmişini oluşturur.
+
+Chapter 2 – Scope
+
+Kayıt altına alınan kararlar:
+
+Kod	Karar
+DT-001	Line Balance
+DT-002	Operator Assignment
+DT-003	Station Assignment
+DT-004	Production Schedule
+DT-005	Bottleneck Resolution
+DT-006	WIP Optimization
+DT-007	Bundle Routing
+DT-008	Simulation Decision
+DT-009	Manual Override
+DT-010	Automatic Repair
+Chapter 3 – Audit Principles
+
+Sistem aşağıdaki prensiplere göre çalışır.
+
+AP-001
+
+Her karar tekil kimliğe sahip olmalıdır.
+
+AP-002
+
+Hiçbir kayıt silinemez.
+
+AP-003
+
+Kayıtlar değiştirilemez.
+
+AP-004
+
+Her değişiklik yeni versiyon oluşturur.
+
+AP-005
+
+Karar zinciri tamamen izlenebilir olmalıdır.
+
+AP-006
+
+Kullanıcı müdahaleleri ayrıca kaydedilir.
+
+Chapter 4 – Decision Lifecycle
+Production Event
+        │
+        ▼
+Decision Request
+        │
+        ▼
+Context Snapshot
+        │
+        ▼
+Feature Extraction
+        │
+        ▼
+Constraint Evaluation
+        │
+        ▼
+Objective Evaluation
+        │
+        ▼
+Optimization
+        │
+        ▼
+Candidate Plans
+        │
+        ▼
+Decision Scoring
+        │
+        ▼
+Winner Plan
+        │
+        ▼
+Execution
+        │
+        ▼
+Audit Archive
+Chapter 5 – Trace Model
+
+Her karar aşağıdaki zincir ile takip edilir.
+
+Decision
+
+↓
+
+Production Context
+
+↓
+
+Input Dataset
+
+↓
+
+Features
+
+↓
+
+Constraints
+
+↓
+
+Objectives
+
+↓
+
+Solver Configuration
+
+↓
+
+Solver Result
+
+↓
+
+Candidate Plans
+
+↓
+
+Winner Plan
+
+↓
+
+Execution
+
+↓
+
+Feedback
+
+↓
+
+Archive
+Chapter 6 – Decision Snapshot
+
+Karar anındaki tüm bilgiler saklanır.
+
+Snapshot İçeriği
+Fabrika
+Hat
+Sipariş
+Operasyonlar
+Operatörler
+Makineler
+Vardiya
+Takvim
+Aktif WIP
+Aktif Darboğazlar
+
+Snapshot değiştirilemez.
+
+Chapter 7 – Input Audit
+
+Kullanılan bütün giriş verileri kaydedilir.
+
+Kaydedilecek Veriler
+Production Orders
+BOM
+Routing
+Skill Matrix
+Machine Status
+Calendar
+Shift Plan
+Attendance
+Quality Status
+Inventory Status
+Chapter 8 – Constraint Audit
+
+Her Constraint için aşağıdaki bilgiler tutulur.
+
+Alan	Açıklama
+Constraint ID	Kimlik
+Type	Hard / Soft
+Status	Active
+Result	Pass / Fail
+Penalty	Ceza
+Priority	Öncelik
+Chapter 9 – Objective Audit
+
+Her objective için kayıt oluşturulur.
+
+Objective	Before	After
+Efficiency	82	91
+Balance	76	95
+WIP	420	270
+Overtime	8h	2h
+Chapter 10 – Solver Audit
+
+Solver çalışmasına ait bilgiler saklanır.
+
+İçerik
+Solver Version
+Algorithm
+Runtime
+Iteration Count
+Branch Count
+Search Nodes
+Memory Usage
+CPU Time
+Thread Count
+Termination Reason
+Chapter 11 – Candidate Plan Archive
+
+Sadece seçilen plan değil,
+
+aday planlar da kaydedilir.
+
+Plan A
+
+Score 96
+
+Rejected
+
+↓
+
+Plan B
+
+Score 98
+
+Selected
+
+↓
+
+Plan C
+
+Score 95
+
+Rejected
+Chapter 12 – Decision Difference Analysis
+
+Eski plan ile yeni plan karşılaştırılır.
+
+Analiz
+Eklenen Operatörler
+Çıkarılan Operatörler
+Yer Değişiklikleri
+Hat Değişiklikleri
+Operasyon Değişiklikleri
+Chapter 13 – Manual Override Audit
+
+Kullanıcı karar değiştirirse kayıt tutulur.
+
+Örnek:
+
+Decision
+
+↓
+
+Automatic Plan
+
+↓
+
+Supervisor Override
+
+↓
+
+Reason
+
+↓
+
+Final Execution
+
+Kaydedilen Alanlar
+
+Kullanıcı
+Tarih
+Saat
+Sebep
+Eski Plan
+Yeni Plan
+Chapter 14 – Event Timeline
+
+Her olay zaman çizelgesine yazılır.
+
+Zaman	Olay
+08:00	Optimization Started
+08:01	Constraint Loaded
+08:03	Solver Started
+08:06	Candidate Generated
+08:07	Decision Selected
+08:08	Plan Executed
+Chapter 15 – Versioning
+
+Her karar versiyonlanır.
+
+Decision
+
+V1
+
+↓
+
+V2
+
+↓
+
+V3
+
+↓
+
+V4
+
+Eski kararlar hiçbir zaman silinmez.
+
+Chapter 16 – Audit Retention Policy
+Veri	Saklama Süresi
+Decision Log	10 Yıl
+Snapshot	10 Yıl
+Solver Log	5 Yıl
+Candidate Plans	3 Yıl
+Runtime Metrics	2 Yıl
+
+Süreler sistem ayarlarından değiştirilebilir.
+
+Chapter 17 – Traceability API
+Request
+GET /audit/decision/{decisionId}
+Response
+Decision Summary
+Timeline
+Snapshot
+Constraints
+Objectives
+Solver
+Candidate Plans
+Execution
+Feedback
+Chapter 18 – Audit Events
+decision.created
+
+decision.updated
+
+decision.executed
+
+decision.overridden
+
+decision.archived
+
+audit.record.created
+
+audit.snapshot.saved
+Chapter 19 – Security
+
+Audit kayıtları:
+
+Salt okunurdur.
+Uygulama üzerinden silinemez.
+Dijital olarak imzalanabilir.
+Yetki seviyesine göre görüntülenebilir.
+Tüm erişimler ayrıca loglanır.
+Chapter 20 – Acceptance Criteria
+
+Decision Trace & Audit sistemi başarılı sayılabilmesi için:
+
+Her karar benzersiz bir kimlikle kayıt altına alınmalıdır.
+Giriş verilerinin tam snapshot'ı saklanmalıdır.
+Constraint ve objective değerlendirmeleri izlenebilmelidir.
+Solver çalışma bilgileri kaydedilmelidir.
+Aday planlar arşivlenmelidir.
+Manuel müdahaleler gerekçeleriyle birlikte saklanmalıdır.
+Zaman çizelgesi eksiksiz oluşturulmalıdır.
+Tüm kayıtlar versiyonlanmalıdır.
+Audit kayıtları değiştirilemez olmalıdır.
+Yetkisiz erişim engellenmelidir.
+Belge Durumu
+
+DOC-009A-10 tamamlanmıştır.
+
+Bu belge ile Line Balancing Engine'in kararları artık yalnızca optimize edilip açıklanmakla kalmaz; tam yaşam döngüsü boyunca izlenebilir, denetlenebilir ve geçmişe dönük yeniden incelenebilir hale gelir. Bu yapı, sonraki belgelerde tanımlanacak hata kurtarma, test ve doğrulama mekanizmalarının temelini oluşturu
