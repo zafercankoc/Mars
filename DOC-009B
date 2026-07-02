@@ -1,0 +1,2633 @@
+DOC-009B
+Operator Assignment Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine Code: OAE
+Document Type: Engine Architecture Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, MARS APS içerisinde yer alan Operator Assignment Engine (OAE)'nin teknik mimarisini, sorumluluklarını, optimizasyon kapsamını ve diğer sistem bileşenleriyle olan etkileşimini tanımlar.
+
+Operator Assignment Engine'in temel görevi, mevcut operatör havuzunu üretim ihtiyaçlarına göre en uygun operasyonlara, istasyonlara ve üretim hatlarına atamaktır.
+
+Bu motor, Line Balancing Engine ile birlikte çalışır ancak kendi optimizasyon modeli, constraint yapısı ve karar mekanizmasına sahiptir.
+
+Chapter 2 – Mission
+
+Operator Assignment Engine'in amacı:
+
+Doğru operatörü doğru operasyona atamak
+Beceri (Skill) uyumluluğunu en üst seviyeye çıkarmak
+Verimliliği artırmak
+Kaliteyi korumak
+Fazla mesai ihtiyacını azaltmak
+Operatör yükünü dengelemek
+Esnek üretim yapısını desteklemek
+Operatör rotasyonunu yönetmek
+Chapter 3 – Responsibilities
+
+Operator Assignment Engine aşağıdaki kararları üretir.
+
+Kod	Karar
+OA-001	Operator Assignment
+OA-002	Station Assignment
+OA-003	Skill Matching
+OA-004	Shift Assignment
+OA-005	Cross Training Utilization
+OA-006	Backup Operator Assignment
+OA-007	Temporary Replacement
+OA-008	Multi Skill Allocation
+OA-009	Rotation Planning
+OA-010	Assignment Validation
+Chapter 4 – Scope
+
+Engine aşağıdaki üretim alanlarında çalışır.
+
+Dikim Hatları
+Ütü Bölümü
+Paketleme
+Kalite Kontrol
+Ara Operasyonlar
+Yardımcı Operasyonlar
+Rework Alanları
+Chapter 5 – Optimization Goals
+
+Operator Assignment Engine aşağıdaki hedefleri optimize eder.
+
+Skill Match
+Efficiency
+Learning Curve
+Fatigue
+Attendance
+Overtime
+Workload Balance
+Quality Performance
+Production Stability
+Operator Satisfaction
+Chapter 6 – Input Model
+
+Motor aşağıdaki verileri kullanır.
+
+Operator Information
+Operator ID
+Name
+Skill Matrix
+Efficiency
+Experience
+Attendance
+Certification
+Restrictions
+Medical Status
+Training History
+Production Information
+Orders
+Operations
+Stations
+Production Lines
+Calendars
+Shift Plans
+Machine Status
+Business Rules
+Constraint Library
+Assignment Policies
+Rotation Policies
+Labor Rules
+Company Policies
+Chapter 7 – Output Model
+
+Motor aşağıdaki çıktıları üretir.
+
+Operator Assignment Plan
+Backup Assignment
+Rotation Plan
+Multi Skill Distribution
+Skill Utilization Report
+Assignment Score
+Assignment Explanation
+Audit Record
+Chapter 8 – Engine Architecture
+                Operator Assignment Engine
+                          │
+ ┌────────────────────────────────────────────────┐
+ │                                                │
+ │ Operator Analyzer                              │
+ │ Skill Matching Engine                          │
+ │ Assignment Optimizer                           │
+ │ Rotation Planner                               │
+ │ Backup Assignment Engine                       │
+ │ Validation Engine                              │
+ │ Explainability Engine                          │
+ │ Audit Engine                                   │
+ │ Runtime Controller                             │
+ │                                                │
+ └────────────────────────────────────────────────┘
+Chapter 9 – Processing Flow
+Operator Data
+       │
+       ▼
+Skill Analysis
+       │
+       ▼
+Constraint Evaluation
+       │
+       ▼
+Assignment Optimization
+       │
+       ▼
+Validation
+       │
+       ▼
+Decision Scoring
+       │
+       ▼
+Explainability
+       │
+       ▼
+Audit
+       │
+       ▼
+Publish Assignment
+Chapter 10 – Decision Variables
+
+Karar değişkenleri:
+
+Variable	Description
+X(i,j)	Operatör i, Operasyon j
+Y(i,s)	Operatör i, İstasyon s
+Z(i,l)	Operatör i, Hat l
+R(i,t)	Operatör i, Vardiya t
+B(i)	Backup Operatör
+C(i)	Cross Training Kullanımı
+Chapter 11 – Decision Lifecycle
+Request
+
+↓
+
+Operator Analysis
+
+↓
+
+Skill Evaluation
+
+↓
+
+Assignment Optimization
+
+↓
+
+Validation
+
+↓
+
+Assignment Decision
+
+↓
+
+Deployment
+
+↓
+
+Monitoring
+
+↓
+
+Feedback
+Chapter 12 – Integration Points
+
+Operator Assignment Engine aşağıdaki sistemlerle entegre çalışır.
+
+Sistem	Amaç
+Line Balancing Engine	Hat dengesi
+Scheduling Engine	Zamanlama
+Simulation Engine	Simülasyon
+HR System	Operatör bilgileri
+MES	Üretim verileri
+ERP	Sipariş verileri
+Decision Engine	Karar puanlama
+Chapter 13 – Runtime Characteristics
+Özellik	Destek
+Multi-thread	✔
+Incremental Assignment	✔
+Explainability	✔
+Audit	✔
+Warm Start	✔
+High Availability	✔
+Chapter 14 – Quality Attributes
+
+Motor aşağıdaki kalite özelliklerini sağlamalıdır.
+
+Reliability
+Availability
+Scalability
+Traceability
+Explainability
+Maintainability
+Extensibility
+Testability
+Chapter 15 – Performance Targets
+İşlem	Hedef
+Tek Operatör Atama	<100 ms
+Hat Ataması	<500 ms
+Vardiya Ataması	<1 sn
+Toplu Atama	<5 sn
+Global Atama	<30 sn
+Chapter 16 – Dependencies
+
+Bu motor aşağıdaki dokümanlara bağlıdır.
+
+DOC-009A – Line Balancing Engine
+DOC-008 – Data Model
+DOC-007 – Domain Model
+DOC-006 – Business Rules
+DOC-005 – Functional Requirements
+Chapter 17 – Subdocuments
+
+Bu motor aşağıdaki teknik alt dokümanlardan oluşacaktır.
+
+Kod	Doküman
+DOC-009B-1	Mathematical Optimization Model
+DOC-009B-2	Constraint Library Specification
+DOC-009B-3	Objective Function Library
+DOC-009B-4	OR-Tools CP-SAT Implementation
+DOC-009B-5	Assignment Algorithms
+DOC-009B-6	Skill Matching Engine
+DOC-009B-7	Rotation Planning Engine
+DOC-009B-8	Backup Assignment Engine
+DOC-009B-9	Explainability Engine
+DOC-009B-10	Decision Trace & Audit
+DOC-009B-11	Failure Recovery
+DOC-009B-12	Incremental Assignment
+DOC-009B-13	Test Specification
+DOC-009B-14	Validation & Verification
+DOC-009B-15	Technical API
+DOC-009B-16	Deployment & Runtime
+DOC-009B-17	Final Technical Specification
+Chapter 18 – Acceptance Criteria
+
+Operator Assignment Engine tamamlanmış kabul edilmesi için:
+
+Matematiksel model tanımlanmış olmalıdır.
+Constraint Library oluşturulmuş olmalıdır.
+Objective fonksiyonları tanımlanmış olmalıdır.
+Skill Matching modeli tamamlanmış olmalıdır.
+Rotasyon ve yedek operatör mekanizmaları tanımlanmış olmalıdır.
+Explainability ve Audit mekanizmaları desteklenmelidir.
+API ve Runtime mimarisi tamamlanmış olmalıdır.
+Tüm alt dokümanlar tamamlanmış olmalıdır.
+Document Status
+
+DOC-009B – Operator Assignment Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009B-1 – Mathematical Optimization Model
+DOC-009B-1
+Mathematical Optimization Model
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Operator Assignment Engine (OAE)
+Document Type: Mathematical Optimization Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Operator Assignment Engine'in matematiksel optimizasyon modelini tanımlar.
+
+Modelin amacı;
+
+operatörleri en uygun operasyonlara atamak,
+beceri uyumunu maksimize etmek,
+üretim verimliliğini artırmak,
+iş yükünü dengelemek,
+kaliteyi korumak,
+tüm iş kurallarını sağlayan en iyi çözümü üretmektir.
+Chapter 2 – Optimization Model
+
+Operator Assignment problemi bir Constraint Optimization Problem (COP) olarak modellenmiştir.
+
+Model aşağıdaki bileşenlerden oluşur.
+
+Decision Variables
+        │
+        ▼
+Parameters
+        │
+        ▼
+Constraints
+        │
+        ▼
+Objective Functions
+        │
+        ▼
+Optimal Assignment
+Chapter 3 – Sets
+Operators
+O={o
+1
+	​
+
+,o
+2
+	​
+
+,…,o
+n
+	​
+
+}
+Operations
+P={p
+1
+	​
+
+,p
+2
+	​
+
+,…,p
+m
+	​
+
+}
+Stations
+S={s
+1
+	​
+
+,s
+2
+	​
+
+,…,s
+k
+	​
+
+}
+Production Lines
+L={l
+1
+	​
+
+,l
+2
+	​
+
+,…,l
+r
+	​
+
+}
+Shifts
+T={t
+1
+	​
+
+,t
+2
+	​
+
+,…,t
+q
+	​
+
+}
+Skills
+K={k
+1
+	​
+
+,k
+2
+	​
+
+,…,k
+h
+	​
+
+}
+Chapter 4 – Parameters
+Symbol	Description
+Skill(i,k)	Operatör beceri seviyesi
+Required(j,k)	Operasyon gereksinimi
+Efficiency(i)	Operatör verimliliği
+Cycle(j)	Operasyon çevrim süresi
+Fatigue(i)	Yorgunluk skoru
+Availability(i,t)	Vardiya uygunluğu
+Line(j)	Operasyonun hattı
+Station(j)	Operasyon istasyonu
+Priority(j)	Operasyon önceliği
+Chapter 5 – Decision Variables
+Primary Assignment
+X
+ij
+	​
+
+={
+1,
+0,
+	​
+
+Operat
+o
+¨
+r i operasyon j
+′
+yeatanır
+Aksi halde
+	​
+
+Station Assignment
+Y
+is
+	​
+
+
+Operatör i'nin istasyon s'ye atanmasını gösterir.
+
+Shift Assignment
+Z
+it
+	​
+
+
+Operatör i'nin vardiya t'de görev almasını gösterir.
+
+Backup Assignment
+B
+i
+	​
+
+
+Operatörün yedek atama durumunu gösterir.
+
+Chapter 6 – Feasible Solution
+
+Geçerli çözüm aşağıdaki koşulları sağlamalıdır.
+
+Her operasyon atanmalıdır.
+Hard Constraint ihlali olmamalıdır.
+Operatör uygun olmalıdır.
+İstasyon uygun olmalıdır.
+Vardiya uygun olmalıdır.
+Chapter 7 – Assignment Model
+
+Her operasyon yalnızca bir operatöre atanır.
+
+i
+∑
+	​
+
+X
+ij
+	​
+
+=1
+
+Her operatör aynı anda yalnızca bir operasyon yürütür.
+
+j
+∑
+	​
+
+X
+ij
+	​
+
+≤1
+Chapter 8 – Skill Compatibility Model
+
+Operatör yalnızca yeterli beceriye sahipse atanabilir.
+
+Skill(i,k)≥Required(j,k)
+
+Bu koşul sağlanmıyorsa atama geçersizdir.
+
+Chapter 9 – Availability Model
+
+Operatör ilgili vardiyada çalışabilir olmalıdır.
+
+Availability(i,t)=1
+Chapter 10 – Workload Model
+
+Operatör iş yükü kapasitesini aşamaz.
+
+Load(i)≤Capacity(i)
+Chapter 11 – Fatigue Model
+
+Yorgunluk limiti korunmalıdır.
+
+Fatigue(i)≤FatigueLimit
+Chapter 12 – Certification Model
+
+Sertifika gerektiren operasyonlarda yalnızca yetkili operatör atanabilir.
+
+Certification(i)=RequiredCertification(j)
+Chapter 13 – Multi-Skill Model
+
+Bir operatör birden fazla beceriye sahip olabilir.
+
+Skill vektörü:
+
+SkillVector
+i
+	​
+
+=(k
+1
+	​
+
+,k
+2
+	​
+
+,…,k
+n
+	​
+
+)
+
+Optimizasyon tüm becerileri birlikte değerlendirir.
+
+Chapter 14 – Cross Training Model
+
+Çapraz eğitim alan operatörler alternatif operasyonlarda kullanılabilir.
+
+Cross-training ceza veya ödül katsayısı objective fonksiyonlarında değerlendirilir.
+
+Chapter 15 – Assignment Graph
+Operators
+     │
+     ▼
+Skill Matching
+     │
+     ▼
+Candidate Operations
+     │
+     ▼
+Constraint Filtering
+     │
+     ▼
+Optimization
+     │
+     ▼
+Assignment
+Chapter 16 – Mathematical Properties
+
+Model aşağıdaki özelliklere sahiptir.
+
+Property	Value
+Binary Variables	Evet
+Integer Variables	Evet
+Linear Constraints	Evet
+Linear Objectives	Evet
+CP-SAT Compatible	Evet
+Chapter 17 – Solver Formulation
+
+Model aşağıdaki solver yapıları ile çözülebilir.
+
+OR-Tools CP-SAT
+Mixed Integer Programming (MIP)
+Constraint Programming (CP)
+Hybrid Solver
+
+Referans implementasyon OR-Tools CP-SAT'tir.
+
+Chapter 18 – Optimization Workflow
+Input Data
+      │
+      ▼
+Variable Generation
+      │
+      ▼
+Constraint Construction
+      │
+      ▼
+Objective Construction
+      │
+      ▼
+Solver Execution
+      │
+      ▼
+Feasible Solution
+      │
+      ▼
+Optimal Assignment
+Chapter 19 – Assumptions
+
+Model aşağıdaki varsayımlar altında çalışır.
+
+Giriş verileri doğrulanmıştır.
+Skill Matrix günceldir.
+Operatör uygunluk bilgileri doğrudur.
+Üretim takvimi kesindir.
+Operasyon süreleri geçerlidir.
+Chapter 20 – Acceptance Criteria
+
+Matematiksel model tamamlanmış kabul edilmesi için:
+
+Karar değişkenleri tanımlanmış olmalıdır.
+Parametreler tanımlanmış olmalıdır.
+Atama modeli oluşturulmuş olmalıdır.
+Beceri modeli oluşturulmuş olmalıdır.
+Uygunluk modeli oluşturulmuş olmalıdır.
+İş yükü modeli tanımlanmış olmalıdır.
+Sertifikasyon modeli oluşturulmuş olmalıdır.
+Model CP-SAT ile çözülebilir olmalıdır.
+Model doğrusal optimizasyon kurallarına uygun olmalıdır.
+DOC-009B-2
+Constraint Library Specification
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Operator Assignment Engine (OAE)
+Document Type: Constraint Library Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Operator Assignment Engine tarafından kullanılan tüm kısıtların (Constraints) standart tanımını içerir.
+
+Constraint Library'nin amacı:
+
+Operatör atamalarının iş kurallarına uygun olmasını sağlamak,
+Yasal ve kurumsal kuralları uygulamak,
+Üretim kalitesini korumak,
+Optimizasyon motoruna standart constraint yapısı sağlamaktır.
+
+Bu doküman yalnızca constraint tanımlarını içerir. Matematiksel formülasyonlar DOC-009B-1, objective etkileri ise DOC-009B-3 kapsamında ele alınır.
+
+Chapter 2 – Constraint Classification
+
+Tüm constraint'ler aşağıdaki kategorilere ayrılır.
+
+Kod	Kategori
+C-100	Operator Constraints
+C-200	Skill Constraints
+C-300	Station Constraints
+C-400	Shift Constraints
+C-500	Labor Rules
+C-600	Production Constraints
+C-700	Quality Constraints
+C-800	Health & Safety Constraints
+C-900	Business Rules
+Chapter 3 – Constraint Types
+
+Her constraint aşağıdaki tiplerden biridir.
+
+Type	Description
+Hard Constraint	İhlal edilemez
+Soft Constraint	Ceza puanı uygulanır
+Dynamic Constraint	Çalışma anında değişebilir
+Contextual Constraint	Üretim durumuna bağlıdır
+Chapter 4 – Operator Constraints (C-100)
+C-101 – Single Active Assignment
+
+Bir operatör aynı anda yalnızca tek aktif operasyona atanabilir.
+
+Type: Hard
+
+C-102 – Availability
+
+Operatör ilgili vardiyada çalışabilir durumda olmalıdır.
+
+Type: Hard
+
+C-103 – Employment Status
+
+Pasif, izinli veya işten ayrılmış operatör atanamaz.
+
+Type: Hard
+
+C-104 – Attendance
+
+Devamsız operatör planlamaya dahil edilmez.
+
+Type: Hard
+
+C-105 – Maximum Concurrent Responsibility
+
+Bir operatör aynı anda tanımlı maksimum sorumluluk sayısını aşamaz.
+
+Type: Hard
+
+Chapter 5 – Skill Constraints (C-200)
+C-201 – Minimum Skill Level
+
+Operatörün beceri seviyesi operasyon gereksinimini karşılamalıdır.
+
+Type: Hard
+
+C-202 – Skill Expiration
+
+Süresi dolmuş yetkinlikler geçersiz kabul edilir.
+
+Type: Hard
+
+C-203 – Certification Requirement
+
+Sertifika gerektiren operasyonlarda yalnızca sertifikalı operatör atanabilir.
+
+Type: Hard
+
+C-204 – Preferred Skill Match
+
+Yüksek beceri eşleşmesi tercih edilir.
+
+Type: Soft
+
+C-205 – Cross Skill Usage
+
+Çok yetenekli operatörlerin verimli kullanılması teşvik edilir.
+
+Type: Soft
+
+Chapter 6 – Station Constraints (C-300)
+C-301 – Station Compatibility
+
+Operatör yalnızca uygun istasyonlarda çalışabilir.
+
+Type: Hard
+
+C-302 – Ergonomic Compatibility
+
+İstasyon ergonomik gereksinimleri operatöre uygun olmalıdır.
+
+Type: Hard
+
+C-303 – Hazardous Station Authorization
+
+Riskli istasyonlarda yalnızca yetkili personel çalışabilir.
+
+Type: Hard
+
+C-304 – Preferred Station Continuity
+
+Operatörün alışık olduğu istasyonda çalışması tercih edilir.
+
+Type: Soft
+
+Chapter 7 – Shift Constraints (C-400)
+C-401 – Shift Availability
+
+Operatör yalnızca uygun vardiyada atanabilir.
+
+Type: Hard
+
+C-402 – Maximum Working Hours
+
+Yasal çalışma süresi aşılmamalıdır.
+
+Type: Hard
+
+C-403 – Mandatory Breaks
+
+Zorunlu mola kuralları uygulanmalıdır.
+
+Type: Hard
+
+C-404 – Consecutive Shift Limit
+
+Arka arkaya çalışılabilecek vardiya sayısı sınırlandırılır.
+
+Type: Hard
+
+C-405 – Overtime Preference
+
+Fazla mesai mümkün olduğunca azaltılır.
+
+Type: Soft
+
+Chapter 8 – Labor Rules (C-500)
+C-501 – Labor Law Compliance
+
+Tüm atamalar yürürlükteki iş mevzuatına uygun olmalıdır.
+
+Type: Hard
+
+C-502 – Union Agreement
+
+Toplu iş sözleşmesi kuralları uygulanmalıdır.
+
+Type: Hard
+
+C-503 – Seniority Preference
+
+Kıdem kuralları gerektiğinde dikkate alınır.
+
+Type: Soft
+
+C-504 – Equal Opportunity
+
+Atamalar ayrımcılık oluşturmamalıdır.
+
+Type: Hard
+
+Chapter 9 – Production Constraints (C-600)
+C-601 – Line Eligibility
+
+Operatör yalnızca yetkili olduğu hatta atanabilir.
+
+Type: Hard
+
+C-602 – Operation Dependency
+
+Ön koşullu operasyonlar desteklenmelidir.
+
+Type: Hard
+
+C-603 – Production Priority
+
+Yüksek öncelikli siparişler desteklenmelidir.
+
+Type: Soft
+
+C-604 – WIP Protection
+
+WIP dengesini bozacak atamalardan kaçınılmalıdır.
+
+Type: Soft
+
+Chapter 10 – Quality Constraints (C-700)
+C-701 – Quality Qualification
+
+Kalite gereksinimi olan operasyonlarda yalnızca uygun operatör atanabilir.
+
+Type: Hard
+
+C-702 – Historical Quality Score
+
+Kalite performansı yüksek operatörler tercih edilir.
+
+Type: Soft
+
+C-703 – Rework Restriction
+
+Belirli rework operasyonlarında yalnızca yetkili operatörler çalışabilir.
+
+**Type:**Hard
+
+Chapter 11 – Health & Safety Constraints (C-800)
+C-801 – Medical Restriction
+
+Sağlık kısıtı bulunan operatörler uygun olmayan operasyonlara atanamaz.
+
+Type: Hard
+
+C-802 – Physical Capability
+
+Operasyon fiziksel yeterlilik gerektiriyorsa operatör bunu sağlamalıdır.
+
+Type: Hard
+
+C-803 – PPE Requirement
+
+Kişisel koruyucu ekipman gerektiren alanlarda gerekli yetkilendirme bulunmalıdır.
+
+Type: Hard
+
+Chapter 12 – Business Constraints (C-900)
+C-901 – Rotation Policy
+
+Rotasyon politikaları uygulanmalıdır.
+
+Type: Soft
+
+C-902 – Backup Availability
+
+Kritik operasyonlarda yedek operatör bulunmalıdır.
+
+Type: Soft
+
+C-903 – Learning Assignment
+
+Eğitim amacıyla belirli atamalar yapılabilir.
+
+Type: Soft
+
+C-904 – Department Restriction
+
+Departman kısıtları korunmalıdır.
+
+Type: Hard
+
+Chapter 13 – Constraint Evaluation Order
+
+Constraint değerlendirme sırası:
+
+Input Validation
+        │
+        ▼
+Operator Constraints
+        │
+        ▼
+Skill Constraints
+        │
+        ▼
+Station Constraints
+        │
+        ▼
+Shift Constraints
+        │
+        ▼
+Labor Rules
+        │
+        ▼
+Production Constraints
+        │
+        ▼
+Quality Constraints
+        │
+        ▼
+Health & Safety Constraints
+        │
+        ▼
+Business Constraints
+Chapter 14 – Constraint Priority
+Öncelik	Tür
+P1	Safety
+P2	Labor Law
+P3	Availability
+P4	Skill
+P5	Production
+P6	Quality
+P7	Business Rules
+P8	Preferences
+Chapter 15 – Constraint Metadata
+
+Her constraint aşağıdaki metadata ile tanımlanır.
+
+Alan	Açıklama
+Constraint ID	Benzersiz kimlik
+Name	Constraint adı
+Category	Kategori
+Type	Hard / Soft
+Priority	Öncelik
+Version	Sürüm
+Status	Active / Inactive
+Description	Açıklama
+Error Code	Hata kodu
+Chapter 16 – Constraint Lifecycle
+Defined
+   │
+   ▼
+Validated
+   │
+   ▼
+Activated
+   │
+   ▼
+Applied
+   │
+   ▼
+Audited
+   │
+   ▼
+Versioned
+Chapter 17 – Acceptance Criteria
+
+Constraint Library tamamlanmış kabul edilmesi için:
+
+Tüm constraint kategorileri tanımlanmış olmalıdır.
+Hard ve Soft constraint ayrımı yapılmış olmalıdır.
+Öncelik sırası belirlenmiş olmalıdır.
+Metadata yapısı tanımlanmış olmalıdır.
+Değerlendirme sırası belirlenmiş olmalıdır.
+Constraint yaşam döngüsü tanımlanmış olmalıdır.
+Yeni constraint eklenmesini destekleyecek şekilde genişletilebilir olmalıdır.
+Document Status
+
+DOC-009B-2 – Constraint Library Specification
+
+Status: ✅ Completed
+Next Document
+
+DOC-009B-3 – Objective Function Library
+DOC-009B-3
+Objective Function Library
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Operator Assignment Engine (OAE)
+Document Type: Objective Function Library Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Operator Assignment Engine tarafından kullanılan tüm Objective Function tanımlarını ve optimizasyon hedeflerini içerir.
+
+Objective Function Library'nin amacı:
+
+Operatör atamalarının kalitesini ölçmek,
+Birden fazla optimizasyon hedefini aynı model içerisinde değerlendirmek,
+Hard Constraint'leri sağlayan çözümler arasından en yüksek kaliteye sahip planı seçmektir.
+
+Hard Constraint'ler zorunlu, Objective Function'lar ise optimizasyon hedefidir.
+
+Chapter 2 – Optimization Strategy
+
+Operator Assignment Engine Multi-Objective Optimization yaklaşımını kullanır.
+
+Toplam optimizasyon skoru, tüm objective fonksiyonlarının ağırlıklı toplamından oluşur.
+
+MaximizeZ=
+i=1
+∑
+n
+	​
+
+w
+i
+	​
+
+⋅O
+i
+	​
+
+
+Burada:
+
+O
+i
+	​
+
+: Objective Function
+w
+i
+	​
+
+: Objective Weight
+Chapter 3 – Objective Classification
+Kod	Objective
+O-101	Skill Match
+O-102	Efficiency
+O-103	Workload Balance
+O-104	Quality
+O-105	Learning Development
+O-106	Cross Skill Utilization
+O-107	Rotation Stability
+O-108	Overtime Reduction
+O-109	Operator Satisfaction
+O-110	Production Stability
+Chapter 4 – O-101 Skill Match Maximization
+Objective
+
+Operatör ile operasyon arasındaki beceri uyumunu en üst seviyeye çıkarmak.
+
+Amaç
+Minimum skill yerine en iyi skill seçimi
+Kritik operasyonlara en uygun operatörü atamak
+Type
+
+Maximize
+
+Chapter 5 – O-102 Efficiency Maximization
+Objective
+
+Toplam üretim verimliliğini artırmak.
+
+Değerlendirilen kriterler:
+
+Operatör Efficiency
+Historical Performance
+Cycle Time Contribution
+Type
+
+Maximize
+
+Chapter 6 – O-103 Workload Balance
+Objective
+
+Operatörler arasındaki iş yükü farkını azaltmak.
+
+Hedef:
+
+Dengeli görev dağılımı
+Aşırı yüklenmeyi önleme
+Boş kapasiteyi azaltma
+Type
+
+Minimize Variance
+
+Chapter 7 – O-104 Quality Optimization
+Objective
+
+Kalite performansı yüksek operatörleri uygun operasyonlara yönlendirmek.
+
+Değerlendirilen metrikler:
+
+First Pass Yield
+Defect Rate
+Rework History
+Inspection Score
+Type
+
+Maximize
+
+Chapter 8 – O-105 Learning Development
+Objective
+
+Operatör gelişimini desteklemek.
+
+Kullanım alanları:
+
+Yeni beceri kazanımı
+Kontrollü rotasyon
+Eğitim planları
+
+Bu objective yalnızca eğitim modunda etkinleştirilebilir.
+
+Type
+
+Maximize
+
+Chapter 9 – O-106 Cross Skill Utilization
+Objective
+
+Çok becerili operatörlerin verimli kullanılmasını sağlamak.
+
+Amaç:
+
+Esnek üretim
+Operasyon sürekliliği
+Darboğazlara hızlı müdahale
+Type
+
+Maximize
+
+Chapter 10 – O-107 Rotation Stability
+Objective
+
+Gereksiz operatör değişimlerini azaltmak.
+
+Hedef:
+
+Mevcut planı korumak
+Operatör alışkanlıklarını sürdürmek
+Üretim kararlılığını artırmak
+Type
+
+Maximize Stability
+
+Chapter 11 – O-108 Overtime Reduction
+Objective
+
+Toplam fazla mesai süresini azaltmak.
+
+Ölçülen kriterler:
+
+Fazla mesai saati
+Yasal sınır
+Vardiya dengesi
+Type
+
+Minimize
+
+Chapter 12 – O-109 Operator Satisfaction
+Objective
+
+Operatör memnuniyetini artırmak.
+
+Değerlendirilen faktörler:
+
+Tercih edilen istasyon
+Tercih edilen vardiya
+Rotasyon sıklığı
+İş yükü dengesi
+Type
+
+Maximize
+
+Chapter 13 – O-110 Production Stability
+Objective
+
+Üretim planının mümkün olduğunca kararlı kalmasını sağlamak.
+
+Amaç:
+
+Gereksiz yeniden atamaları azaltmak
+Mevcut düzeni korumak
+Incremental Optimization performansını artırmak
+Type
+
+Maximize
+
+Chapter 14 – Objective Priority Matrix
+Priority	Objective
+P1	Skill Match
+P2	Efficiency
+P3	Production Stability
+P4	Workload Balance
+P5	Quality
+P6	Overtime Reduction
+P7	Cross Skill Utilization
+P8	Rotation Stability
+P9	Operator Satisfaction
+P10	Learning Development
+
+Not: Nihai ağırlık katsayıları çalışma moduna (Normal, High Efficiency, Training, Emergency vb.) göre DOC-009B-4 ve sistem konfigürasyonunda belirlenir.
+
+Chapter 15 – Objective Evaluation Pipeline
+Assignment Candidates
+        │
+        ▼
+Objective Calculation
+        │
+        ▼
+Weighted Scoring
+        │
+        ▼
+Penalty Calculation
+        │
+        ▼
+Total Objective Score
+        │
+        ▼
+Candidate Ranking
+Chapter 16 – Objective Metadata
+
+Her objective aşağıdaki metadata ile tanımlanır.
+
+Alan	Açıklama
+Objective ID	Benzersiz kimlik
+Name	Objective adı
+Category	Performans alanı
+Optimization Type	Maximize / Minimize
+Weight	Varsayılan ağırlık
+Unit	Ölçü birimi
+Version	Sürüm
+Status	Active / Inactive
+Chapter 17 – Objective Lifecycle
+Defined
+    │
+    ▼
+Configured
+    │
+    ▼
+Activated
+    │
+    ▼
+Calculated
+    │
+    ▼
+Scored
+    │
+    ▼
+Audited
+    │
+    ▼
+Versioned
+Chapter 18 – Objective Conflict Resolution
+
+Birden fazla objective birbiriyle çelişebilir.
+
+Örnekler:
+
+Objective A	Objective B	Çözüm
+Skill Match	Learning Development	Ağırlıklandırma
+Production Stability	Rotation	Çalışma modu önceliği
+Efficiency	Operator Satisfaction	Skor optimizasyonu
+Overtime Reduction	Production Priority	Penalty + Weight
+
+Çatışmalar, ağırlıklı toplam modeli ve aktif çalışma profili kullanılarak çözülür.
+
+Chapter 19 – Acceptance Criteria
+
+Objective Function Library tamamlanmış kabul edilmesi için:
+
+Tüm objective fonksiyonları tanımlanmış olmalıdır.
+Her objective için optimizasyon yönü belirlenmiş olmalıdır.
+Öncelik matrisi oluşturulmuş olmalıdır.
+Objective değerlendirme akışı tanımlanmış olmalıdır.
+Metadata yapısı tanımlanmış olmalıdır.
+Objective yaşam döngüsü belirlenmiş olmalıdır.
+Objective çatışma çözüm stratejisi tanımlanmış olmalıdır.
+Document Status
+
+DOC-009B-3 – Objective Function Library
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009B-4
+OR-Tools CP-SAT Implementation Specification
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Operator Assignment Engine (OAE)
+Document Type: Solver Implementation Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Operator Assignment Engine'in Google OR-Tools CP-SAT Solver kullanılarak nasıl gerçekleştirileceğini tanımlar.
+
+Referans solver:
+
+Google OR-Tools CP-SAT
+
+Chapter 2 – Solver Architecture
+Operator Assignment Request
+            │
+            ▼
+      Data Preparation
+            │
+            ▼
+ Variable Generation
+            │
+            ▼
+ Constraint Building
+            │
+            ▼
+ Objective Building
+            │
+            ▼
+ CP-SAT Solver
+            │
+            ▼
+ Solution Validation
+            │
+            ▼
+ Assignment Result
+Chapter 3 – Variable Model
+
+Solver aşağıdaki karar değişkenlerini oluşturur.
+
+Variable	Type
+Assignment	Boolean
+Station Assignment	Boolean
+Shift Assignment	Boolean
+Backup Assignment	Boolean
+Rotation Flag	Boolean
+Chapter 4 – Constraint Builder
+
+Constraint Builder aşağıdaki modüllerden oluşur.
+
+Operator Constraints
+Skill Constraints
+Shift Constraints
+Station Constraints
+Production Constraints
+Labor Rules
+Business Rules
+
+Her modül bağımsız olarak solver modeline eklenir.
+
+Chapter 5 – Objective Builder
+
+Objective Builder aşağıdaki skorları hesaplar.
+
+Skill Score
+Efficiency Score
+Quality Score
+Workload Balance Score
+Rotation Score
+Overtime Score
+Stability Score
+
+Toplam skor ağırlıklı toplam yöntemiyle oluşturulur.
+
+Chapter 6 – Solver Parameters
+Parameter	Default
+max_time_in_seconds	30
+num_search_workers	CPU Core Count
+relative_gap_limit	0.01
+log_search_progress	False
+random_seed	Configurable
+Chapter 7 – Solution States
+Status	Açıklama
+OPTIMAL	En iyi çözüm bulundu
+FEASIBLE	Geçerli çözüm bulundu
+INFEASIBLE	Çözüm yok
+MODEL_INVALID	Model hatalı
+UNKNOWN	Sonuç üretilemedi
+Chapter 8 – Warm Start
+
+Daha önce oluşturulan atama planı yeni optimizasyonun başlangıç noktası olarak kullanılabilir.
+
+Bu özellik özellikle:
+
+Operatör değişikliği
+Devamsızlık
+Vardiya değişimi
+
+senaryolarında yeniden hesaplama süresini azaltır.
+
+Chapter 9 – Solution Validation
+
+Solver sonucu yayımlanmadan önce aşağıdaki kontroller yapılır.
+
+Hard Constraint doğrulaması
+Objective Score hesaplaması
+Assignment bütünlüğü
+Shift uygunluğu
+Skill uygunluğu
+
+Başarısız doğrulama durumunda çözüm reddedilir.
+
+Chapter 10 – Acceptance Criteria
+
+Bu implementasyon tamamlanmış kabul edilmesi için:
+
+CP-SAT modeli oluşturulmalıdır.
+Tüm karar değişkenleri tanımlanmalıdır.
+Constraint Builder eksiksiz çalışmalıdır.
+Objective Builder doğru hesaplama yapmalıdır.
+Warm Start desteklenmelidir.
+Solver durumları doğru yönetilmelidir.
+Sonuç doğrulama süreci tamamlanmalıdır.
+Document Status
+
+DOC-009B-4 – OR-Tools CP-SAT Implementation Specification
+DOC-009B-5
+Assignment Algorithms
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Operator Assignment Engine (OAE)
+Document Type: Algorithm Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Operator Assignment Engine tarafından kullanılan atama algoritmalarını, seçim stratejilerini ve çalışma akışını tanımlar.
+
+Operator Assignment Engine tek bir algoritmaya bağlı değildir. Problem büyüklüğü, çalışma modu ve çözüm süresi hedeflerine göre farklı algoritmalar kullanılabilir.
+
+Chapter 2 – Algorithm Architecture
+                Assignment Request
+                        │
+                        ▼
+              Assignment Preprocessing
+                        │
+                        ▼
+             Candidate Generation Engine
+                        │
+                        ▼
+              Algorithm Selection Layer
+                        │
+     ┌──────────┬──────────┬──────────┐
+     ▼          ▼          ▼
+   Greedy     CP-SAT     Hybrid
+     │          │          │
+     └──────────┴──────────┘
+                │
+                ▼
+         Solution Validation
+                │
+                ▼
+         Assignment Decision
+Chapter 3 – Algorithm Selection Strategy
+Problem Size	Algorithm
+Çok küçük	Greedy
+Küçük	Greedy + Local Search
+Orta	CP-SAT
+Büyük	CP-SAT + Warm Start
+Çok Büyük	Hybrid
+
+Algoritma seçimi sistem tarafından otomatik yapılabilir veya konfigürasyondan zorlanabilir.
+
+Chapter 4 – Greedy Assignment Algorithm
+Purpose
+
+Hızlı ve uygulanabilir bir ilk çözüm üretmek.
+
+Kullanım Alanı
+İlk plan oluşturma
+Küçük üretim hatları
+Acil operatör değişiklikleri
+Warm Start üretimi
+Avantajlar
+Çok hızlıdır.
+Basit uygulanır.
+Deterministiktir.
+Dezavantajlar
+Global optimum garanti etmez.
+Chapter 5 – CP-SAT Optimization
+Purpose
+
+Global optimuma en yakın çözümü üretmek.
+
+CP-SAT;
+
+tüm constraint'leri birlikte değerlendirir,
+objective fonksiyonlarını optimize eder,
+en yüksek toplam skoru oluşturmaya çalışır.
+Kullanım Alanı
+Günlük planlama
+Vardiya planlama
+Büyük üretim hatları
+Chapter 6 – Local Search Improvement
+
+Greedy veya önceki çözüm üzerinde iyileştirme yapılır.
+
+Temel işlemler:
+
+Operatör değiştirme
+İstasyon değiştirme
+Operasyon değiştirme
+Komşu çözüm üretme
+
+Amaç:
+
+Objective Score'u artırmak.
+Chapter 7 – Incremental Assignment Algorithm
+
+Bu algoritma yalnızca değişen bölgeyi yeniden optimize eder.
+
+Kullanıldığı senaryolar:
+
+Operatör devamsızlığı
+Hastalık
+Fazla mesai
+Makine arızası
+Acil sipariş
+
+Etkilenmeyen atamalar korunur.
+
+Chapter 8 – Candidate Generation
+
+Optimizasyondan önce aday operatör listesi oluşturulur.
+
+Filtreleme kriterleri:
+
+Skill
+Sertifikasyon
+Uygunluk
+Vardiya
+Sağlık durumu
+İstasyon uygunluğu
+
+Bu aşamayı geçemeyen operatörler solver modeline dahil edilmez.
+
+Chapter 9 – Candidate Ranking
+
+Adaylar aşağıdaki kriterlere göre puanlanır.
+
+Kriter
+Skill Match
+Efficiency
+Historical Quality
+Attendance
+Fatigue
+Learning Score
+Rotation Score
+
+Bu sıralama, solver önceliklerini belirlemek için kullanılabilir.
+
+Chapter 10 – Conflict Resolution
+
+Birden fazla operatör aynı operasyon için uygun olabilir.
+
+Çözüm sırası:
+
+Hard Constraint
+Skill Match
+Efficiency
+Quality
+Stability
+Rotation Policy
+Random Tie Break (isteğe bağlı)
+Chapter 11 – Repair Strategy
+
+Geçerli çözüm üretilemediğinde Repair mekanizması devreye girer.
+
+Uygulanan işlemler:
+
+Alternatif operatör arama
+Yakın skill eşleşmesi
+Yedek operatör kullanımı
+Rotasyon değişikliği
+Kısıtlı yeniden optimizasyon
+Chapter 12 – Optimization Modes
+Mod	Amaç
+Standard	Dengeli optimizasyon
+High Efficiency	Maksimum verimlilik
+Quality Focus	Kalite öncelikli
+Training	Eğitim odaklı
+Emergency	En hızlı uygulanabilir çözüm
+Manual Assist	Kullanıcı destekli planlama
+
+Aktif mod, objective ağırlıklarını ve algoritma seçimini etkileyebilir.
+
+Chapter 13 – Performance Strategy
+
+Algoritma seçiminde hedeflenen performans:
+
+Senaryo	Hedef Süre
+Tek operatör değişimi	<100 ms
+Tek hat	<500 ms
+Vardiya planı	<2 sn
+Fabrika geneli	<30 sn
+Chapter 14 – Algorithm Decision Flow
+Assignment Request
+        │
+        ▼
+Input Validation
+        │
+        ▼
+Candidate Generation
+        │
+        ▼
+Algorithm Selection
+        │
+        ▼
+Optimization
+        │
+        ▼
+Repair (Gerekirse)
+        │
+        ▼
+Validation
+        │
+        ▼
+Assignment Result
+Chapter 15 – Extensibility
+
+Algoritma altyapısı yeni yöntemlerin eklenmesini desteklemelidir.
+
+Desteklenen genişleme modeli:
+
+Strategy Pattern
+Pluggable Algorithm Interface
+Configurable Selection Policy
+
+Yeni algoritmalar mevcut motoru değiştirmeden sisteme eklenebilir.
+
+Chapter 16 – Acceptance Criteria
+
+Assignment Algorithms modülü tamamlanmış kabul edilmesi için:
+
+Algoritma seçim mekanizması tanımlanmış olmalıdır.
+Candidate Generation süreci oluşturulmuş olmalıdır.
+Greedy ve CP-SAT stratejileri tanımlanmış olmalıdır.
+Incremental Assignment desteklenmelidir.
+Repair Strategy tanımlanmış olmalıdır.
+Çakışma çözüm mekanizması belirlenmiş olmalıdır.
+Performans hedefleri tanımlanmış olmalıdır.
+Yeni algoritmaların eklenmesini destekleyen genişletilebilir bir mimari sağlanmalıdır.
+Document Status
+
+DOC-009B-5 – Assignment Algorithms
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009B-6
+Skill Matching Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Operator Assignment Engine (OAE)
+Module: Skill Matching Engine (SME)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Skill Matching Engine (SME), üretim operasyonları için en uygun operatörü belirleyen çekirdek modüldür.
+
+Bu modülün amacı yalnızca operatörün ilgili operasyonu yapabiliyor olması değil; beceri seviyesi, deneyim, kalite geçmişi, sertifikasyon, eğitim durumu ve üretim performansı gibi kriterleri birlikte değerlendirerek en uygun eşleşmeyi üretmektir.
+
+Chapter 2 – Responsibilities
+
+Skill Matching Engine aşağıdaki görevlerden sorumludur.
+
+Kod	Görev
+SME-001	Skill Verification
+SME-002	Skill Scoring
+SME-003	Certification Validation
+SME-004	Experience Evaluation
+SME-005	Multi Skill Analysis
+SME-006	Skill Gap Analysis
+SME-007	Candidate Ranking
+SME-008	Skill Recommendation
+Chapter 3 – Engine Architecture
+                 Operator
+                     │
+                     ▼
+             Skill Validation
+                     │
+                     ▼
+          Certification Control
+                     │
+                     ▼
+          Experience Evaluation
+                     │
+                     ▼
+           Skill Score Calculation
+                     │
+                     ▼
+            Candidate Ranking
+                     │
+                     ▼
+           Assignment Optimizer
+Chapter 4 – Input Data Model
+
+Engine aşağıdaki verileri kullanır.
+
+Operator Data
+Operator ID
+Skill Matrix
+Certification List
+Experience
+Efficiency
+Quality History
+Training Records
+Attendance
+Department
+Shift Availability
+Operation Data
+Operation ID
+Required Skills
+Minimum Skill Level
+Required Certification
+Line
+Station
+Cycle Time
+Priority
+Chapter 5 – Skill Matrix
+
+Skill Matrix temel veri yapısıdır.
+
+Operator	Operation	Skill Level
+OP001	Sewing	5
+OP001	Sleeve	4
+OP001	Collar	3
+OP002	Sewing	2
+
+Skill seviyeleri örnek olarak aşağıdaki ölçekle tanımlanabilir:
+
+Level	Description
+0	Skill Yok
+1	Eğitim Aşamasında
+2	Gözetim Altında Çalışabilir
+3	Bağımsız Çalışabilir
+4	İleri Seviye
+5	Uzman
+
+Seviye aralıkları sistem konfigürasyonundan değiştirilebilir.
+
+Chapter 6 – Matching Process
+
+Skill eşleşmesi aşağıdaki adımlarla gerçekleştirilir.
+
+Operation
+
+↓
+
+Required Skills
+
+↓
+
+Candidate Operators
+
+↓
+
+Skill Validation
+
+↓
+
+Certification Validation
+
+↓
+
+Experience Evaluation
+
+↓
+
+Score Calculation
+
+↓
+
+Ranking
+
+↓
+
+Assignment Engine
+Chapter 7 – Skill Verification
+
+Kontrol edilen kriterler:
+
+Minimum Skill Level
+Skill Validity
+Skill Expiration
+Department Authorization
+Machine Authorization
+Line Authorization
+
+Başarısız olan adaylar elenir.
+
+Chapter 8 – Certification Verification
+
+Kontrol edilen belgeler:
+
+Teknik Sertifikalar
+Kalite Yetkileri
+Güvenlik Eğitimleri
+Makine Kullanım Yetkileri
+Özel Operasyon Eğitimleri
+
+Geçerlilik tarihi dolmuş sertifikalar dikkate alınmaz.
+
+Chapter 9 – Experience Evaluation
+
+Değerlendirilen kriterler:
+
+Aynı operasyondaki çalışma süresi
+Aynı hatta çalışma süresi
+Benzer operasyon deneyimi
+Son çalışma tarihi
+Tekrarlama sıklığı
+
+Deneyim puanı, Skill Score'u destekleyen ikincil bir kriterdir.
+
+Chapter 10 – Multi-Skill Analysis
+
+Çok becerili operatörler analiz edilir.
+
+Amaçlar:
+
+Esnek üretim sağlamak
+Darboğaz riskini azaltmak
+Kritik operasyonlar için alternatif oluşturmak
+Rotasyon planlarını desteklemek
+
+Multi-skill analizi, tek beceriye göre öncelik kazanabilir ancak bu karar Objective ağırlıklarına bağlıdır.
+
+Chapter 11 – Skill Gap Analysis
+
+Yetersiz beceri durumunda sistem farkı hesaplar.
+
+Örnek:
+
+Required	Current	Gap
+5	5	0
+5	4	1
+5	3	2
+
+Bu analiz eğitim planlaması için kullanılabilir ancak Hard Constraint ihlalini ortadan kaldırmaz.
+
+Chapter 12 – Candidate Scoring
+
+Aday operatörler aşağıdaki kriterlere göre puanlanır.
+
+Kriter	Varsayılan Etki
+Skill Match	%35
+Efficiency	%20
+Experience	%15
+Historical Quality	%10
+Attendance	%10
+Fatigue	%5
+Rotation Preference	%5
+
+Bu oranlar varsayılan öneri değerleridir. Nihai ağırlıklar sistem konfigürasyonunda yönetilir.
+
+Chapter 13 – Candidate Ranking
+
+Adaylar toplam puana göre sıralanır.
+
+Operator Candidates
+
+↓
+
+Score Calculation
+
+↓
+
+Sorting
+
+↓
+
+Best Candidate
+
+↓
+
+Assignment Engine
+
+Eşit puan durumunda sırasıyla:
+
+Skill Level
+Quality History
+Experience
+Daha düşük Fatigue
+Rastgele seçim (opsiyonel)
+
+kullanılır.
+
+Chapter 14 – Recommendation Engine
+
+Skill Matching Engine yalnızca seçim yapmaz, öneriler de üretir.
+
+Örnek öneriler:
+
+Eğitim önerisi
+Sertifika yenileme
+Alternatif operatör
+Çapraz eğitim önerisi
+Yedek operatör önerisi
+
+Bu öneriler kararı otomatik değiştirmez; karar destek amacı taşır.
+
+Chapter 15 – Integration Points
+
+Skill Matching Engine aşağıdaki modüllerle haberleşir.
+
+Modül	Amaç
+Assignment Optimizer	Nihai atama
+Rotation Planning Engine	Rotasyon değerlendirmesi
+Backup Assignment Engine	Alternatif operatör
+Explainability	Karar açıklaması
+Decision Engine	Karar puanlaması
+Audit Engine	İzlenebilirlik
+Chapter 16 – Acceptance Criteria
+
+Skill Matching Engine tamamlanmış kabul edilmesi için:
+
+Skill doğrulama mekanizması tanımlanmış olmalıdır.
+Sertifikasyon doğrulaması uygulanmalıdır.
+Deneyim değerlendirmesi desteklenmelidir.
+Multi-skill analizi yapılabilmelidir.
+Skill Gap hesaplanabilmelidir.
+Aday puanlama ve sıralama süreçleri tanımlanmış olmalıdır.
+Öneri üretme mekanizması bulunmalıdır.
+Assignment Engine ile standart arayüz üzerinden entegre çalışmalıdır.
+Document Status
+
+DOC-009B-6 – Skill Matching Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009B-7 – Rotation Planning Engine
+
+Bu modül, operatör rotasyonu, ergonomik dengeleme, öğrenme planları ve uzun dönem operatör dağılım stratejilerini yöneten alt motoru tanımlayacaktır.
+Chapter 1 – Purpose
+1.1 Objective
+
+Rotation Planning Engine (RPE), operatörlerin üretim hatları, istasyonlar ve operasyonlar arasında planlı şekilde rotasyonunu yöneten alt motordur.
+
+Amaç;
+
+Tekrarlayan iş yükünü azaltmak,
+Ergonomik riskleri düşürmek,
+Çok becerili operatör yapısını geliştirmek,
+Operasyonel esnekliği artırmak,
+Üretim verimliliğini koruyarak sürdürülebilir bir rotasyon planı oluşturmaktır.
+Chapter 2 – Responsibilities
+Kod	Görev
+RPE-001	Rotation Planning
+RPE-002	Rotation Validation
+RPE-003	Rotation Optimization
+RPE-004	Ergonomic Distribution
+RPE-005	Learning Rotation
+RPE-006	Rotation Recommendation
+RPE-007	Rotation History Management
+RPE-008	Rotation Compliance
+Chapter 3 – Rotation Types
+Rotation Type	Description
+Station Rotation	İstasyon değişimi
+Operation Rotation	Operasyon değişimi
+Line Rotation	Hat değişimi
+Shift Rotation	Vardiya değişimi
+Cross Skill Rotation	Beceri geliştirme rotasyonu
+Ergonomic Rotation	Fiziksel yükü dengeleme
+Planned Rotation	Planlı rotasyon
+Emergency Rotation	Acil durum rotasyonu
+Chapter 4 – Rotation Architecture
+Production Plan
+        │
+        ▼
+Rotation Policy Engine
+        │
+        ▼
+Eligibility Analysis
+        │
+        ▼
+Rotation Optimizer
+        │
+        ▼
+Validation
+        │
+        ▼
+Rotation Schedule
+Chapter 5 – Input Data
+Operator Data
+Operator ID
+Skill Matrix
+Experience
+Current Assignment
+Rotation History
+Fatigue Score
+Ergonomic Profile
+Attendance
+Certifications
+Production Data
+Production Line
+Station
+Operation
+Shift Plan
+Production Calendar
+Order Priority
+Configuration Data
+Rotation Policies
+Rotation Frequency
+Restricted Operations
+Labor Rules
+Chapter 6 – Rotation Eligibility
+
+Bir operatör aşağıdaki koşulları sağlıyorsa rotasyona uygun kabul edilir.
+
+Gerekli skill seviyesine sahip
+Sertifikası geçerli
+Sağlık açısından uygun
+Vardiyası uygun
+Yasaklı operasyon listesinde değil
+Minimum görev süresini tamamlamış
+Chapter 7 – Rotation Policies
+
+Desteklenen politika örnekleri:
+
+Policy	Description
+Fixed Interval	Belirli süre sonunda rotasyon
+Daily Rotation	Günlük rotasyon
+Weekly Rotation	Haftalık rotasyon
+Fatigue Based	Yorgunluk temelli
+Skill Development	Eğitim amaçlı
+Quality Based	Kalite performansına bağlı
+Manual Override	Manuel planlama
+
+Politikalar sistem yöneticisi tarafından yapılandırılabilir.
+
+Chapter 8 – Ergonomic Rotation
+
+Ergonomik dengeleme için aşağıdaki faktörler değerlendirilir.
+
+Tekrarlayan hareket seviyesi
+Fiziksel yük
+Ayakta çalışma süresi
+Kuvvet gereksinimi
+Omuz ve bel yükü
+El bileği kullanım yoğunluğu
+
+Yüksek ergonomik riskli operasyonlarda uzun süreli görevlendirmeden kaçınılır.
+
+Chapter 9 – Learning Rotation
+
+Learning Mode etkin olduğunda sistem:
+
+Yeni operasyonlara kontrollü geçiş planlar.
+Deneyimli operatörlerle eşleştirme yapabilir.
+Eğitim kapasitesini dikkate alır.
+Kritik operasyonlarda minimum deneyim seviyesini korur.
+
+Bu mod üretim verimliliğini düşürmeyecek şekilde sınırlandırılır.
+
+Chapter 10 – Rotation Optimization
+
+Optimizasyon hedefleri:
+
+Ergonomik yükü dengelemek
+Skill çeşitliliğini artırmak
+Kaliteyi korumak
+Verimliliği sürdürmek
+Gereksiz rotasyonları azaltmak
+
+Rotation Planning Engine, Operator Assignment Engine ile birlikte çalışarak en uygun rotasyon planını oluşturur.
+
+Chapter 11 – Rotation Validation
+
+Rotasyon planı yayımlanmadan önce aşağıdaki kontroller yapılır.
+
+Skill uygunluğu
+Sertifikasyon kontrolü
+İş kanunu uyumu
+Vardiya uygunluğu
+Üretim kapasitesi
+Kalite gereksinimleri
+Ergonomik kurallar
+
+Herhangi bir Hard Constraint ihlali durumunda plan reddedilir.
+
+Chapter 12 – Rotation History
+
+Her rotasyon kaydı aşağıdaki bilgileri içerir.
+
+Alan	Açıklama
+Rotation ID	Benzersiz kimlik
+Operator ID	Operatör
+Previous Assignment	Önceki görev
+New Assignment	Yeni görev
+Rotation Type	Rotasyon türü
+Reason	Rotasyon nedeni
+Decision ID	Karar referansı
+Timestamp	Tarih/Saat
+
+Bu kayıtlar denetlenebilir ve geriye dönük analizlerde kullanılabilir.
+
+Chapter 13 – Recommendation Engine
+
+Rotation Planning Engine aşağıdaki önerileri üretebilir.
+
+Rotasyon ertelensin.
+Alternatif operatör kullanılsın.
+Eğitim planı oluşturulsun.
+Ergonomik risk nedeniyle görev değiştirilsin.
+Aynı operasyonda devam edilsin.
+
+Bu öneriler karar destek amacı taşır.
+
+Chapter 14 – Integration Points
+Modül	Amaç
+Skill Matching Engine	Skill değerlendirmesi
+Assignment Optimizer	Nihai atama
+Backup Assignment Engine	Alternatif operatör
+Decision Engine	Karar puanlaması
+Line Balancing Engine	Hat dengesi
+Scheduling Engine	Zamanlama
+Explainability	Karar açıklaması
+Chapter 15 – Acceptance Criteria
+
+Rotation Planning Engine tamamlanmış kabul edilmesi için:
+
+Rotasyon türleri tanımlanmış olmalıdır.
+Uygunluk kuralları belirlenmiş olmalıdır.
+Politika yönetimi desteklenmelidir.
+Ergonomik değerlendirme yapılabilmelidir.
+Learning Rotation desteklenmelidir.
+Rotasyon optimizasyonu tanımlanmış olmalıdır.
+Geçerlilik kontrolleri uygulanmalıdır.
+Rotasyon geçmişi kayıt altına alınmalıdır.
+Diğer motorlarla standart arayüz üzerinden entegre çalışmalıdır.
+Document Status
+
+DOC-009B-7 – Rotation Planning Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009B-8 – Backup Assignment Engine
+
+Bu belge, operatör devamsızlığı, ani iş gücü kaybı ve beklenmeyen üretim olaylarında devreye giren yedek operatör atama mekanizmasını tanımlayacaktır.
+DOC-009B-8
+Backup Assignment Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Operator Assignment Engine (OAE)
+Module: Backup Assignment Engine (BAE)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Backup Assignment Engine (BAE), üretim sırasında oluşabilecek beklenmedik personel değişikliklerine hızlı ve kontrollü şekilde yanıt vermek amacıyla tasarlanmıştır.
+
+Motorun temel amacı;
+
+üretimin durmasını önlemek,
+kritik operasyonların sürekliliğini sağlamak,
+minimum yeniden planlama ile uygun yedek operatörü belirlemek,
+gerektiğinde Operator Assignment Engine ve Scheduling Engine'i tetikleyerek yeni bir plan oluşturmaktır.
+Chapter 2 – Responsibilities
+Kod	Görev
+BAE-001	Backup Operator Selection
+BAE-002	Emergency Assignment
+BAE-003	Replacement Validation
+BAE-004	Assignment Recalculation
+BAE-005	Critical Operation Protection
+BAE-006	Escalation Management
+BAE-007	Recovery Planning
+BAE-008	Assignment Recommendation
+Chapter 3 – Trigger Events
+
+Backup Assignment Engine aşağıdaki olaylarda devreye girer.
+
+Event	Description
+Operator Absence	Operatör işe gelmedi
+Sick Leave	Hastalık bildirimi
+Emergency Leave	Acil izin
+Shift Change	Vardiya değişikliği
+Operator Removal	Manuel çıkarma
+Performance Issue	Performans yetersizliği
+Safety Restriction	Güvenlik nedeniyle görev değişikliği
+Manual Request	Planlayıcı talebi
+Chapter 4 – Engine Architecture
+Production Event
+        │
+        ▼
+Event Analyzer
+        │
+        ▼
+Affected Assignment Detection
+        │
+        ▼
+Backup Candidate Generator
+        │
+        ▼
+Candidate Ranking
+        │
+        ▼
+Validation
+        │
+        ▼
+Assignment Update
+Chapter 5 – Backup Candidate Selection
+
+Adaylar aşağıdaki kriterlere göre belirlenir.
+
+Gerekli skill seviyesine sahip olmalıdır.
+Sertifikasyonu geçerli olmalıdır.
+Aynı vardiyada bulunmalıdır.
+Müsait olmalıdır.
+Kritik operasyonlarda deneyimli olmalıdır.
+Sağlık açısından uygun olmalıdır.
+
+Hard Constraint sağlamayan adaylar değerlendirmeye alınmaz.
+
+Chapter 6 – Candidate Priority
+
+Varsayılan öncelik sırası:
+
+Priority	Kriter
+P1	Aynı operasyon deneyimi
+P2	Skill Match
+P3	Aynı üretim hattı deneyimi
+P4	Quality History
+P5	Efficiency
+P6	Fatigue Score
+P7	Rotation Impact
+P8	Learning Opportunity
+
+Bu öncelikler sistem konfigürasyonundan değiştirilebilir.
+
+Chapter 7 – Replacement Strategies
+
+Desteklenen stratejiler:
+
+Strategy	Description
+Direct Replacement	Aynı operasyon için doğrudan yedek
+Chain Replacement	Zincirleme görev değişikliği
+Incremental Optimization	Etkilenen alanın yeniden optimize edilmesi
+Global Reassignment	Tüm planın yeniden oluşturulması
+Manual Approval	Planlayıcı onayı beklenmesi
+Chapter 8 – Escalation Levels
+
+Yedek bulunamaması durumunda sistem aşağıdaki seviyeleri uygular.
+
+Level	Action
+L1	Alternatif operatör ara
+L2	Cross-skill operatör kullan
+L3	Yakın skill seviyesini değerlendir
+L4	Kısmi yeniden optimizasyon başlat
+L5	Planlayıcıya uyarı gönder
+L6	Global yeniden planlama öner
+Chapter 9 – Validation Process
+
+Yeni atama aşağıdaki kontrollerden geçer.
+
+Skill doğrulaması
+Sertifikasyon kontrolü
+Vardiya uygunluğu
+Çalışma süresi kontrolü
+İş kanunu uyumluluğu
+Kalite gereksinimleri
+Ergonomik uygunluk
+
+Herhangi bir Hard Constraint ihlalinde atama reddedilir.
+
+Chapter 10 – Recovery Planning
+
+Olay sonrasında sistem normale dönüş planı oluşturur.
+
+Aşamalar:
+
+Geçici atamayı uygula.
+Üretimi devam ettir.
+Uygun ilk fırsatta kalıcı planı oluştur.
+Gerekirse Incremental Optimization çalıştır.
+Tüm değişiklikleri kayıt altına al.
+Chapter 11 – Notification Model
+
+Backup Assignment Engine aşağıdaki bildirimleri üretebilir.
+
+Operatör değişikliği
+Kritik operasyon uyarısı
+Yedek operatör ataması
+Plan güncellemesi
+Manuel onay talebi
+Global yeniden planlama önerisi
+
+Bildirimler Event Bus üzerinden diğer modüllere iletilir.
+
+Chapter 12 – Integration Points
+Modül	Amaç
+Operator Assignment Engine	Nihai atama
+Skill Matching Engine	Aday değerlendirme
+Rotation Planning Engine	Rotasyon etkisi
+Scheduling Engine	Zamanlama güncellemesi
+Line Balancing Engine	Hat dengesinin korunması
+Decision Engine	Karar puanlaması
+Notification Service	Bildirim gönderimi
+Chapter 13 – Runtime Characteristics
+Özellik	Destek
+Event Driven	✔
+Real-Time Response	✔
+Incremental Optimization	✔
+Manual Override	✔
+Audit Compatible	✔
+Explainability Compatible	✔
+Chapter 14 – Acceptance Criteria
+
+Backup Assignment Engine tamamlanmış kabul edilmesi için:
+
+Tetikleyici olaylar tanımlanmış olmalıdır.
+Yedek aday belirleme süreci oluşturulmuş olmalıdır.
+Önceliklendirme mekanizması tanımlanmış olmalıdır.
+Değiştirme stratejileri belirlenmiş olmalıdır.
+Eskalasyon süreci tanımlanmış olmalıdır.
+Doğrulama mekanizması uygulanmalıdır.
+Kurtarma planı oluşturulmalıdır.
+Olay tabanlı çalışma modeli desteklenmelidir.
+Diğer motorlarla standart arayüz üzerinden entegre çalışmalıdır.
+Document Status
+
+DOC-009B-8 – Backup Assignment Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+Yeni sadeleştirilmiş mimariye göre Operator Assignment Engine serisinin son belgesi:
+
+DOC-009B-9 – Final Technical Specification
+
+Bu belge, DOC-009B-1 ile DOC-009B-8 arasındaki tüm teknik tanımları tek bir nihai referans dokümanında birleştirecek ve Operator Assignment Engine'in geliştirmeye hazır son teknik spesifikasyonu olacaktır.
+DOC-009B-9
+Operator Assignment Engine – Final Technical Specification
+
+Version: 1.0
+Status: Final Architecture Specification
+Engine Code: OAE
+Document Type: Final Technical Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Operator Assignment Engine (OAE) için hazırlanmış nihai teknik referans belgesidir.
+
+Belgenin amacı;
+
+motorun mimarisini tek dokümanda toplamak,
+tüm alt modüllerin sorumluluklarını tanımlamak,
+diğer MARS APS motorlarıyla entegrasyonu açıklamak,
+geliştirme ekibi için resmi teknik referans oluşturmaktır.
+
+Bu belge, DOC-009B serisinin tamamlanmış ve onaylanmış son versiyonudur.
+
+Chapter 2 – Mission
+
+Operator Assignment Engine'in temel görevi, mevcut insan kaynağını üretim planına en uygun şekilde atamaktır.
+
+Kararlar aşağıdaki kriterlere göre oluşturulur:
+
+Skill uyumluluğu
+Sertifikasyon
+Verimlilik
+İş yükü dengesi
+Kalite geçmişi
+Operatör uygunluğu
+Rotasyon politikaları
+İş kanunu kuralları
+Üretim öncelikleri
+Chapter 3 – Functional Scope
+
+Engine aşağıdaki fonksiyonları yerine getirir.
+
+Kod	Fonksiyon
+OAE-001	Operator Assignment
+OAE-002	Skill Matching
+OAE-003	Rotation Planning
+OAE-004	Backup Assignment
+OAE-005	Workload Distribution
+OAE-006	Shift Assignment
+OAE-007	Candidate Ranking
+OAE-008	Assignment Validation
+OAE-009	Incremental Reassignment
+OAE-010	Assignment Recommendation
+Chapter 4 – Engine Architecture
+                 Operator Assignment Engine
+                           │
+ ┌─────────────────────────────────────────────────────┐
+ │                                                     │
+ │ Mathematical Optimization Model                     │
+ │ Constraint Library                                  │
+ │ Objective Function Library                          │
+ │ CP-SAT Solver                                       │
+ │ Assignment Algorithms                               │
+ │ Skill Matching Engine                               │
+ │ Rotation Planning Engine                            │
+ │ Backup Assignment Engine                            │
+ │                                                     │
+ └─────────────────────────────────────────────────────┘
+Chapter 5 – Processing Pipeline
+Operator Data
+      │
+      ▼
+Candidate Generation
+      │
+      ▼
+Constraint Evaluation
+      │
+      ▼
+Objective Calculation
+      │
+      ▼
+CP-SAT Optimization
+      │
+      ▼
+Assignment Validation
+      │
+      ▼
+Assignment Publication
+Chapter 6 – Input Model
+
+Operator Assignment Engine aşağıdaki veri kümelerini kullanır.
+
+Operator Data
+Operator
+Skill Matrix
+Certification
+Experience
+Attendance
+Availability
+Fatigue
+Department
+Shift
+Production Data
+Production Orders
+Operations
+Routing
+Stations
+Production Lines
+Shift Calendar
+Factory Calendar
+Configuration Data
+Constraint Profiles
+Objective Profiles
+Rotation Policies
+Labor Rules
+Runtime Configuration
+Chapter 7 – Output Model
+
+Motor aşağıdaki çıktıları üretir.
+
+Operator Assignment Plan
+Station Assignment
+Shift Assignment
+Rotation Plan
+Backup Assignment Plan
+Candidate Ranking Report
+Assignment Score
+Assignment Recommendation
+Assignment Audit Record
+Chapter 8 – Core Decision Flow
+Planning Request
+        │
+        ▼
+Candidate Selection
+        │
+        ▼
+Skill Matching
+        │
+        ▼
+Optimization
+        │
+        ▼
+Validation
+        │
+        ▼
+Decision Generation
+        │
+        ▼
+Publication
+Chapter 9 – Internal Modules
+Modül	Sorumluluk
+Mathematical Model	Matematiksel optimizasyon modeli
+Constraint Library	İş kuralları
+Objective Library	Optimizasyon hedefleri
+Solver	CP-SAT çözümü
+Assignment Algorithms	Algoritma yönetimi
+Skill Matching	Beceri analizi
+Rotation Planning	Rotasyon planlama
+Backup Assignment	Acil durum atamaları
+Chapter 10 – External Integrations
+Sistem	Kullanım
+Line Balancing Engine	Hat dengesi
+Scheduling Engine	Üretim takvimi
+Simulation Engine	Senaryo analizi
+Decision Engine	Karar puanlama
+ERP	Sipariş verisi
+MES	Gerçek zamanlı üretim
+HR System	Personel bilgileri
+Notification Service	Bildirimler
+Chapter 11 – Runtime Characteristics
+Özellik	Durum
+Stateless	✔
+Multi-thread	✔
+Event Driven	✔
+Incremental Optimization	✔
+High Availability	✔
+Horizontal Scaling	✔
+Cloud Ready	✔
+Chapter 12 – Quality Attributes
+
+Operator Assignment Engine aşağıdaki kalite hedeflerini karşılar.
+
+Reliability
+Availability
+Scalability
+Maintainability
+Extensibility
+Traceability
+Explainability
+Testability
+Security
+Chapter 13 – Performance Targets
+KPI	Hedef
+Tek Operatör Atama	<100 ms
+Hat Bazlı Atama	<500 ms
+Vardiya Atama	<2 sn
+Toplu Atama	<10 sn
+Fabrika Bazlı Optimizasyon	<30 sn
+Hard Constraint Başarı Oranı	%100
+Servis Erişilebilirliği	≥99.9%
+Chapter 14 – Engine Dependencies
+
+Bu motor aşağıdaki temel bileşenlere bağlıdır.
+
+Constraint Repository
+Configuration Service
+Event Bus
+Identity Provider
+Logging Service
+Metrics Service
+Audit Service
+Decision Engine
+Chapter 15 – Document Dependency Matrix
+Referans Doküman	İçerik
+DOC-009B-1	Mathematical Optimization Model
+DOC-009B-2	Constraint Library Specification
+DOC-009B-3	Objective Function Library
+DOC-009B-4	OR-Tools CP-SAT Implementation
+DOC-009B-5	Assignment Algorithms
+DOC-009B-6	Skill Matching Engine
+DOC-009B-7	Rotation Planning Engine
+DOC-009B-8	Backup Assignment Engine
+Chapter 16 – Acceptance Criteria
+
+Operator Assignment Engine geliştirmeye hazır kabul edilmesi için:
+
+Tüm alt modüller tamamlanmış olmalıdır.
+Matematiksel model doğrulanmış olmalıdır.
+Constraint ve Objective kütüphaneleri tanımlanmış olmalıdır.
+CP-SAT implementasyonu tamamlanmış olmalıdır.
+Skill Matching, Rotation ve Backup modülleri entegre çalışmalıdır.
+Performans hedefleri sağlanmalıdır.
+Diğer MARS APS motorlarıyla entegrasyon tanımlanmış olmalıdır.
+Chapter 17 – Final Statement
+
+Operator Assignment Engine, MARS APS'in insan kaynağı optimizasyonundan sorumlu çekirdek karar motorudur.
+
+Bu motor, Line Balancing Engine ile koordineli çalışarak üretim hattının yalnızca operasyonel değil, aynı zamanda insan kaynağı açısından da optimum şekilde planlanmasını sağlar.
+
+Bu belge ile DOC-009B serisi tamamlanmıştır ve geliştirme aşamasına geçmeye hazırdır.
+
+Document Status
+
+DOC-009B – Operator Assignment Engine
+
+Ana Doküman: 1
+Alt Doküman: 9
+Toplam Doküman: 10
+Status: ✅ Completed
+Architecture Status: Frozen
+Implementation Status: Ready for Development
+Roadmap Durumu
+
+Tamamlanan motorlar:
+
+✅ DOC-009A – Line Balancing Engine
+✅ DOC-009B – Operator Assignment Engine
+Next Document
+
+Plan sırasına göre sıradaki ana doküman:
+
+DOC-009C – Scheduling Engine
+
+Bu motor, MARS APS'in üretim zamanlama (Scheduling) çekirdeğini oluşturacak ve siparişlerin zaman ekseninde optimize edilmesinden sorumlu olacaktır. Bu noktadan itibaren sistem, APS'nin üç ana optimizasyon motorundan ikisini tamamlamış olacaktır.
