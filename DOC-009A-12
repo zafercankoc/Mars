@@ -1,0 +1,275 @@
+DOC-009A-12
+Incremental Optimization Strategy
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Line Balancing Engine
+Document Type: Technical Architecture Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Incremental Optimization Strategy, üretim sırasında meydana gelen değişikliklere yalnızca etkilenen bölgeyi yeniden optimize ederek cevap veren optimizasyon stratejisini tanımlar.
+
+Bu stratejinin amacı;
+
+tüm hattı yeniden optimize etmemek,
+mevcut planı mümkün olduğunca korumak,
+yeniden hesaplama süresini azaltmak,
+üretim sürekliliğini sağlamaktır.
+Chapter 2 – Scope
+
+Incremental optimizasyon aşağıdaki olaylarda uygulanabilir.
+
+Kod	Olay
+IO-001	Operatör değişikliği
+IO-002	Makine arızası
+IO-003	Acil sipariş eklenmesi
+IO-004	Operasyon süresi güncellenmesi
+IO-005	Bundle yön değişikliği
+IO-006	WIP dengesizliği
+IO-007	Kalite reddi
+IO-008	İstasyon kapatılması
+IO-009	İstasyon açılması
+IO-010	Manuel plan değişikliği
+Chapter 3 – Design Principles
+
+Incremental Optimization aşağıdaki prensiplere göre çalışır.
+
+IO-P001
+
+En küçük değişiklik uygulanır.
+
+IO-P002
+
+Değişiklik yalnızca etkilenen bölgeyi kapsar.
+
+IO-P003
+
+Diğer hatlar etkilenmez.
+
+IO-P004
+
+Stabil üretim planı korunur.
+
+IO-P005
+
+Hard Constraint'ler hiçbir zaman ihlal edilmez.
+
+Chapter 4 – Optimization Scope Detection
+
+İlk adım değişiklik kapsamını belirlemektir.
+
+Production Event
+        │
+        ▼
+Impact Detection
+        │
+        ▼
+Affected Resources
+        │
+        ▼
+Affected Operations
+        │
+        ▼
+Optimization Scope
+Chapter 5 – Impact Analysis
+
+Her olay için etki alanı hesaplanır.
+
+Analiz Edilen Alanlar
+Operatör
+Operasyon
+Hat
+Makine
+Bundle
+WIP
+Takvim
+Vardiya
+Sipariş
+Öncelik ilişkileri
+Chapter 6 – Optimization Levels
+Level 1
+Single Assignment
+
+Yalnızca tek operatör yeniden atanır.
+
+Level 2
+Station Optimization
+
+Tek istasyon yeniden dengelenir.
+
+Level 3
+Line Optimization
+
+Yalnızca ilgili üretim hattı yeniden optimize edilir.
+
+Level 4
+Multi-Line Optimization
+
+Birden fazla üretim hattı yeniden optimize edilir.
+
+Level 5
+Global Optimization
+
+Tüm fabrika yeniden optimize edilir.
+
+Bu seviye yalnızca gerekli olduğunda çalıştırılır.
+
+Chapter 7 – Change Propagation
+
+Değişiklik zincirleme analiz edilir.
+
+Operator Change
+        │
+        ▼
+Station
+        │
+        ▼
+Operation
+        │
+        ▼
+Bundle
+        │
+        ▼
+Line
+
+Etkilenmeyen alanlar yeniden hesaplanmaz.
+
+Chapter 8 – Frozen Zone Strategy
+
+Planın belirli bölümleri korunabilir.
+
+Frozen Zone
+
+Bu bölgelerde;
+
+Operatör değişmez.
+Operasyon değişmez.
+Hat dengesi korunur.
+
+Solver bu alanlara müdahale etmez.
+
+Chapter 9 – Flexible Zone Strategy
+
+Flexible Zone içerisinde:
+
+Operatör değişebilir.
+Operasyon taşınabilir.
+Bundle yönlendirilebilir.
+İstasyon dengesi değişebilir.
+Chapter 10 – Optimization Window
+
+Yeniden optimizasyon belirli zaman pencerelerinde uygulanabilir.
+
+Pencere	Açıklama
+Current Hour	Mevcut saat
+Current Shift	Aktif vardiya
+Remaining Shift	Kalan vardiya
+Current Day	Günlük
+Selected Interval	Kullanıcı seçimi
+Chapter 11 – Incremental Solver Strategy
+
+Incremental Solver aşağıdaki sırayı izler.
+
+Existing Solution
+        │
+        ▼
+Affected Area Detection
+        │
+        ▼
+Freeze Stable Areas
+        │
+        ▼
+Local Optimization
+        │
+        ▼
+Constraint Validation
+        │
+        ▼
+Deployment
+Chapter 12 – Warm Start Integration
+
+Mevcut çözüm yeni çözümün başlangıç noktasıdır.
+
+Korunan bilgiler:
+
+Operatör atamaları
+Hat dengesi
+Bundle yerleşimi
+Operasyon sırası
+
+Solver yalnızca değişen alanı optimize eder.
+
+Chapter 13 – Validation
+
+Incremental çözüm aşağıdaki kontrollerden geçer.
+
+Hard Constraint
+Soft Constraint
+Objective Score
+WIP
+Cycle Time
+Operator Availability
+
+Başarısız olursa daha geniş optimizasyon seviyesi uygulanır.
+
+Chapter 14 – Escalation Strategy
+
+Yerel optimizasyon yeterli olmazsa kapsam büyütülür.
+
+Level 1
+    ↓
+Level 2
+    ↓
+Level 3
+    ↓
+Level 4
+    ↓
+Level 5
+
+Her seviye yalnızca önceki başarısız olursa çalıştırılır.
+
+Chapter 15 – Rollback Integration
+
+Yeni plan uygulanmadan önce doğrulanır.
+
+Başarısız olursa:
+
+Eski plan korunur.
+Audit kaydı oluşturulur.
+Failure Recovery Strategy devreye girer.
+Chapter 16 – Performance Targets
+Senaryo	Hedef Süre
+Tek Operatör Değişikliği	< 200 ms
+Tek İstasyon	< 500 ms
+Tek Hat	< 2 sn
+Çoklu Hat	< 10 sn
+Global Optimizasyon	< 60 sn
+Chapter 17 – Events
+
+Üretilen sistem olayları:
+
+incremental.started
+
+impact.detected
+
+optimization.scope.selected
+
+local.optimization.completed
+
+incremental.validated
+
+incremental.deployed
+Chapter 18 – Acceptance Criteria
+
+Incremental Optimization Strategy başarılı kabul edilmesi için:
+
+Etki alanı doğru belirlenmelidir.
+Etkilenmeyen kaynaklar korunmalıdır.
+Frozen Zone yapısı desteklenmelidir.
+Warm Start kullanılmalıdır.
+Gerektiğinde optimizasyon seviyesi otomatik yükseltilmelidir.
+Hard Constraint ihlali oluşmamalıdır.
+Performans hedefleri sağlanmalıdır.
+Tüm işlemler Audit ve Explainability katmanına aktarılmalıdır.
