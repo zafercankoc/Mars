@@ -1,0 +1,290 @@
+DOC-009A-15
+Line Balancing Engine Technical API Specification
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Line Balancing Engine
+Document Type: Technical API Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Line Balancing Engine tarafından sunulan servislerin, API sözleşmelerinin, veri modellerinin ve entegrasyon kurallarının teknik tanımını içerir.
+
+Bu API'ler;
+
+diğer MARS motorları,
+Presentation Layer,
+Workflow Engine,
+Simulation Engine,
+ERP,
+MES,
+üçüncü parti sistemler
+
+tarafından kullanılacaktır.
+
+Chapter 2 – API Design Principles
+
+Tüm API'ler aşağıdaki prensiplere uygun olmalıdır.
+
+Stateless
+RESTful
+JSON Payload
+UTF-8 Encoding
+HTTPS Only
+Idempotent (uygun işlemler için)
+Versioned API
+OpenAPI Compatible
+Chapter 3 – Base URL
+/api/v1/line-balancing
+Chapter 4 – Authentication
+
+Desteklenen kimlik doğrulama yöntemleri:
+
+OAuth2 Bearer Token
+JWT
+Service Token
+API Key (Internal Services)
+
+Her istek kimlik doğrulaması gerektirir.
+
+Chapter 5 – Common Headers
+Header	Açıklama
+Authorization	Bearer Token
+Content-Type	application/json
+Accept	application/json
+X-Correlation-Id	İzleme Kimliği
+X-Request-Id	İstek Kimliği
+X-Tenant-Id	Tenant Kimliği
+X-Factory-Id	Fabrika Kimliği
+Chapter 6 – API Modules
+Kod	Modül
+API-001	Optimization
+API-002	Incremental Optimization
+API-003	Validation
+API-004	Explainability
+API-005	Decision Trace
+API-006	Audit
+API-007	Benchmark
+API-008	Health
+API-009	Configuration
+API-010	Runtime Metrics
+Chapter 7 – Optimization API
+Start Optimization
+POST /optimization
+Request
+{
+  "factoryId": "",
+  "lineId": "",
+  "planningWindow": {},
+  "orders": [],
+  "resources": [],
+  "constraints": [],
+  "objectives": []
+}
+Response
+{
+  "optimizationId": "",
+  "status": "Running"
+}
+Optimization Status
+GET /optimization/{optimizationId}
+Cancel Optimization
+DELETE /optimization/{optimizationId}
+Chapter 8 – Incremental Optimization API
+Execute Incremental Optimization
+POST /optimization/incremental
+Request
+{
+  "eventType": "",
+  "affectedResources": [],
+  "scope": ""
+}
+Response
+{
+  "optimizationId": "",
+  "scope": "",
+  "status": ""
+}
+Chapter 9 – Validation API
+Validate Model
+POST /validation
+
+Doğrulanan alanlar:
+
+Constraints
+Orders
+Skills
+Resources
+Calendar
+Shift
+Validation Result
+GET /validation/{validationId}
+Chapter 10 – Explainability API
+Decision Explanation
+GET /explanations/{decisionId}
+Response
+{
+  "decisionId": "",
+  "summary": "",
+  "constraintSummary": [],
+  "objectiveSummary": [],
+  "confidence": 0
+}
+Chapter 11 – Decision Trace API
+Decision Timeline
+GET /decision-trace/{decisionId}
+Decision Snapshot
+GET /decision-trace/{decisionId}/snapshot
+Candidate Plans
+GET /decision-trace/{decisionId}/plans
+Chapter 12 – Audit API
+Audit Record
+GET /audit/{decisionId}
+Audit Timeline
+GET /audit/{decisionId}/timeline
+Audit Export
+POST /audit/export
+Chapter 13 – Benchmark API
+Benchmark Result
+GET /benchmark/{benchmarkId}
+Benchmark Execution
+POST /benchmark
+Chapter 14 – Configuration API
+Get Configuration
+GET /configuration
+Update Configuration
+PUT /configuration
+Active Solver Profile
+GET /configuration/solver
+Chapter 15 – Runtime Metrics API
+Current Metrics
+GET /metrics/runtime
+Solver Metrics
+GET /metrics/solver
+Performance Metrics
+GET /metrics/performance
+Chapter 16 – Health API
+Health Check
+GET /health
+Readiness Check
+GET /ready
+Liveness Check
+GET /live
+Chapter 17 – Event Publishing
+
+API aşağıdaki olayları yayınlar.
+
+Event
+optimization.started
+optimization.completed
+optimization.failed
+incremental.started
+incremental.completed
+decision.created
+decision.executed
+audit.created
+validation.completed
+Chapter 18 – Error Handling
+
+Standart hata yapısı:
+
+{
+  "code": "",
+  "message": "",
+  "details": [],
+  "timestamp": "",
+  "correlationId": ""
+}
+HTTP Status Codes
+Kod	Açıklama
+200	Success
+201	Created
+202	Accepted
+204	No Content
+400	Bad Request
+401	Unauthorized
+403	Forbidden
+404	Not Found
+409	Conflict
+422	Validation Error
+429	Too Many Requests
+500	Internal Server Error
+503	Service Unavailable
+Chapter 19 – API Versioning
+
+Versiyonlama URI üzerinden yapılır.
+
+Örnek:
+
+/api/v1/
+/api/v2/
+
+Geriye dönük uyumluluk ana sürüm boyunca korunmalıdır.
+
+Chapter 20 – Idempotency
+
+Aşağıdaki işlemler idempotent olmalıdır.
+
+Validation
+Configuration Update
+Retry Requests
+Incremental Optimization Retry
+
+İstemci Idempotency-Key başlığı gönderebilir.
+
+Chapter 21 – Rate Limiting
+
+Varsayılan sınırlar:
+
+API	Limit
+Read	1000 req/min
+Optimization	100 req/min
+Validation	500 req/min
+Audit	300 req/min
+
+Limitler yapılandırılabilir.
+
+Chapter 22 – Security
+
+API güvenlik kuralları:
+
+HTTPS zorunludur.
+JWT doğrulaması yapılır.
+Tenant izolasyonu uygulanır.
+Role Based Authorization kullanılır.
+Tüm istekler Audit Log'a yazılır.
+Hassas alanlar maskelenir.
+Chapter 23 – API Documentation
+
+Her servis için aşağıdaki bilgiler yayınlanmalıdır.
+
+Endpoint
+HTTP Method
+Description
+Request Schema
+Response Schema
+Error Codes
+Example Requests
+Example Responses
+Authorization Rules
+
+OpenAPI 3.x standardı kullanılmalıdır.
+
+Chapter 24 – Acceptance Criteria
+
+Technical API Specification tamamlanmış kabul edilmesi için:
+
+Tüm servisler tanımlanmış olmalıdır.
+Ortak veri modeli kullanılmalıdır.
+Standart hata yapısı uygulanmalıdır.
+Kimlik doğrulama kuralları tanımlanmalıdır.
+API versiyonlama stratejisi belirlenmiş olmalıdır.
+Güvenlik kuralları tanımlanmalıdır.
+Olay yayınlama modeli belirlenmiş olmalıdır.
+OpenAPI dokümantasyonu üretilebilir olmalıdır.
+Document Status
+
+DOC-009A-15 – Line Balancing Engine Technical API Specification
+
+Status: ✅ Completed
