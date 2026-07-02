@@ -1,0 +1,271 @@
+DOC-009A-16
+Deployment & Runtime Architecture
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Line Balancing Engine
+Document Type: Deployment & Runtime Architecture Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Line Balancing Engine'in geliştirme, test ve üretim ortamlarında nasıl dağıtılacağını, çalıştırılacağını ve yönetileceğini tanımlar.
+
+Kapsam:
+
+Dağıtım mimarisi
+Runtime bileşenleri
+Ölçeklenebilirlik
+Yüksek erişilebilirlik
+İzlenebilirlik
+Kaynak yönetimi
+İşletim gereksinimleri
+Chapter 2 – Deployment Principles
+
+Line Balancing Engine aşağıdaki prensiplere göre dağıtılır.
+
+Container Based
+Stateless Service
+Horizontal Scalability
+Fault Tolerant
+High Availability
+Cloud Native Compatible
+Environment Independent
+Immutable Deployment
+Chapter 3 – Runtime Architecture
+                Client Applications
+                        │
+                        ▼
+                 API Gateway Layer
+                        │
+                        ▼
+          Line Balancing Engine Service
+                        │
+     ┌──────────────┬──────────────┐
+     ▼              ▼              ▼
+ Solver Layer   Decision Layer  Runtime Layer
+     │              │              │
+     └──────────────┴──────────────┘
+                        │
+                        ▼
+                 Infrastructure Layer
+Chapter 4 – Deployment Environments
+Environment	Purpose
+Development	Yazılım geliştirme
+Integration	Entegrasyon testleri
+QA	Kalite doğrulama
+UAT	Kullanıcı kabul testleri
+Staging	Üretim öncesi
+Production	Canlı sistem
+Disaster Recovery	Felaket kurtarma
+Chapter 5 – Runtime Components
+Component	Description
+API Service	Dış servis erişimi
+Optimization Service	Solver yönetimi
+Decision Service	Karar üretimi
+Validation Service	Veri doğrulama
+Explainability Service	Karar açıklama
+Audit Service	Denetim kayıtları
+Metrics Service	Performans metrikleri
+Configuration Service	Yapılandırma yönetimi
+Chapter 6 – Process Lifecycle
+Application Start
+        │
+        ▼
+Configuration Load
+        │
+        ▼
+Dependency Check
+        │
+        ▼
+Service Initialization
+        │
+        ▼
+Health Verification
+        │
+        ▼
+Ready State
+        │
+        ▼
+Request Processing
+        │
+        ▼
+Shutdown Sequence
+Chapter 7 – Startup Sequence
+
+Başlatma adımları:
+
+Configuration yüklenir.
+Lisans doğrulanır.
+Bağımlı servisler kontrol edilir.
+Solver bileşenleri yüklenir.
+Constraint Library yüklenir.
+Objective Library yüklenir.
+Heuristic Library yüklenir.
+API servisleri başlatılır.
+Health Check başarılı olursa servis aktif olur.
+Chapter 8 – Shutdown Sequence
+
+Kapatma sırasında:
+
+Yeni istek kabul edilmez.
+Devam eden optimizasyonlar tamamlanır veya kontrollü durdurulur.
+Geçici veriler temizlenir.
+Audit kayıtları yazılır.
+Kaynaklar serbest bırakılır.
+Chapter 9 – Configuration Management
+
+Yapılandırmalar aşağıdaki gruplarda yönetilir.
+
+Group	Description
+Solver	
+Runtime	
+Security	
+Logging	
+Performance	
+Resource	
+Integration	
+Feature Flags	
+
+Tüm değişiklikler versiyonlanmalıdır.
+
+Chapter 10 – Resource Management
+
+İzlenen kaynaklar:
+
+CPU
+RAM
+Disk
+Network
+Thread Pool
+Solver Pool
+Queue Length
+
+Kaynak limitleri aşılırsa uyarı üretilir.
+
+Chapter 11 – Scalability
+Horizontal Scaling
+
+Yeni Line Balancing Engine instance'ları eklenebilir.
+
+İstekler yük dengeleyici üzerinden dağıtılır.
+
+Vertical Scaling
+
+Kaynaklar artırılarak aynı instance güçlendirilebilir.
+
+Chapter 12 – High Availability
+
+Yüksek erişilebilirlik için:
+
+Çoklu servis örneği
+Load Balancer
+Health Monitoring
+Automatic Restart
+Failover
+Rolling Deployment
+
+desteklenmelidir.
+
+Chapter 13 – Runtime Monitoring
+
+İzlenecek metrikler:
+
+Metric
+CPU Usage
+Memory Usage
+Active Requests
+Optimization Queue
+Solver Time
+Error Rate
+Response Time
+Thread Count
+Chapter 14 – Logging Architecture
+
+Log seviyeleri:
+
+Level	Description
+TRACE	Ayrıntılı izleme
+DEBUG	Geliştirme
+INFO	Normal çalışma
+WARN	Uyarılar
+ERROR	Hatalar
+FATAL	Kritik hatalar
+
+Tüm loglar zaman damgası ve Correlation ID içermelidir.
+
+Chapter 15 – Security Architecture
+
+Runtime güvenlik kuralları:
+
+TLS zorunlu
+JWT doğrulama
+Role Based Access Control
+Tenant Isolation
+Secret Management
+Configuration Encryption
+Audit Logging
+Chapter 16 – Health Management
+
+Health Check seviyeleri:
+
+Check	Description
+Liveness	Servis çalışıyor mu?
+Readiness	İstek almaya hazır mı?
+Startup	Başlatma tamamlandı mı?
+Dependency	Bağımlı servisler erişilebilir mi?
+
+Başarısız Health Check durumunda servis yük dengeleyiciden çıkarılır.
+
+Chapter 17 – Runtime Events
+
+Üretilen olaylar:
+
+engine.started
+engine.ready
+engine.stopped
+optimization.started
+optimization.completed
+optimization.failed
+configuration.updated
+health.changed
+runtime.warning
+runtime.error
+Chapter 18 – Deployment Strategy
+
+Desteklenen dağıtım yöntemleri:
+
+Rolling Deployment
+Blue-Green Deployment
+Canary Deployment
+Zero Downtime Deployment
+
+Dağıtım stratejisi ortam bazında yapılandırılabilir.
+
+Chapter 19 – Disaster Recovery
+
+Felaket kurtarma planı:
+
+Son yapılandırma yüklenir.
+Son doğrulanmış plan geri yüklenir.
+Audit kayıtları doğrulanır.
+Servis yeniden başlatılır.
+Entegrasyonlar yeniden bağlanır.
+Sistem Health Check sonrası aktif edilir.
+Chapter 20 – Runtime Acceptance Criteria
+
+Runtime mimarisi başarılı kabul edilmesi için:
+
+Servis başarıyla başlatılmalıdır.
+Tüm bağımlılıklar doğrulanmalıdır.
+Health Check mekanizmaları çalışmalıdır.
+Yüksek erişilebilirlik desteklenmelidir.
+Ölçeklenebilirlik sağlanmalıdır.
+Kaynak yönetimi aktif olmalıdır.
+Güvenlik politikaları uygulanmalıdır.
+İzleme ve loglama eksiksiz çalışmalıdır.
+Kontrollü kapatma desteklenmelidir.
+Felaket kurtarma prosedürü tanımlanmış olmalıdır.
+Document Status
+
+DOC-009A-16 – Deployment & Runtime Architecture
