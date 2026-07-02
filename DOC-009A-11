@@ -1,0 +1,225 @@
+DOC-009A-11
+Failure Recovery Strategy
+
+Bu belge, Line Balancing Engine'in herhangi bir nedenle geçerli bir çözüm üretememesi veya üretim sırasında beklenmedik olaylar yaşanması durumunda sistemin nasıl davranacağını tanımlar.
+
+Bu noktada artık "normal çalışma" değil, "olağanüstü durum yönetimi" tanımlanmaktadır.
+
+Version
+
+Version: 1.0
+
+Status: Architecture Freeze
+
+Engine: Line Balancing Engine
+
+Document Type: Technical Architecture Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Failure Recovery Strategy'nin amacı;
+
+optimizasyon başarısız olduğunda üretimin durmasını engellemek,
+sistemi kontrollü şekilde toparlamak,
+minimum üretim kaybı ile çalışmaya devam etmek,
+otomatik kurtarma senaryolarını standartlaştırmaktır.
+
+Temel ilke:
+
+Hiçbir optimizasyon hatası üretimi durdurmamalıdır.
+
+Chapter 2 – Failure Classification
+
+Tüm hatalar aşağıdaki sınıflardan birine girer.
+
+Kod	Hata Türü
+FR-001	Solver Timeout
+FR-002	Infeasible Model
+FR-003	Constraint Conflict
+FR-004	Missing Resource
+FR-005	Machine Failure
+FR-006	Operator Absence
+FR-007	Data Validation Failure
+FR-008	Integration Failure
+FR-009	Performance Degradation
+FR-010	Unknown Failure
+Chapter 3 – Recovery Levels
+
+Kurtarma dört seviyede uygulanır.
+
+Seviye	Açıklama
+Level-1	Retry
+Level-2	Partial Optimization
+Level-3	Heuristic Recovery
+Level-4	Manual Intervention
+
+Sistem her zaman en düşük seviyeden başlamalıdır.
+
+Chapter 4 – Failure Detection Pipeline
+Production Event
+        │
+        ▼
+Validation
+        │
+        ▼
+Optimization
+        │
+        ▼
+Failure Detection
+        │
+        ▼
+Failure Classification
+        │
+        ▼
+Recovery Strategy Selection
+        │
+        ▼
+Recovery Execution
+        │
+        ▼
+Validation
+        │
+        ▼
+Production Continue
+Chapter 5 – Solver Timeout Recovery
+Tanım
+
+Solver, belirlenen SLA süresi içinde çözüm üretememiştir.
+
+Recovery Adımları
+Mevcut en iyi çözümü kontrol et.
+Uygulanabilir çözüm varsa yayınla.
+Yoksa zaman limitini bir kez artır.
+Tekrar başarısız olursa Heuristic Recovery başlat.
+Hâlâ başarısızsa Manual Intervention oluştur.
+Chapter 6 – Infeasible Model Recovery
+Tanım
+
+Modeldeki hard constraint'ler nedeniyle geçerli çözüm bulunamamaktadır.
+
+Recovery Sırası
+Constraint doğrulaması
+Çakışan constraint analizi
+Soft constraint gevşetme
+Alternatif çözüm üretme
+Heuristic plan oluşturma
+Operatör onayı isteme
+Chapter 7 – Resource Failure Recovery
+Machine Failure
+
+Makine arızasında:
+
+Alternatif makine aranır.
+Operasyon yeniden atanır.
+Hat yeniden dengelenir.
+Gerekirse lokal optimizasyon yapılır.
+Operator Absence
+
+Operatör devamsızlığında:
+
+Aynı skill seviyesinde operatör aranır.
+Yakın skill eşleşmesi değerlendirilir.
+Lokal yeniden dengeleme yapılır.
+Tüm hattı yeniden optimize etmekten kaçınılır.
+Chapter 8 – Constraint Recovery
+
+Constraint ihlali tespit edilirse:
+
+İhlalin türü belirlenir.
+Hard constraint ise çözüm reddedilir.
+Soft constraint ise ceza puanı hesaplanır.
+Gerekirse yeniden optimizasyon yapılır.
+Chapter 9 – Data Recovery
+
+Eksik veya hatalı veri durumunda:
+
+Eksik alanlar raporlanır.
+Önceki doğrulanmış veri kullanılabilir.
+Varsayılan değerler yalnızca izin verilen alanlarda uygulanır.
+Kritik veri eksikse optimizasyon başlatılmaz.
+Chapter 10 – Heuristic Recovery
+
+Solver başarısız olursa aşağıdaki heuristic'ler devreye alınabilir:
+
+Greedy Assignment
+Local Swap
+Minimal Change Repair
+Bottleneck Relief
+Fast Assignment
+
+Amaç, optimum çözüm değil, üretimin güvenli şekilde devam etmesidir.
+
+Chapter 11 – Rollback Strategy
+
+Her optimizasyon öncesinde aktif plan saklanır.
+
+Başarısızlık halinde:
+
+Current Plan
+      │
+      ▼
+Optimization
+      │
+      ▼
+Failure
+      │
+      ▼
+Rollback
+      │
+      ▼
+Previous Stable Plan
+
+Rollback yalnızca doğrulanmış son plan üzerine yapılır.
+
+Chapter 12 – Retry Policy
+Failure Type	Retry
+Timeout	1
+Temporary Resource Issue	2
+Integration Failure	3
+Infeasible Model	0
+Unknown Failure	1
+Chapter 13 – Notification Policy
+
+Recovery sürecinde aşağıdaki bildirimler üretilebilir:
+
+Solver Timeout
+Optimization Failed
+Recovery Started
+Recovery Completed
+Manual Approval Required
+Rollback Executed
+Chapter 14 – Recovery Logging
+
+Her kurtarma işlemi kayıt altına alınır.
+
+Kayıt alanları:
+
+Failure ID
+Failure Type
+Detection Time
+Recovery Strategy
+Recovery Duration
+Final Status
+User Intervention
+Result
+Chapter 15 – Success Criteria
+
+Recovery başarılı sayılırsa:
+
+Üretim devam eder.
+Hard constraint ihlali oluşmaz.
+Sistem kararlı duruma döner.
+Audit kaydı oluşturulur.
+Explainability kaydı oluşturulur.
+Chapter 16 – Acceptance Criteria
+
+Failure Recovery Strategy başarılı kabul edilmesi için:
+
+Tüm hata türleri sınıflandırılmalıdır.
+Her hata için standart kurtarma akışı tanımlanmalıdır.
+Rollback mekanizması çalışmalıdır.
+Retry politikası uygulanmalıdır.
+Kurtarma süreci loglanmalıdır.
+Manuel müdahaleler kayıt altına alınmalıdır.
+Üretimin güvenli şekilde devamı sağlanmalıdır.
