@@ -1,0 +1,242 @@
+Test Specification
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Line Balancing Engine
+Document Type: Technical Test Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Line Balancing Engine'in fonksiyonel doğruluğunu, performansını, güvenilirliğini ve kararlılığını doğrulamak amacıyla uygulanacak test standartlarını tanımlar.
+
+Testlerin amacı;
+
+algoritmaların doğruluğunu doğrulamak,
+constraint'lerin doğru uygulanmasını sağlamak,
+objective fonksiyonlarının beklenen sonucu üretmesini doğrulamak,
+sistem performansını ölçmek,
+üretim senaryolarını doğrulamaktır.
+Chapter 2 – Scope
+
+Bu test dokümanı aşağıdaki bileşenleri kapsar.
+
+Kod	Bileşen
+TS-001	Mathematical Model
+TS-002	Constraint Library
+TS-003	Objective Functions
+TS-004	CP-SAT Engine
+TS-005	Optimization Algorithms
+TS-006	Heuristic Library
+TS-007	Incremental Optimization
+TS-008	Failure Recovery
+TS-009	Explainability
+TS-010	Decision Trace
+Chapter 3 – Test Levels
+Seviye	Açıklama
+Unit Test	Tek bileşen testi
+Component Test	Motor testi
+Integration Test	Modüller arası test
+System Test	Tüm Line Balancing Engine
+Performance Test	Performans testi
+Stress Test	Limit testi
+Regression Test	Sürüm karşılaştırması
+Acceptance Test	Kabul testi
+Chapter 4 – Unit Test Specification
+
+Test edilecek birimler:
+
+Objective Calculator
+Constraint Evaluator
+Operator Assignment
+Station Assignment
+Balance Calculator
+WIP Calculator
+Penalty Calculator
+Score Calculator
+Decision Score
+Repair Engine
+
+Her sınıf için minimum %90 kod kapsamı hedeflenir.
+
+Chapter 5 – Constraint Tests
+
+Her constraint aşağıdaki senaryolarla test edilir.
+
+Test	Beklenen Sonuç
+Geçerli veri	Constraint sağlanır
+Eksik veri	Hata üretilir
+Hard ihlal	Çözüm reddedilir
+Soft ihlal	Penalty uygulanır
+Çoklu ihlal	Toplam penalty hesaplanır
+Chapter 6 – Objective Function Tests
+
+Her objective ayrı test edilir.
+
+Kontrol edilen alanlar:
+
+Efficiency
+Balance
+WIP
+Throughput
+Overtime
+Cost
+Quality
+Idle Time
+
+Beklenen objective değeri hesaplanan değer ile karşılaştırılır.
+
+Chapter 7 – Solver Tests
+
+Test kapsamı:
+
+Optimal çözüm
+Feasible çözüm
+Timeout
+Infeasible model
+Memory limit
+Çok çekirdekli çalışma
+Warm Start
+LNS
+Chapter 8 – Heuristic Tests
+
+Her heuristic için doğrulanacak kriterler:
+
+Geçerli çözüm üretmesi
+Hard Constraint ihlal etmemesi
+Süre hedefini sağlaması
+Beklenen kapsamda değişiklik yapması
+Chapter 9 – Incremental Optimization Tests
+
+Senaryolar:
+
+Operatör değişikliği
+Makine arızası
+Yeni sipariş
+Bundle taşıma
+Hat kapatma
+Hat açma
+
+Kontrol:
+
+Sadece etkilenen alan optimize edilmeli.
+Frozen Zone korunmalıdır.
+Chapter 10 – Failure Recovery Tests
+
+Her hata türü test edilir.
+
+Failure	Beklenen Davranış
+Timeout	Retry
+Infeasible	Recovery
+Missing Operator	Repair
+Machine Failure	Rebalance
+Integration Failure	Retry
+Unknown Error	Manual Recovery
+Chapter 11 – Explainability Tests
+
+Kontrol edilir:
+
+Açıklama üretildi mi?
+Constraint açıklamaları doğru mu?
+Objective katkıları doğru mu?
+Confidence Score hesaplandı mı?
+Chapter 12 – Decision Trace Tests
+
+Kontrol edilir:
+
+Snapshot oluşturuldu mu?
+Candidate Plan kaydedildi mi?
+Audit Log oluşturuldu mu?
+Timeline tamamlandı mı?
+Version üretildi mi?
+Chapter 13 – Performance Tests
+Senaryo	Hedef
+Tek Operatör	< 200 ms
+Tek Hat	< 2 sn
+Çok Hat	< 10 sn
+Global Optimizasyon	< 60 sn
+Chapter 14 – Stress Tests
+
+Test senaryoları:
+
+100 Operatör
+500 Operatör
+1000 Operatör
+5000 Operasyon
+Maksimum Constraint
+
+Amaç:
+
+Sistem kararlılığını ölçmek.
+
+Chapter 15 – Load Tests
+
+Sistem aşağıdaki eşzamanlı yüklerde test edilir.
+
+İstek Sayısı	Beklenen Sonuç
+1	Normal
+5	Normal
+10	Normal
+25	Normal
+50	Performans kabul edilebilir
+Chapter 16 – Regression Tests
+
+Her yeni sürümde aşağıdaki alanlar karşılaştırılır.
+
+Objective Score
+Runtime
+Constraint Count
+Solver Result
+Memory Usage
+CPU Usage
+
+Performans gerilemesi kabul edilmez.
+
+Chapter 17 – Test Dataset Standards
+
+Her test veri seti aşağıdaki bilgileri içermelidir.
+
+Factory
+Production Lines
+Operators
+Operations
+Skill Matrix
+Machines
+Orders
+Calendar
+Constraints
+Objectives
+Chapter 18 – Test Reporting
+
+Her test sonunda aşağıdaki rapor üretilir.
+
+Test ID
+Test Name
+Start Time
+End Time
+Duration
+Result
+Failed Assertions
+Performance Metrics
+Logs
+Chapter 19 – Acceptance Criteria
+
+Line Balancing Engine testleri başarılı sayılabilmesi için:
+
+Tüm Unit Test'ler başarılı olmalıdır.
+Tüm Integration Test'ler başarılı olmalıdır.
+Constraint doğruluğu %100 olmalıdır.
+Hard Constraint ihlali olmamalıdır.
+Performans hedefleri sağlanmalıdır.
+Explainability kayıtları oluşturulmalıdır.
+Audit kayıtları eksiksiz olmalıdır.
+Regression testlerinde performans kaybı olmamalıdır.
+Chapter 20 – Test Completion Criteria
+
+Test süreci tamamlanmış kabul edilmesi için:
+
+Planlanan testlerin tamamı çalıştırılmış olmalıdır.
+Kritik hata bulunmamalıdır.
+Kabul kriterleri karşılanmalıdır.
+Test raporları arşivlenmelidir.
+Sonuçlar doğrulanmalıdır
