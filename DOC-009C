@@ -1,0 +1,2522 @@
+Harika. Artık MARS APS'in üçüncü çekirdek motoruna geçiyoruz. Bu motor, aslında APS sisteminin kalbidir. Line Balancing ve Operator Assignment motorlarının ürettiği kararları kullanarak zaman ekseninde en uygun üretim planını oluşturur.
+
+MARS APS
+DOC-009C
+Scheduling Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine Code: SE
+Document Type: Engine Architecture Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Scheduling Engine (SE), MARS APS'in üretim zamanlama motorudur.
+
+Görevi;
+
+üretim emirlerini,
+operasyonları,
+makineleri,
+üretim hatlarını,
+operatörleri,
+takvimleri,
+kapasiteyi
+
+birlikte değerlendirerek en uygun üretim takvimini oluşturmaktır.
+
+Scheduling Engine, MARS APS'in merkezi optimizasyon motorudur ve diğer tüm karar motorlarından gelen sonuçları zaman ekseninde birleştirir.
+
+Chapter 2 – Mission
+
+Scheduling Engine'in temel amacı;
+
+üretim emirlerini zamanlamak,
+teslim tarihlerini karşılamak,
+kapasiteyi en verimli şekilde kullanmak,
+darboğaz oluşumunu azaltmak,
+makine ve operatör bekleme sürelerini düşürmek,
+üretim akışını optimize etmektir.
+Chapter 3 – Responsibilities
+Kod	Görev
+SE-001	Production Scheduling
+SE-002	Order Sequencing
+SE-003	Capacity Planning
+SE-004	Machine Scheduling
+SE-005	Operator Time Coordination
+SE-006	Shift Scheduling
+SE-007	Due Date Optimization
+SE-008	Rescheduling
+SE-009	Schedule Validation
+SE-010	Schedule Publication
+Chapter 4 – Scope
+
+Scheduling Engine aşağıdaki planlama seviyelerini destekler.
+
+Planning Level	Açıklama
+Operation Level	Operasyon bazlı
+Work Center Level	İş merkezi bazlı
+Production Line Level	Hat bazlı
+Department Level	Bölüm bazlı
+Factory Level	Fabrika bazlı
+Multi Factory Level	Çok fabrikalı yapı (gelecek sürüm)
+Chapter 5 – Planning Objects
+
+Scheduling Engine aşağıdaki nesneleri planlar.
+
+Production Orders
+Operations
+Routings
+Work Centers
+Machines
+Production Lines
+Operators
+Calendars
+Shifts
+Resources
+Tools
+Chapter 6 – Input Model
+
+Motor aşağıdaki verileri kullanır.
+
+Production
+Production Orders
+Order Priority
+Due Date
+Routing
+BOM
+Operation Times
+Resources
+Machines
+Production Lines
+Operators
+Tools
+Capacity
+Calendars
+Planning Rules
+Scheduling Policies
+Constraint Profiles
+Objective Profiles
+Business Rules
+Chapter 7 – Output Model
+
+Motor aşağıdaki çıktıları üretir.
+
+Production Schedule
+Machine Schedule
+Operator Schedule
+Shift Schedule
+Resource Utilization
+Critical Path Report
+Capacity Report
+Schedule KPI Report
+Schedule Version
+Chapter 8 – Engine Architecture
+                 Scheduling Engine
+                         │
+ ┌──────────────────────────────────────────────┐
+ │                                              │
+ │ Scheduling Optimizer                         │
+ │ Sequencing Engine                            │
+ │ Capacity Planner                             │
+ │ Calendar Engine                              │
+ │ Resource Allocator                           │
+ │ Validation Engine                            │
+ │ Rescheduling Engine                          │
+ │ Runtime Controller                           │
+ │                                              │
+ └──────────────────────────────────────────────┘
+Chapter 9 – Planning Workflow
+Planning Request
+
+↓
+
+Input Validation
+
+↓
+
+Resource Loading
+
+↓
+
+Capacity Analysis
+
+↓
+
+Scheduling
+
+↓
+
+Validation
+
+↓
+
+Schedule Publication
+Chapter 10 – Planning Modes
+Mod	Açıklama
+Forward Scheduling	İleri planlama
+Backward Scheduling	Geriye doğru planlama
+ASAP	En erken başlangıç
+JIT	Tam zamanında üretim
+Finite Capacity	Sonlu kapasite planlama
+Infinite Capacity	Sonsuz kapasite simülasyonu
+Incremental Scheduling	Kısmi yeniden planlama
+Chapter 11 – Integration Points
+Sistem	Amaç
+Line Balancing Engine	Hat dengesi
+Operator Assignment Engine	Operatör planı
+Simulation Engine	Senaryo analizi
+Bottleneck Resolution Engine	Darboğaz giderme
+ERP	Üretim emirleri
+MES	Gerçekleşen üretim
+Warehouse	Malzeme durumu
+Decision Engine	Karar puanlama
+Chapter 12 – Runtime Characteristics
+Özellik	Destek
+Event Driven	✔
+Multi-thread	✔
+Incremental Scheduling	✔
+Real-Time Rescheduling	✔
+High Availability	✔
+Cloud Ready	✔
+Chapter 13 – Quality Attributes
+
+Scheduling Engine aşağıdaki kalite hedeflerini karşılar.
+
+Reliability
+Scalability
+Performance
+Maintainability
+Explainability
+Traceability
+Extensibility
+Security
+Chapter 14 – Performance Targets
+KPI	Hedef
+Tek Sipariş Planlama	<200 ms
+Hat Planlama	<2 sn
+Bölüm Planlama	<10 sn
+Fabrika Planlama	<60 sn
+Yeniden Planlama	<5 sn
+Schedule Accuracy	≥99%
+Chapter 15 – Dependencies
+
+Scheduling Engine aşağıdaki bileşenlere bağlıdır.
+
+Constraint Repository
+Calendar Service
+Configuration Service
+Event Bus
+Decision Engine
+Line Balancing Engine
+Operator Assignment Engine
+Chapter 16 – Planned Subdocuments
+
+Yeni sadeleştirilmiş mimariye göre bu motor aşağıdaki teknik belgelerden oluşacaktır.
+
+Kod	Doküman
+DOC-009C-1	Mathematical Optimization Model
+DOC-009C-2	Constraint Library Specification
+DOC-009C-3	Objective Function Library
+DOC-009C-4	OR-Tools CP-SAT Implementation
+DOC-009C-5	Scheduling Algorithms
+DOC-009C-6	Sequencing Engine
+DOC-009C-7	Capacity Planning Engine
+DOC-009C-8	Rescheduling Engine
+DOC-009C-9	Final Technical Specification
+Chapter 17 – Acceptance Criteria
+
+Scheduling Engine tamamlanmış kabul edilmesi için:
+
+Zamanlama modeli tanımlanmış olmalıdır.
+Kaynak planlama mekanizması oluşturulmuş olmalıdır.
+Sıralama (Sequencing) motoru tanımlanmış olmalıdır.
+Kapasite planlama desteklenmelidir.
+Yeniden planlama mekanizması uygulanmalıdır.
+Diğer optimizasyon motorlarıyla entegre çalışmalıdır.
+Performans hedefleri sağlanmalıdır.
+Document Status
+
+DOC-009C – Scheduling Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009C-1 – Mathematical Optimization Model
+
+Bu belge, Scheduling Engine'in matematiksel modelini; zaman değişkenleri, kapasite kısıtları, öncelik ilişkileri ve zamanlama optimizasyonunu tanımlayacaktır. Bu model, MARS APS'in en karmaşık optimizasyon bileşenlerinden biri olacaktır.
+
+sıaradki döküman
+MARS APS
+DOC-009C-1
+Mathematical Optimization Model
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Scheduling Engine (SE)
+Document Type: Mathematical Optimization Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Scheduling Engine tarafından kullanılan matematiksel optimizasyon modelini tanımlar.
+
+Modelin amacı;
+
+üretim emirlerini zaman ekseninde planlamak,
+kaynak çakışmalarını önlemek,
+teslim tarihlerini karşılamak,
+kapasiteyi verimli kullanmak,
+toplam üretim performansını optimize etmektir.
+
+Bu model, Finite Capacity Scheduling (FCS) yaklaşımını temel alır ve gerektiğinde Infinite Capacity Scheduling (ICS) senaryolarını da destekler.
+
+Chapter 2 – Optimization Model
+
+Scheduling problemi bir Constraint Optimization Problem (COP) olarak modellenmiştir.
+
+Temel bileşenler:
+
+Planning Data
+      │
+      ▼
+Decision Variables
+      │
+      ▼
+Constraints
+      │
+      ▼
+Objective Functions
+      │
+      ▼
+Schedule
+Chapter 3 – Sets
+Production Orders
+O={o
+1
+	​
+
+,o
+2
+	​
+
+,…,o
+n
+	​
+
+}
+Operations
+P={p
+1
+	​
+
+,p
+2
+	​
+
+,…,p
+m
+	​
+
+}
+Resources
+R={r
+1
+	​
+
+,r
+2
+	​
+
+,…,r
+k
+	​
+
+}
+Machines
+M={m
+1
+	​
+
+,m
+2
+	​
+
+,…,m
+x
+	​
+
+}
+Operators
+W={w
+1
+	​
+
+,w
+2
+	​
+
+,…,w
+y
+	​
+
+}
+Time Slots
+T={t
+1
+	​
+
+,t
+2
+	​
+
+,…,t
+h
+	​
+
+}
+Chapter 4 – Parameters
+Symbol	Description
+ProcessingTime(p)	Operasyon süresi
+SetupTime(p)	Hazırlık süresi
+DueDate(o)	Teslim tarihi
+Priority(o)	Sipariş önceliği
+Capacity(r,t)	Kaynak kapasitesi
+Calendar(r)	Kaynak takvimi
+Precedence(p)	Öncelik ilişkisi
+Line(p)	Üretim hattı
+Chapter 5 – Decision Variables
+Operation Start Time
+Start
+p
+	​
+
+
+Operasyonun başlangıç zamanı.
+
+Operation Finish Time
+Finish
+p
+	​
+
+
+Operasyonun bitiş zamanı.
+
+Resource Assignment
+Assign
+pr
+	​
+
+
+Operasyonun hangi kaynağa atanacağını gösterir.
+
+Sequence Variable
+Seq
+ij
+	​
+
+
+İki operasyonun aynı kaynak üzerindeki sırasını belirler.
+
+Chapter 6 – Precedence Constraints
+
+Operasyonlar rota sırasına uymalıdır.
+
+Finish
+i
+	​
+
+≤Start
+j
+	​
+
+
+Burada j, i operasyonundan sonra gelen işlemdir.
+
+Chapter 7 – Capacity Constraints
+
+Her kaynak aynı anda yalnızca bir operasyon gerçekleştirebilir.
+
+∑Assign
+pr
+	​
+
+≤Capacity(r)
+
+Finite Capacity modunda bu kural zorunludur.
+
+Chapter 8 – Calendar Constraints
+
+Operasyonlar yalnızca ilgili kaynağın çalışma takviminde planlanabilir.
+
+Kontrol edilen takvimler:
+
+Fabrika Takvimi
+Hat Takvimi
+Makine Takvimi
+Operatör Takvimi
+Vardiya Takvimi
+Chapter 9 – Resource Constraints
+
+Her operasyon için gerekli kaynaklar aynı zaman aralığında uygun olmalıdır.
+
+Kontrol edilen kaynaklar:
+
+Makine
+Operatör
+Üretim Hattı
+Takım / Aparat
+İş Merkezi
+Chapter 10 – Setup Constraints
+
+Ardışık operasyonlar arasında hazırlık süreleri dikkate alınır.
+
+Toplam işlem süresi:
+
+Finish=Start+ProcessingTime+SetupTime
+
+Setup süreleri ürün tipi, renk, model veya makine durumuna göre değişebilir.
+
+Chapter 11 – Due Date Constraints
+
+Teslim tarihi mümkün olduğunca karşılanmalıdır.
+
+Gecikme:
+
+Tardiness=Max(0,Finish−DueDate)
+
+Gecikmeler objective fonksiyonunda ceza olarak değerlendirilir.
+
+Chapter 12 – Scheduling Graph
+Orders
+   │
+   ▼
+Operations
+   │
+   ▼
+Resource Assignment
+   │
+   ▼
+Time Assignment
+   │
+   ▼
+Constraint Validation
+   │
+   ▼
+Schedule
+Chapter 13 – Feasible Schedule
+
+Geçerli bir plan aşağıdaki koşulları sağlamalıdır.
+
+Tüm operasyonlar planlanmalıdır.
+Öncelik ilişkileri korunmalıdır.
+Kaynak çakışması olmamalıdır.
+Takvim kuralları sağlanmalıdır.
+Hard Constraint ihlali bulunmamalıdır.
+Chapter 14 – Mathematical Properties
+Property	Value
+Binary Variables	Evet
+Integer Variables	Evet
+Interval Variables	Evet
+Linear Constraints	Evet
+CP-SAT Compatible	Evet
+Chapter 15 – Solver Compatibility
+
+Desteklenen çözümleyiciler:
+
+Google OR-Tools CP-SAT (referans implementasyon)
+Mixed Integer Programming (MIP)
+Constraint Programming (CP)
+Hybrid Optimization Framework
+Chapter 16 – Optimization Workflow
+Planning Data
+      │
+      ▼
+Variable Generation
+      │
+      ▼
+Constraint Construction
+      │
+      ▼
+Objective Construction
+      │
+      ▼
+Solver Execution
+      │
+      ▼
+Schedule Validation
+      │
+      ▼
+Production Schedule
+Chapter 17 – Model Assumptions
+
+Model aşağıdaki varsayımlar altında çalışır.
+
+Üretim emirleri doğrulanmıştır.
+Rotalar tanımlıdır.
+Operasyon süreleri günceldir.
+Kaynak takvimleri doğrudur.
+Kapasite bilgileri günceldir.
+Gerekli operatör ve makine atamaları yapılabilir durumdadır.
+Chapter 18 – Acceptance Criteria
+
+Matematiksel model tamamlanmış kabul edilmesi için:
+
+Karar değişkenleri tanımlanmış olmalıdır.
+Parametreler belirlenmiş olmalıdır.
+Öncelik (precedence) kısıtları oluşturulmuş olmalıdır.
+Kapasite kısıtları tanımlanmış olmalıdır.
+Takvim ve kaynak kısıtları desteklenmelidir.
+Setup süreleri modele dahil edilmelidir.
+Teslim tarihi modeli tanımlanmış olmalıdır.
+Model CP-SAT ile çözülebilir olmalıdır.
+Sonlu kapasite planlaması (Finite Capacity Scheduling) desteklenmelidir.
+Document Status
+
+DOC-009C-1 – Mathematical Optimization Model
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009C-2 – Constraint Library Specification
+
+Bu belge, Scheduling Engine'in kullandığı tüm zamanlama, kapasite, kaynak, takvim ve üretim kurallarını standart bir kütüphane halinde tanımlayacaktır. Bu kütüphane, MARS APS içindeki tüm zamanlama kararlarının temelini oluşturacaktır.
+
+sıradaki döküman
+MARS APS
+DOC-009C-2
+Constraint Library Specification
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Scheduling Engine (SE)
+Document Type: Constraint Library Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Scheduling Engine tarafından kullanılan tüm zamanlama kısıtlarını (Constraints) tanımlar.
+
+Constraint Library'nin amacı:
+
+Geçerli ve uygulanabilir üretim planları oluşturmak,
+Kaynak çakışmalarını önlemek,
+Üretim kurallarını standartlaştırmak,
+Yasal, operasyonel ve kurumsal kısıtları merkezi olarak yönetmektir.
+
+Bu doküman yalnızca kısıtların tanımlarını içerir. Matematiksel ifadeler DOC-009C-1, optimizasyon hedefleri ise DOC-009C-3 dokümanında yer alır.
+
+Chapter 2 – Constraint Classification
+Kod	Kategori
+C-100	Order Constraints
+C-200	Operation Constraints
+C-300	Resource Constraints
+C-400	Capacity Constraints
+C-500	Calendar Constraints
+C-600	Sequence Constraints
+C-700	Due Date Constraints
+C-800	Production Constraints
+C-900	Business Rules
+Chapter 3 – Constraint Types
+Type	Description
+Hard Constraint	İhlal edilemez
+Soft Constraint	Ceza puanı uygulanır
+Dynamic Constraint	Çalışma anında değişebilir
+Conditional Constraint	Belirli koşullarda uygulanır
+Chapter 4 – Order Constraints (C-100)
+C-101 – Order Completeness
+
+Her üretim emri planlanmalıdır.
+
+Type: Hard
+
+C-102 – Order Priority
+
+Yüksek öncelikli siparişler mümkün olduğunca önce planlanmalıdır.
+
+Type: Soft
+
+C-103 – Order Splitting Policy
+
+Sipariş bölünebilir veya bölünemez olarak tanımlanabilir.
+
+Type: Hard
+
+C-104 – Frozen Orders
+
+Planı dondurulmuş siparişler değiştirilemez.
+
+Type: Hard
+
+Chapter 5 – Operation Constraints (C-200)
+C-201 – Routing Compliance
+
+Operasyonlar tanımlı rota sırasına uymalıdır.
+
+Type: Hard
+
+C-202 – Operation Dependency
+
+Bağımlı operasyonlar tamamlanmadan sonraki operasyon başlatılamaz.
+
+Type: Hard
+
+C-203 – Operation Interruptibility
+
+Kesintiye izin verilmeyen operasyonlar durdurulamaz.
+
+Type: Hard
+
+C-204 – Setup Requirement
+
+Hazırlık süreleri planlamaya dahil edilmelidir.
+
+Type: Hard
+
+Chapter 6 – Resource Constraints (C-300)
+C-301 – Machine Availability
+
+Makine uygun değilse operasyon planlanamaz.
+
+Type: Hard
+
+C-302 – Operator Availability
+
+Operatör uygun değilse operasyon başlatılamaz.
+
+Type: Hard
+
+C-303 – Tool Availability
+
+Gerekli ekipman veya aparat kullanılabilir olmalıdır.
+
+Type: Hard
+
+C-304 – Resource Compatibility
+
+Kaynak operasyon gereksinimlerini karşılamalıdır.
+
+Type: Hard
+
+Chapter 7 – Capacity Constraints (C-400)
+C-401 – Finite Capacity
+
+Kaynak kapasitesi aşılamaz.
+
+Type: Hard
+
+C-402 – Parallel Capacity
+
+Paralel kaynaklar tanımlanan kapasite sınırları içinde kullanılabilir.
+
+Type: Hard
+
+C-403 – Capacity Reservation
+
+Rezerve edilmiş kapasite korunmalıdır.
+
+Type: Hard
+
+C-404 – Overtime Capacity
+
+Gerekirse fazla mesai kapasitesi kullanılabilir.
+
+Type: Soft
+
+Chapter 8 – Calendar Constraints (C-500)
+C-501 – Working Calendar
+
+Operasyon yalnızca çalışma takviminde planlanabilir.
+
+Type: Hard
+
+C-502 – Shift Calendar
+
+Vardiya başlangıç ve bitiş saatleri korunmalıdır.
+
+Type: Hard
+
+C-503 – Holiday Calendar
+
+Resmi tatillerde planlama yapılamaz (aksi belirtilmedikçe).
+
+Type: Hard
+
+C-504 – Maintenance Calendar
+
+Bakım süresince makine kullanılamaz.
+
+Type: Hard
+
+Chapter 9 – Sequence Constraints (C-600)
+C-601 – Operation Sequence
+
+Operasyon sırası değiştirilemez.
+
+Type: Hard
+
+C-602 – Setup Optimization
+
+Benzer ürünlerin ardışık planlanması tercih edilir.
+
+Type: Soft
+
+C-603 – Changeover Minimization
+
+Ürün değişim sayısı mümkün olduğunca azaltılır.
+
+Type: Soft
+
+Chapter 10 – Due Date Constraints (C-700)
+C-701 – Due Date Compliance
+
+Teslim tarihleri mümkün olduğunca karşılanmalıdır.
+
+Type: Soft
+
+C-702 – Critical Orders
+
+Kritik siparişler geciktirilemez.
+
+Type: Hard
+
+C-703 – Tardiness Penalty
+
+Gecikmeler objective fonksiyonunda ceza olarak değerlendirilir.
+
+Type: Soft
+
+Chapter 11 – Production Constraints (C-800)
+C-801 – Material Availability
+
+Malzeme hazır olmadan operasyon başlatılamaz.
+
+Type: Hard
+
+C-802 – Line Eligibility
+
+Operasyon yalnızca uygun üretim hattında çalıştırılabilir.
+
+Type: Hard
+
+C-803 – Quality Hold
+
+Kalite bekleme durumundaki işler planlanamaz.
+
+Type: Hard
+
+C-804 – WIP Protection
+
+Hatlar arasında aşırı WIP oluşması engellenmelidir.
+
+Type: Soft
+
+Chapter 12 – Business Rules (C-900)
+C-901 – Frozen Horizon
+
+Donmuş planlama periyodu değiştirilemez.
+
+Type: Hard
+
+C-902 – Planning Horizon
+
+Plan yalnızca tanımlı planlama ufku içinde oluşturulur.
+
+Type: Hard
+
+C-903 – Customer Priority Policy
+
+Müşteri öncelikleri dikkate alınmalıdır.
+
+Type: Soft
+
+C-904 – Manual Lock
+
+Kullanıcı tarafından kilitlenen planlar değiştirilemez.
+
+Type: Hard
+
+Chapter 13 – Constraint Evaluation Order
+Input Validation
+        │
+        ▼
+Order Constraints
+        │
+        ▼
+Operation Constraints
+        │
+        ▼
+Resource Constraints
+        │
+        ▼
+Capacity Constraints
+        │
+        ▼
+Calendar Constraints
+        │
+        ▼
+Sequence Constraints
+        │
+        ▼
+Due Date Constraints
+        │
+        ▼
+Production Constraints
+        │
+        ▼
+Business Rules
+Chapter 14 – Constraint Priority
+Öncelik	Tür
+P1	Safety & Legal
+P2	Routing
+P3	Resource Availability
+P4	Capacity
+P5	Calendar
+P6	Production
+P7	Due Date
+P8	Business Preferences
+Chapter 15 – Constraint Metadata
+
+Her constraint aşağıdaki bilgilerle tanımlanır.
+
+Alan	Açıklama
+Constraint ID	Benzersiz kimlik
+Name	Constraint adı
+Category	Kategori
+Type	Hard / Soft
+Priority	Öncelik
+Version	Sürüm
+Status	Active / Inactive
+Description	Açıklama
+Chapter 16 – Acceptance Criteria
+
+Constraint Library tamamlanmış kabul edilmesi için:
+
+Tüm zamanlama kısıtları tanımlanmış olmalıdır.
+Hard ve Soft Constraint ayrımı yapılmış olmalıdır.
+Öncelik sıraları belirlenmiş olmalıdır.
+Değerlendirme akışı tanımlanmış olmalıdır.
+Metadata yapısı standartlaştırılmış olmalıdır.
+Yeni constraint'lerin eklenmesini destekleyen genişletilebilir bir yapı oluşturulmuş olmalıdır.
+Document Status
+
+DOC-009C-2 – Constraint Library Specification
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009C-3 – Objective Function Library
+
+Bu belge, Scheduling Engine'in optimizasyon hedeflerini (teslim tarihi, makespan, kapasite kullanımı, WIP, setup süreleri, gecikme vb.) tanımlayacak ve zamanlama motorunun karar verme stratejisinin temelini oluşturacaktır.
+DOC-009C-3
+Objective Function Library
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Scheduling Engine (SE)
+Document Type: Objective Function Library Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Scheduling Engine tarafından kullanılan tüm optimizasyon hedeflerini (Objective Functions) tanımlar.
+
+Scheduling Engine'in amacı yalnızca geçerli bir üretim planı oluşturmak değil, aynı zamanda işletmenin operasyonel hedeflerine en uygun planı üretmektir.
+
+Objective Function Library;
+
+teslim performansını artırır,
+kapasite kullanımını optimize eder,
+üretim akışını iyileştirir,
+darboğaz etkisini azaltır,
+toplam üretim maliyetini düşürmeye yardımcı olur.
+Chapter 2 – Optimization Strategy
+
+Scheduling Engine Multi-Objective Optimization yaklaşımını kullanır.
+
+Toplam optimizasyon skoru:
+
+MaximizeZ=
+i=1
+∑
+n
+	​
+
+w
+i
+	​
+
+⋅O
+i
+	​
+
+
+Burada;
+
+Oᵢ → Objective Function
+wᵢ → Objective Weight
+
+Ağırlıklar aktif planlama profiline göre dinamik olarak değiştirilebilir.
+
+Chapter 3 – Objective Classification
+Kod	Objective
+O-101	Makespan Minimization
+O-102	Due Date Performance
+O-103	Tardiness Reduction
+O-104	Capacity Utilization
+O-105	Setup Time Reduction
+O-106	Resource Balance
+O-107	WIP Minimization
+O-108	Flow Time Reduction
+O-109	Schedule Stability
+O-110	Production Efficiency
+Chapter 4 – O-101 Makespan Minimization
+Objective
+
+Toplam üretim tamamlanma süresini (Makespan) mümkün olduğunca azaltmak.
+
+Amaç
+Üretimi daha kısa sürede tamamlamak
+Kaynak beklemelerini azaltmak
+Fabrika verimliliğini artırmak
+Type
+
+Minimize
+
+Chapter 5 – O-102 Due Date Performance
+Objective
+
+Siparişlerin teslim tarihine zamanında tamamlanma oranını artırmak.
+
+Değerlendirilen kriterler:
+
+On-Time Delivery (OTD)
+Early Completion
+Late Completion
+Type
+
+Maximize
+
+Chapter 6 – O-103 Tardiness Reduction
+Objective
+
+Teslim tarihi geçen siparişlerin gecikmesini azaltmak.
+
+Ölçülen metrikler:
+
+Toplam gecikme süresi
+Ortalama gecikme
+Maksimum gecikme
+Type
+
+Minimize
+
+Chapter 7 – O-104 Capacity Utilization
+Objective
+
+Makine ve iş merkezi kapasitesinin etkin kullanımını sağlamak.
+
+Hedefler:
+
+Boşta kalma sürelerini azaltmak
+Dengesiz yük dağılımını önlemek
+Kapasite kullanım oranını artırmak
+Type
+
+Maximize
+
+Chapter 8 – O-105 Setup Time Reduction
+Objective
+
+Setup ve changeover sürelerini azaltmak.
+
+Değerlendirilen kriterler:
+
+Ürün değişim sayısı
+Setup süresi
+Renk/model geçişleri
+Makine hazırlık süreleri
+Type
+
+Minimize
+
+Chapter 9 – O-106 Resource Balance
+Objective
+
+Kaynaklar arasında dengeli yük dağılımı sağlamak.
+
+Kapsam:
+
+Makineler
+Üretim hatları
+İş merkezleri
+Operatörler
+Type
+
+Minimize Variance
+
+Chapter 10 – O-107 WIP Minimization
+Objective
+
+Hatlar ve operasyonlar arasında oluşan yarı mamul stokunu (WIP) azaltmak.
+
+Beklenen faydalar:
+
+Daha akıcı üretim
+Daha düşük stok maliyeti
+Daha kısa çevrim süresi
+Type
+
+Minimize
+
+Chapter 11 – O-108 Flow Time Reduction
+Objective
+
+Siparişlerin sistemde geçirdiği toplam süreyi azaltmak.
+
+Flow Time;
+
+Bekleme
+İşleme
+Taşıma
+Kuyruk
+
+sürelerinin toplamını kapsar.
+
+Type
+
+Minimize
+
+Chapter 12 – O-109 Schedule Stability
+Objective
+
+Mevcut üretim planını mümkün olduğunca korumak.
+
+Amaç:
+
+Gereksiz yeniden planlamaları azaltmak
+Operasyonel kararlılığı korumak
+Sürekli değişen planların önüne geçmek
+Type
+
+Maximize Stability
+
+Chapter 13 – O-110 Production Efficiency
+Objective
+
+Toplam üretim verimliliğini artırmak.
+
+Değerlendirilen göstergeler:
+
+Kaynak kullanım oranı
+Hat verimliliği
+Operasyon süreleri
+Toplam üretim çıktısı
+Type
+
+Maximize
+
+Chapter 14 – Objective Priority Matrix
+Priority	Objective
+P1	Due Date Performance
+P2	Tardiness Reduction
+P3	Makespan Minimization
+P4	Capacity Utilization
+P5	Production Efficiency
+P6	Setup Time Reduction
+P7	Resource Balance
+P8	WIP Minimization
+P9	Flow Time Reduction
+P10	Schedule Stability
+
+Öncelik sıralaması, seçilen planlama profiline göre (Standard, JIT, High Throughput, Emergency vb.) değiştirilebilir.
+
+Chapter 15 – Objective Evaluation Pipeline
+Schedule Candidates
+        │
+        ▼
+Objective Calculation
+        │
+        ▼
+Weighted Scoring
+        │
+        ▼
+Penalty Calculation
+        │
+        ▼
+Total Schedule Score
+        │
+        ▼
+Candidate Ranking
+Chapter 16 – Objective Metadata
+
+Her objective aşağıdaki metadata ile tanımlanır.
+
+Alan	Açıklama
+Objective ID	Benzersiz kimlik
+Name	Objective adı
+Optimization Type	Maximize / Minimize
+Weight	Varsayılan ağırlık
+Unit	Ölçü birimi
+Version	Sürüm
+Status	Active / Inactive
+Chapter 17 – Objective Conflict Resolution
+
+Bazı hedefler birbirleriyle çelişebilir.
+
+Objective A	Objective B	Çözüm
+Due Date	Setup Reduction	Ağırlıklandırma
+Makespan	Schedule Stability	Çalışma modu
+Capacity Utilization	WIP Reduction	Penalty + Weight
+Resource Balance	Production Efficiency	Çok amaçlı optimizasyon
+
+Çatışmalar, CP-SAT çözüm modeli ve ağırlıklı objective fonksiyonları ile yönetilir.
+
+Chapter 18 – Acceptance Criteria
+
+Objective Function Library tamamlanmış kabul edilmesi için:
+
+Tüm optimizasyon hedefleri tanımlanmış olmalıdır.
+Her objective için optimizasyon yönü belirlenmiş olmalıdır.
+Öncelik matrisi oluşturulmuş olmalıdır.
+Objective değerlendirme süreci tanımlanmış olmalıdır.
+Metadata standardı belirlenmiş olmalıdır.
+Çatışma çözüm mekanizması tanımlanmış olmalıdır.
+Çalışma profillerine göre dinamik ağırlıklandırma desteklenmelidir.
+Document Status
+
+DOC-009C-3 – Objective Function Library
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009C-4 – OR-Tools CP-SAT Implementation Specification
+
+Bu belge, Scheduling Engine'in Google OR-Tools CP-SAT üzerinde nasıl modelleneceğini; interval variables, no-overlap constraints, cumulative constraints, precedence constraints ve solver yapılandırmasını tanımlayacaktır. Bu doküman, geliştirme ekibi için doğrudan uygulanabilir teknik referans olacaktır.
+DOC-009C-4
+OR-Tools CP-SAT Implementation Specification
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Scheduling Engine (SE)
+Solver: Google OR-Tools CP-SAT
+Document Type: Technical Implementation Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Scheduling Engine'in Google OR-Tools CP-SAT kullanılarak nasıl uygulanacağını tanımlar.
+
+Amaç;
+
+matematiksel modeli CP-SAT veri yapılarına dönüştürmek,
+karar değişkenlerini oluşturmak,
+constraint'leri modele eklemek,
+objective fonksiyonlarını tanımlamak,
+solver yapılandırmasını standartlaştırmaktır.
+
+Bu belge doğrudan yazılım geliştirme ekibi için teknik referans niteliğindedir.
+
+Chapter 2 – Solver Architecture
+Planning Request
+        │
+        ▼
+Data Loader
+        │
+        ▼
+Variable Builder
+        │
+        ▼
+Constraint Builder
+        │
+        ▼
+Objective Builder
+        │
+        ▼
+CP-SAT Solver
+        │
+        ▼
+Solution Validator
+        │
+        ▼
+Schedule Generator
+Chapter 3 – Model Construction Pipeline
+
+Model aşağıdaki sırayla oluşturulur.
+
+Adım	Açıklama
+1	Planning verilerinin yüklenmesi
+2	Karar değişkenlerinin oluşturulması
+3	Interval değişkenlerinin oluşturulması
+4	Constraint'lerin eklenmesi
+5	Objective fonksiyonlarının oluşturulması
+6	Solver parametrelerinin ayarlanması
+7	Çözümün çalıştırılması
+8	Sonucun doğrulanması
+9	Schedule nesnesinin oluşturulması
+Chapter 4 – Decision Variables
+
+Scheduling Engine aşağıdaki CP-SAT değişkenlerini kullanır.
+
+Variable	CP-SAT Type
+Start Time	IntVar
+Finish Time	IntVar
+Interval	IntervalVar
+Machine Assignment	BoolVar
+Operator Assignment	BoolVar
+Sequence	BoolVar
+Tardiness	IntVar
+Makespan	IntVar
+Chapter 5 – Interval Variables
+
+Her operasyon için bir IntervalVar oluşturulur.
+
+Interval bileşenleri:
+
+Start
+Duration
+End
+
+Bu yapı;
+
+zaman çakışmalarını,
+makine kullanımını,
+operasyon sürelerini
+
+tek nesne üzerinden yönetmeyi sağlar.
+
+Chapter 6 – Constraint Mapping
+Matematiksel Model	CP-SAT Yapısı
+Start Time	IntVar
+Finish Time	IntVar
+Operation Interval	IntervalVar
+Resource Assignment	BoolVar
+Precedence	Add()
+No Overlap	AddNoOverlap()
+Capacity	AddCumulative()
+Boolean Logic	OnlyEnforceIf()
+Chapter 7 – Scheduling Constraints
+
+CP-SAT modeline aşağıdaki temel kısıtlar eklenir.
+
+Precedence Constraint
+
+Operasyon sırası korunur.
+
+No Overlap Constraint
+
+Aynı makinede aynı anda iki operasyon çalışamaz.
+
+Calendar Constraint
+
+Operasyonlar çalışma takvimine uygun zaman aralıklarına yerleştirilir.
+
+Shift Constraint
+
+Operasyonlar vardiya sınırlarına uygun planlanır.
+
+Due Date Constraint
+
+Teslim tarihi ihlalleri ceza değişkenleri ile modele dahil edilir.
+
+Chapter 8 – Resource Constraints
+
+Kaynak yönetimi için aşağıdaki yapı kullanılır.
+
+Kaynak	Constraint
+Machine	AddNoOverlap()
+Operator	AddNoOverlap()
+Tool	AddNoOverlap()
+Work Center	AddCumulative()
+Production Line	AddCumulative()
+Chapter 9 – Capacity Modeling
+
+Finite Capacity Scheduling için:
+
+Her kaynak kapasitesi tanımlanır.
+Aynı anda kullanılan toplam kapasite sınırı aşılmaz.
+Gerekli durumlarda paralel kaynaklar birlikte değerlendirilir.
+
+Kapasite kısıtları AddCumulative() yapısı ile modellenir.
+
+Chapter 10 – Objective Implementation
+
+Objective fonksiyonunda aşağıdaki bileşenler birlikte değerlendirilir.
+
+Makespan
+Tardiness
+Capacity Utilization
+Setup Time
+WIP
+Resource Balance
+Schedule Stability
+
+Bu hedefler, ağırlıklı toplam skor olarak solver'a aktarılır.
+
+Chapter 11 – Solver Configuration
+Parametre	Varsayılan
+Max Time	60 sn
+Num Workers	CPU Core Sayısı
+Relative Gap Limit	%1
+Random Seed	Konfigüre Edilebilir
+Log Search Progress	Açık (Debug)
+Enumerate Solutions	Kapalı
+
+Parametreler sistem konfigürasyonundan değiştirilebilir.
+
+Chapter 12 – Solution Validation
+
+Solver çözümü aşağıdaki kontrollerden geçirilir.
+
+Hard Constraint ihlali var mı?
+Tüm operasyonlar planlandı mı?
+Kaynak çakışması var mı?
+Takvim kurallarına uyuluyor mu?
+Teslim tarihi hesaplamaları doğru mu?
+Kapasite sınırları aşılıyor mu?
+
+Başarısız çözümler yayımlanmaz.
+
+Chapter 13 – Incremental Scheduling
+
+Tam yeniden planlama yerine yalnızca etkilenen operasyonlar yeniden optimize edilebilir.
+
+Desteklenen senaryolar:
+
+Yeni sipariş eklenmesi
+Sipariş iptali
+Makine arızası
+Operatör değişikliği
+Vardiya değişikliği
+Acil sipariş eklenmesi
+
+Bu yaklaşım plan kararlılığını artırır ve çözüm süresini kısaltır.
+
+Chapter 14 – Failure Handling
+
+Solver aşağıdaki durumları yönetmelidir.
+
+Durum	İşlem
+Infeasible	Hata raporu oluştur
+Time Limit	En iyi çözümü döndür
+No Solution	Uyarı üret
+Constraint Conflict	Çatışma analizi yap
+Solver Error	Olay kaydı oluştur
+Chapter 15 – Performance Targets
+KPI	Hedef
+Model Oluşturma	<2 sn
+Küçük Plan	<5 sn
+Orta Ölçekli Plan	<20 sn
+Fabrika Planı	<60 sn
+Incremental Scheduling	<5 sn
+Hard Constraint Başarı Oranı	%100
+Chapter 16 – Integration Points
+Modül	Amaç
+Constraint Library	Kısıtların yüklenmesi
+Objective Library	Hedef fonksiyonlarının oluşturulması
+Line Balancing Engine	Hat dengesi
+Operator Assignment Engine	Operatör atamaları
+Decision Engine	Karar puanlaması
+Audit Service	Çözüm kayıtları
+Explainability Engine	Karar açıklamaları
+Chapter 17 – Acceptance Criteria
+
+OR-Tools CP-SAT implementasyonu tamamlanmış kabul edilmesi için:
+
+Karar değişkenleri tanımlanmış olmalıdır.
+IntervalVar yapısı kullanılmalıdır.
+NoOverlap ve Cumulative constraint'leri uygulanmalıdır.
+Objective fonksiyonları solver'a aktarılmalıdır.
+Çözüm doğrulama mekanizması uygulanmalıdır.
+Incremental Scheduling desteklenmelidir.
+Solver hata senaryoları yönetilmelidir.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009C-4 – OR-Tools CP-SAT Implementation Specification
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009C-5
+Scheduling Algorithms
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Scheduling Engine (SE)
+Module: Scheduling Algorithms
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Scheduling Engine tarafından kullanılan zamanlama algoritmalarını tanımlar.
+
+Scheduling Algorithms modülünün amacı;
+
+farklı üretim senaryolarına uygun planlama stratejisini seçmek,
+zamanlama performansını artırmak,
+optimizasyon süresini azaltmak,
+gerektiğinde hibrit algoritmalar kullanarak en iyi çözümü üretmektir.
+
+Algoritmalar doğrudan karar vermez; CP-SAT optimizasyon modelini besleyen başlangıç çözümü (initial solution), öncelik sıralaması ve sezgisel yönlendirmeleri sağlar.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+SA-001	Scheduling Strategy Selection
+SA-002	Initial Solution Generation
+SA-003	Order Sequencing
+SA-004	Priority Evaluation
+SA-005	Heuristic Scheduling
+SA-006	Hybrid Scheduling
+SA-007	Incremental Scheduling Support
+SA-008	Algorithm Performance Monitoring
+Chapter 3 – Architecture
+Planning Request
+        │
+        ▼
+Scheduling Policy
+        │
+        ▼
+Algorithm Selector
+        │
+        ▼
+Selected Algorithm
+        │
+        ▼
+Initial Schedule
+        │
+        ▼
+CP-SAT Optimizer
+        │
+        ▼
+Final Schedule
+Chapter 4 – Supported Algorithms
+Kod	Algorithm	Kullanım
+ALG-101	Forward Scheduling	Varsayılan planlama
+ALG-102	Backward Scheduling	Teslim tarihine göre planlama
+ALG-103	Earliest Due Date (EDD)	Teslim tarihi odaklı
+ALG-104	Shortest Processing Time (SPT)	Akış süresini azaltma
+ALG-105	Longest Processing Time (LPT)	Yük dengeleme
+ALG-106	Critical Path Method (CPM)	Kritik operasyon analizi
+ALG-107	Priority Based Scheduling	Öncelik odaklı
+ALG-108	Hybrid Scheduling	Çok kriterli planlama
+Chapter 5 – Forward Scheduling (ALG-101)
+Objective
+
+Üretimi mümkün olan en erken tarihte başlatır.
+
+Özellikler
+Varsayılan algoritmadır.
+Kapasite uygunluğunu dikkate alır.
+Siparişler ileri doğru zamanlanır.
+En yüksek üretim akışı hedeflenir.
+Kullanım Senaryosu
+Normal üretim
+Günlük planlama
+Sürekli üretim
+Chapter 6 – Backward Scheduling (ALG-102)
+Objective
+
+Teslim tarihinden geriye doğru planlama yapar.
+
+Özellikler
+Due Date odaklıdır.
+Gereksiz erken üretimi azaltır.
+Stok oluşumunu sınırlar.
+Kullanım Senaryosu
+JIT üretim
+Sipariş bazlı üretim
+Kritik müşteri siparişleri
+Chapter 7 – Earliest Due Date (ALG-103)
+Objective
+
+Teslim tarihi en yakın olan siparişleri önceliklendirir.
+
+Avantajlar
+Gecikmeleri azaltır.
+OTD performansını artırır.
+Kritik siparişleri öne alır.
+Sınırlamalar
+Setup sürelerini artırabilir.
+Kaynak dengesini bozabilir.
+Chapter 8 – Shortest Processing Time (ALG-104)
+Objective
+
+İşlem süresi en kısa olan operasyonları önce planlar.
+
+Avantajlar
+Ortalama akış süresini azaltır.
+WIP seviyesini düşürür.
+Kaynak beklemelerini azaltır.
+Kullanım
+Yüksek hacimli üretim
+Seri üretim
+Kısa çevrim süreleri
+Chapter 9 – Longest Processing Time (ALG-105)
+Objective
+
+İşlem süresi uzun operasyonları önce planlar.
+
+Amaç
+Uzun işlemlerin gecikmesini önlemek
+Kritik kaynak kullanımını dengelemek
+Kullanım
+Büyük üretim emirleri
+Uzun operasyon zincirleri
+Chapter 10 – Critical Path Method (ALG-106)
+Objective
+
+Üretim planındaki kritik yolu belirlemek.
+
+Analiz edilen kriterler:
+
+Kritik operasyonlar
+Toplam gecikme etkisi
+Boşluk (Float)
+Darboğaz noktaları
+
+Bu algoritma özellikle yeniden planlama ve darboğaz analizlerinde kullanılır.
+
+Chapter 11 – Priority Based Scheduling (ALG-107)
+
+Sipariş öncelikleri aşağıdaki kriterlere göre hesaplanabilir.
+
+Müşteri önceliği
+Sipariş tipi
+Teslim tarihi
+Gecikme riski
+Ticari öncelik
+Manuel öncelik
+
+Öncelik puanı, CP-SAT objective fonksiyonuna ek ağırlık olarak aktarılabilir.
+
+Chapter 12 – Hybrid Scheduling (ALG-108)
+
+Hybrid Scheduling birden fazla algoritmanın birlikte kullanılmasını sağlar.
+
+Örnek kombinasyonlar:
+
+Aşama	Algoritma
+İlk sıralama	EDD
+Kaynak dengeleme	LPT
+Akış optimizasyonu	SPT
+Nihai optimizasyon	CP-SAT
+
+Bu yaklaşım büyük ölçekli planlamalarda daha kararlı sonuçlar üretir.
+
+Chapter 13 – Algorithm Selection Policy
+Senaryo	Varsayılan Algoritma
+Günlük üretim	Forward Scheduling
+JIT üretim	Backward Scheduling
+Kritik teslimatlar	EDD
+Yüksek hacimli üretim	SPT
+Uzun operasyonlar	LPT
+Yeniden planlama	CPM + Hybrid
+Karma üretim	Hybrid Scheduling
+Chapter 14 – Performance Monitoring
+
+Her algoritma için aşağıdaki metrikler izlenir.
+
+Metrik	Açıklama
+Runtime	Çalışma süresi
+Schedule Score	Plan puanı
+Makespan	Toplam tamamlanma süresi
+Tardiness	Gecikme
+OTD	Zamanında teslim oranı
+Resource Utilization	Kaynak kullanım oranı
+
+Bu metrikler algoritma performansının karşılaştırılmasında kullanılır.
+
+Chapter 15 – Integration Points
+Modül	Amaç
+Objective Library	Hedef fonksiyonları
+Constraint Library	Kısıt yönetimi
+CP-SAT Solver	Nihai optimizasyon
+Capacity Planning Engine	Kapasite analizi
+Rescheduling Engine	Yeniden planlama
+Decision Engine	Algoritma seçimi
+Chapter 16 – Acceptance Criteria
+
+Scheduling Algorithms modülü tamamlanmış kabul edilmesi için:
+
+Desteklenen algoritmalar tanımlanmış olmalıdır.
+Algoritma seçim politikası oluşturulmuş olmalıdır.
+Hibrit planlama desteği sağlanmalıdır.
+Performans metrikleri belirlenmiş olmalıdır.
+CP-SAT ile entegrasyon tanımlanmış olmalıdır.
+Algoritmalar yeniden planlama süreçlerinde kullanılabilir olmalıdır.
+Document Status
+
+DOC-009C-5 – Scheduling Algorithms
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009C-6
+Sequencing Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Scheduling Engine (SE)
+Module: Sequencing Engine (SQE)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Sequencing Engine (SQE), Scheduling Engine içerisinde üretim emirleri ve operasyonların işlenme sırasını belirleyen alt motordur.
+
+Görevi;
+
+operasyon sıralarını oluşturmak,
+kaynak üzerindeki işlem dizilimini optimize etmek,
+setup sürelerini azaltmak,
+teslim performansını artırmak,
+darboğaz oluşumunu azaltmak,
+Scheduling Engine için uygulanabilir sıralama üretmektir.
+
+Sequencing Engine, hangi operasyonun ne zaman başlayacağını değil, hangi operasyonun hangisinden önce geleceğini belirler.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+SQE-001	Operation Sequencing
+SQE-002	Order Prioritization
+SQE-003	Sequence Optimization
+SQE-004	Setup Reduction
+SQE-005	Changeover Optimization
+SQE-006	Queue Management
+SQE-007	Sequence Validation
+SQE-008	Sequence Publication
+Chapter 3 – Engine Architecture
+Production Orders
+        │
+        ▼
+Priority Evaluation
+        │
+        ▼
+Candidate Queue
+        │
+        ▼
+Sequencing Optimizer
+        │
+        ▼
+Sequence Validation
+        │
+        ▼
+Scheduling Engine
+Chapter 4 – Input Data
+
+Sequencing Engine aşağıdaki verileri kullanır.
+
+Production Orders
+Order ID
+Priority
+Due Date
+Customer
+Quantity
+Operations
+Routing
+Processing Time
+Setup Time
+Operation Type
+Resources
+Machine
+Production Line
+Work Center
+Tool Availability
+Chapter 5 – Sequencing Levels
+Seviye	Açıklama
+Order Level	Sipariş sıralaması
+Operation Level	Operasyon sıralaması
+Machine Level	Makine kuyruğu
+Work Center Level	İş merkezi sıralaması
+Line Level	Hat sıralaması
+Factory Level	Fabrika genel sıralaması
+Chapter 6 – Priority Calculation
+
+Öncelik puanı aşağıdaki kriterlerden hesaplanabilir.
+
+Kriter	Kullanım
+Due Date	Teslim tarihi
+Customer Priority	Müşteri önceliği
+Order Priority	Sipariş önceliği
+Processing Time	İşlem süresi
+Setup Impact	Setup etkisi
+Bottleneck Impact	Darboğaz etkisi
+Business Rules	İş kuralları
+Manual Override	Manuel öncelik
+
+Her kriter, planlama profiline göre ağırlıklandırılabilir.
+
+Chapter 7 – Sequence Optimization Rules
+
+Motor aşağıdaki optimizasyon kurallarını uygular.
+
+Setup değişimlerini azalt.
+Aynı ürün ailesini grupla.
+Benzer renkleri ardışık işle.
+Aynı aparat kullanan işleri grupla.
+Darboğaz makinelerini önceliklendir.
+Kritik siparişleri öne al.
+Gereksiz makine beklemelerini azalt.
+Chapter 8 – Queue Management
+
+Her kaynak için bağımsız işlem kuyruğu oluşturulur.
+
+Desteklenen kuyruk türleri:
+
+Queue Type	Açıklama
+FIFO	İlk giren ilk çıkar
+LIFO	Son giren ilk çıkar
+Priority Queue	Öncelik tabanlı
+Due Date Queue	Teslim tarihi tabanlı
+Processing Time Queue	İşlem süresi tabanlı
+Hybrid Queue	Karma yapı
+
+Varsayılan kuyruk tipi Priority Queue'dur.
+
+Chapter 9 – Changeover Optimization
+
+Motor aşağıdaki değişim maliyetlerini azaltmayı hedefler.
+
+Ürün değişimi
+Model değişimi
+Kumaş tipi değişimi
+Renk değişimi
+Makine ayarı değişimi
+Aparat değişimi
+
+Bu bilgiler Setup Matrix kullanılarak değerlendirilir.
+
+Chapter 10 – Validation Rules
+
+Oluşturulan sıra aşağıdaki kontrollerden geçirilir.
+
+Routing sırası korunuyor mu?
+Hard Constraint ihlali var mı?
+Kaynak çakışması oluşuyor mu?
+Setup kuralları uygulanıyor mu?
+Öncelik kuralları korunuyor mu?
+
+Geçersiz dizilimler Scheduling Engine'e gönderilmez.
+
+Chapter 11 – Runtime Behaviour
+
+Sequencing Engine aşağıdaki durumlarda yeniden çalıştırılabilir.
+
+Yeni sipariş geldiğinde
+Sipariş iptal edildiğinde
+Makine arızasında
+Operatör değiştiğinde
+Acil sipariş eklendiğinde
+Darboğaz oluştuğunda
+Manuel yeniden planlama talebinde
+
+Yalnızca etkilenen kuyruklar yeniden hesaplanır.
+
+Chapter 12 – Integration Points
+Modül	Amaç
+Scheduling Algorithms	Algoritma seçimi
+Capacity Planning Engine	Kapasite kontrolü
+Rescheduling Engine	Yeniden sıralama
+Constraint Library	Kural doğrulama
+Objective Library	Öncelik puanlama
+Decision Engine	Karar desteği
+Chapter 13 – Performance Targets
+KPI	Hedef
+Tek Makine Kuyruğu	<100 ms
+Hat Bazlı Sıralama	<500 ms
+Fabrika Bazlı Sıralama	<3 sn
+Incremental Re-Sequencing	<500 ms
+Hard Constraint Başarı Oranı	%100
+Chapter 14 – Acceptance Criteria
+
+Sequencing Engine tamamlanmış kabul edilmesi için:
+
+Sıralama seviyeleri tanımlanmış olmalıdır.
+Öncelik hesaplama mekanizması oluşturulmuş olmalıdır.
+Kuyruk yönetimi desteklenmelidir.
+Setup optimizasyon kuralları uygulanmalıdır.
+Geçerlilik kontrolleri tanımlanmış olmalıdır.
+Artımlı (incremental) yeniden sıralama desteklenmelidir.
+Scheduling Engine ile tam uyumlu çalışmalıdır.
+Document Status
+
+DOC-009C-6 – Sequencing Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009C-7
+Capacity Planning Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Scheduling Engine (SE)
+Module: Capacity Planning Engine (CPE)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Capacity Planning Engine (CPE), Scheduling Engine içerisinde üretim kaynaklarının kapasitesini analiz eden ve planlama sürecinde kapasite kullanımını yöneten alt motordur.
+
+Görevleri;
+
+mevcut kapasiteyi hesaplamak,
+kapasite yetersizliklerini belirlemek,
+kapasite kullanımını optimize etmek,
+aşırı yüklenmeleri önlemek,
+kullanılabilir kapasiteyi Scheduling Engine'e sağlamaktır.
+
+Capacity Planning Engine tek başına üretim planı oluşturmaz; Scheduling Engine'e kapasite verisi sağlayan uzman modüldür.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+CPE-001	Capacity Calculation
+CPE-002	Resource Availability Analysis
+CPE-003	Capacity Validation
+CPE-004	Capacity Forecasting
+CPE-005	Capacity Balancing
+CPE-006	Bottleneck Detection
+CPE-007	Capacity Publication
+CPE-008	Capacity Monitoring
+Chapter 3 – Engine Architecture
+Production Orders
+        │
+        ▼
+Resource Loader
+        │
+        ▼
+Capacity Calculator
+        │
+        ▼
+Capacity Validator
+        │
+        ▼
+Load Analyzer
+        │
+        ▼
+Capacity Report
+        │
+        ▼
+Scheduling Engine
+Chapter 4 – Capacity Objects
+
+Motor aşağıdaki kapasite nesnelerini yönetir.
+
+Nesne	Açıklama
+Machine	Makine kapasitesi
+Operator	Operatör kapasitesi
+Production Line	Hat kapasitesi
+Work Center	İş merkezi kapasitesi
+Department	Bölüm kapasitesi
+Factory	Fabrika kapasitesi
+Chapter 5 – Capacity Types
+Tür	Açıklama
+Theoretical Capacity	Maksimum teknik kapasite
+Available Capacity	Takvim sonrası kullanılabilir kapasite
+Planned Capacity	Planlanmış kapasite
+Reserved Capacity	Rezerve edilen kapasite
+Remaining Capacity	Kalan kapasite
+Overtime Capacity	Fazla mesai kapasitesi
+Chapter 6 – Capacity Calculation
+
+Her kaynak için aşağıdaki değerler hesaplanır.
+
+Theoretical Capacity
+
+Makinenin veya kaynağın teknik olarak sağlayabileceği maksimum kapasite.
+
+Available Capacity
+
+Takvim, vardiya, bakım ve resmi tatiller dikkate alındıktan sonra kullanılabilir kapasite.
+
+Planned Capacity
+
+Mevcut üretim planı tarafından kullanılan kapasite.
+
+Remaining Capacity
+
+Remaining Capacity =
+Available Capacity − Planned Capacity
+Chapter 7 – Capacity Constraints
+
+Motor aşağıdaki kuralları uygular.
+
+CPE-101
+
+Kaynak kapasitesi aşılamaz.
+
+Type: Hard
+
+CPE-102
+
+Bakım süresindeki kaynak kullanılamaz.
+
+Type: Hard
+
+CPE-103
+
+Vardiya süresi dışına planlama yapılamaz.
+
+Type: Hard
+
+CPE-104
+
+Fazla mesai yalnızca yetkili planlama profillerinde kullanılabilir.
+
+Type: Soft
+
+CPE-105
+
+Rezerve kapasite korunmalıdır.
+
+Type: Hard
+
+Chapter 8 – Load Analysis
+
+Motor aşağıdaki yük analizlerini üretir.
+
+Analiz	Açıklama
+Machine Load	Makine yükü
+Line Load	Hat yükü
+Operator Load	Operatör yükü
+Work Center Load	İş merkezi yükü
+Department Load	Bölüm yükü
+Factory Load	Fabrika yükü
+Chapter 9 – Bottleneck Detection
+
+Aşağıdaki durumlar darboğaz olarak değerlendirilir.
+
+Kapasite kullanım oranı eşik değeri aşarsa
+Uzun işlem kuyruğu oluşursa
+Kritik makine sürekli doluysa
+Teslim tarihleri risk altındaysa
+Alternatif kaynak bulunamıyorsa
+
+Darboğaz bilgileri Bottleneck Resolution Engine'e aktarılır.
+
+Chapter 10 – Capacity Balancing
+
+Motor aşağıdaki yöntemlerle yük dengeleme önerileri oluşturur.
+
+Alternatif makine kullanımı
+Alternatif hat kullanımı
+Operasyon kaydırma
+Vardiya değişikliği
+Fazla mesai önerisi
+İş merkezi yeniden dağıtımı
+
+Bu öneriler otomatik uygulanmaz; Scheduling Engine tarafından değerlendirilir.
+
+Chapter 11 – Capacity Forecasting
+
+Motor planlama ufku boyunca kapasite tahmini oluşturur.
+
+Desteklenen periyotlar:
+
+Saatlik
+Günlük
+Haftalık
+Aylık
+
+Tahminler;
+
+beklenen yük,
+boş kapasite,
+kritik dönemler,
+kapasite riskleri
+
+için kullanılır.
+
+Chapter 12 – Runtime Behaviour
+
+Capacity Planning Engine aşağıdaki olaylarda yeniden çalıştırılır.
+
+Yeni sipariş oluşturulması
+Sipariş iptali
+Makine arızası
+Operatör değişikliği
+Vardiya değişikliği
+Takvim güncellemesi
+Bakım planı değişikliği
+
+Yalnızca etkilenen kaynaklar yeniden hesaplanır.
+
+Chapter 13 – Integration Points
+Modül	Amaç
+Scheduling Engine	Kapasite verisi
+Sequencing Engine	Kuyruk optimizasyonu
+Line Balancing Engine	Hat yükü
+Operator Assignment Engine	Operatör kapasitesi
+Bottleneck Resolution Engine	Darboğaz yönetimi
+Simulation Engine	Senaryo analizi
+Decision Engine	Karar puanlama
+Chapter 14 – Performance Targets
+KPI	Hedef
+Tek Kaynak Hesabı	<20 ms
+Hat Kapasitesi	<100 ms
+Fabrika Kapasitesi	<2 sn
+Capacity Forecast	<5 sn
+Incremental Update	<200 ms
+Kapasite Doğruluğu	≥99%
+Chapter 15 – Acceptance Criteria
+
+Capacity Planning Engine tamamlanmış kabul edilmesi için:
+
+Tüm kapasite türleri tanımlanmış olmalıdır.
+Kapasite hesaplama modeli oluşturulmuş olmalıdır.
+Kapasite kısıtları uygulanmalıdır.
+Yük analizleri üretilebilmelidir.
+Darboğaz tespiti desteklenmelidir.
+Kapasite tahmin mekanizması bulunmalıdır.
+Artımlı (incremental) kapasite güncellemeleri desteklenmelidir.
+Scheduling Engine ile tam entegre çalışmalıdır.
+Document Status
+
+DOC-009C-7 – Capacity Planning Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009C-8
+Rescheduling Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Scheduling Engine (SE)
+Module: Rescheduling Engine (RSE)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Rescheduling Engine (RSE), üretim sırasında meydana gelen plan değişikliklerine gerçek zamanlı veya talep üzerine yanıt veren alt motordur.
+
+Amacı;
+
+mevcut üretim planını mümkün olduğunca korumak,
+yalnızca etkilenen operasyonları yeniden planlamak,
+teslim performansını sürdürmek,
+operasyonel kesintileri en aza indirmek,
+plan kararlılığını (Schedule Stability) korumaktır.
+
+Rescheduling Engine, tam planlama yerine Incremental Scheduling yaklaşımını temel alır.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+RSE-001	Event Detection
+RSE-002	Impact Analysis
+RSE-003	Incremental Rescheduling
+RSE-004	Alternative Resource Selection
+RSE-005	Schedule Stability Protection
+RSE-006	Conflict Resolution
+RSE-007	Version Management
+RSE-008	Schedule Publication
+Chapter 3 – Engine Architecture
+Production Event
+        │
+        ▼
+Event Analyzer
+        │
+        ▼
+Impact Analyzer
+        │
+        ▼
+Rescheduling Planner
+        │
+        ▼
+CP-SAT Optimizer
+        │
+        ▼
+Validation Engine
+        │
+        ▼
+Updated Schedule
+Chapter 4 – Supported Events
+
+Rescheduling Engine aşağıdaki olayları destekler.
+
+Event	Açıklama
+New Order	Yeni sipariş
+Order Cancellation	Sipariş iptali
+Machine Breakdown	Makine arızası
+Operator Absence	Operatör devamsızlığı
+Material Delay	Malzeme gecikmesi
+Tool Failure	Aparat arızası
+Calendar Change	Takvim değişikliği
+Shift Change	Vardiya değişikliği
+Priority Update	Öncelik değişikliği
+Manual Trigger	Manuel yeniden planlama
+Chapter 5 – Event Severity Levels
+Seviye	Açıklama
+Level 1	Düşük etki (tek operasyon)
+Level 2	Orta etki (tek makine veya tek hat)
+Level 3	Yüksek etki (birden fazla kaynak)
+Level 4	Kritik etki (fabrika genelinde)
+
+Etki seviyesi, yeniden planlama kapsamını belirler.
+
+Chapter 6 – Impact Analysis
+
+Her olay aşağıdaki açılardan analiz edilir.
+
+Etkilenen siparişler
+Etkilenen operasyonlar
+Etkilenen makineler
+Etkilenen operatörler
+Etkilenen üretim hatları
+Teslim tarihi riski
+Kapasite etkisi
+Darboğaz riski
+
+Bu analiz sonucunda yeniden planlama kapsamı oluşturulur.
+
+Chapter 7 – Rescheduling Strategies
+Strateji	Açıklama
+Local Rescheduling	Sadece etkilenen operasyonlar
+Resource-Based Rescheduling	Alternatif kaynak kullanımı
+Time-Based Rescheduling	Zaman kaydırma
+Priority-Based Rescheduling	Önceliklere göre yeniden planlama
+Global Rescheduling	Tüm planın yeniden oluşturulması
+
+Varsayılan strateji Local Rescheduling'dir.
+
+Chapter 8 – Incremental Scheduling
+
+Incremental Scheduling yalnızca etkilenen plan bölümünü yeniden optimize eder.
+
+Avantajları:
+
+Daha kısa çözüm süresi
+Daha az operasyon değişikliği
+Daha yüksek plan kararlılığı
+Operasyonel kesintilerin azaltılması
+Daha düşük hesaplama maliyeti
+Chapter 9 – Schedule Stability
+
+Plan kararlılığı aşağıdaki prensiplere göre korunur.
+
+Başlamış operasyonlar değiştirilmez.
+Tamamlanmış operasyonlar korunur.
+Donmuş planlama ufku (Frozen Horizon) değiştirilmez.
+Gereksiz sıra değişikliklerinden kaçınılır.
+Manuel kilitli operasyonlar korunur.
+
+Bu kurallar, yeniden planlamanın üretime etkisini en aza indirir.
+
+Chapter 10 – Alternative Resource Selection
+
+Yeniden planlama sırasında aşağıdaki alternatifler değerlendirilebilir.
+
+Alternatif makine
+Alternatif operatör
+Alternatif üretim hattı
+Alternatif iş merkezi
+Alternatif vardiya
+
+Seçim, Constraint Library ve Objective Library kurallarına uygun olarak yapılır.
+
+Chapter 11 – Version Management
+
+Her yeniden planlama işlemi yeni bir plan sürümü oluşturur.
+
+Alan	Açıklama
+Schedule Version ID	Benzersiz sürüm numarası
+Parent Version	Önceki plan
+Trigger Event	Yeniden planlama nedeni
+Timestamp	Oluşturulma zamanı
+User / System	Tetikleyen kaynak
+Change Summary	Değişiklik özeti
+
+Bu yapı sayesinde tüm plan geçmişi izlenebilir.
+
+Chapter 12 – Validation Rules
+
+Yeni plan yayımlanmadan önce aşağıdaki kontroller yapılır.
+
+Hard Constraint ihlali var mı?
+Kaynak çakışması oluşuyor mu?
+Takvim kuralları korunuyor mu?
+Teslim tarihleri kabul edilebilir mi?
+Plan kararlılığı korunuyor mu?
+Manuel kilitler ihlal edildi mi?
+
+Geçersiz planlar yayımlanmaz.
+
+Chapter 13 – Integration Points
+Modül	Amaç
+Scheduling Engine	Ana planlama
+Capacity Planning Engine	Kapasite güncellemesi
+Sequencing Engine	Sıralama güncellemesi
+Line Balancing Engine	Hat dengesi
+Operator Assignment Engine	Operatör yeniden ataması
+Bottleneck Resolution Engine	Darboğaz çözümü
+Simulation Engine	Senaryo doğrulaması
+Decision Engine	Karar puanlama
+Audit Service	Değişiklik kaydı
+Chapter 14 – Performance Targets
+KPI	Hedef
+Olay Analizi	<100 ms
+Etki Analizi	<500 ms
+Yerel Yeniden Planlama	<2 sn
+Hat Bazlı Yeniden Planlama	<5 sn
+Fabrika Bazlı Yeniden Planlama	<30 sn
+Schedule Stability	≥95%
+Hard Constraint Başarı Oranı	%100
+Chapter 15 – Acceptance Criteria
+
+Rescheduling Engine tamamlanmış kabul edilmesi için:
+
+Olay algılama mekanizması tanımlanmış olmalıdır.
+Etki analizi modeli oluşturulmuş olmalıdır.
+Yeniden planlama stratejileri belirlenmiş olmalıdır.
+Incremental Scheduling desteklenmelidir.
+Plan kararlılığı korunmalıdır.
+Alternatif kaynak seçimi uygulanmalıdır.
+Plan sürüm yönetimi desteklenmelidir.
+Scheduling Engine ile tam entegre çalışmalıdır.
+Document Status
+
+DOC-009C-8 – Rescheduling Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009C-9 – Final Technical Specification
+
+Bu belge, Scheduling Engine serisinin nihai teknik referans dokümanıdır. Önceki sekiz alt dokümanın mimarisini, modüllerini, veri akışını, entegrasyonlarını ve kabul kriterlerini tek bir teknik spesifikasyonda birleştirerek geliştirme ekibi için resmi referans olacaktır.
+DOC-009C-9
+Scheduling Engine Final Technical Specification
+
+Version: 1.0
+Status: Final
+Engine: Scheduling Engine (SE)
+Document Type: Final Technical Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Scheduling Engine'e ait tüm teknik tasarım dokümanlarının nihai özetidir.
+
+Amaç;
+
+Scheduling Engine mimarisini tek belgede toplamak,
+alt modüller arasındaki ilişkileri tanımlamak,
+geliştirme ekibi için resmi referans oluşturmak,
+test, bakım ve sürüm yönetimi süreçlerinde kullanılacak teknik standardı belirlemektir.
+
+Bu belge yeni tasarım içermez; DOC-009C serisindeki tüm teknik kararların konsolide edilmiş sürümüdür.
+
+Chapter 2 – Engine Overview
+
+Scheduling Engine, MARS APS içerisinde üretim planını oluşturan merkezi optimizasyon motorudur.
+
+Temel görevleri:
+
+Üretim emirlerini zamanlamak
+Operasyon sıralamasını oluşturmak
+Kaynak kullanımını optimize etmek
+Kapasiteyi yönetmek
+Teslim tarihlerini karşılamak
+Yeniden planlama yapmak
+Gerçek zamanlı plan güncellemelerini yönetmek
+Chapter 3 – Module Architecture
+                    Scheduling Engine
+                           │
+ ┌─────────────────────────────────────────────────────┐
+ │                                                     │
+ │  Scheduling Algorithms                              │
+ │  Sequencing Engine                                  │
+ │  Capacity Planning Engine                           │
+ │  Rescheduling Engine                                │
+ │  OR-Tools CP-SAT Solver                             │
+ │                                                     │
+ └─────────────────────────────────────────────────────┘
+Chapter 4 – Internal Modules
+Kod	Modül	Doküman
+SE	Scheduling Engine	DOC-009C
+SE-ALG	Scheduling Algorithms	DOC-009C-5
+SE-SQE	Sequencing Engine	DOC-009C-6
+SE-CPE	Capacity Planning Engine	DOC-009C-7
+SE-RSE	Rescheduling Engine	DOC-009C-8
+Chapter 5 – Technical Components
+Bileşen	Açıklama
+Mathematical Model	Karar değişkenleri ve matematiksel model
+Constraint Library	Hard / Soft Constraint yönetimi
+Objective Library	Optimizasyon hedefleri
+CP-SAT Model	Solver implementasyonu
+Schedule Builder	Nihai üretim planı oluşturma
+Validation Layer	Çözüm doğrulama
+Audit Layer	Karar kayıtları
+Chapter 6 – Scheduling Workflow
+Planning Request
+        │
+        ▼
+Data Validation
+        │
+        ▼
+Scheduling Algorithms
+        │
+        ▼
+Sequencing Engine
+        │
+        ▼
+Capacity Planning Engine
+        │
+        ▼
+CP-SAT Optimization
+        │
+        ▼
+Validation
+        │
+        ▼
+Schedule Publication
+Chapter 7 – Runtime Workflow
+Production Event
+        │
+        ▼
+Impact Analysis
+        │
+        ▼
+Rescheduling Engine
+        │
+        ▼
+Incremental Scheduling
+        │
+        ▼
+Validation
+        │
+        ▼
+Schedule Update
+Chapter 8 – External Integrations
+Sistem	Amaç
+ERP	Üretim emirleri, BOM ve rota bilgileri
+MES	Gerçekleşen üretim verileri
+WMS	Malzeme ve stok bilgileri
+HR	Operatör ve vardiya bilgileri
+Maintenance	Bakım planları
+Decision Engine	Karar puanlama
+Simulation Engine	Senaryo doğrulama
+Bottleneck Resolution Engine	Darboğaz yönetimi
+Chapter 9 – Data Flow
+ERP / MES / WMS
+        │
+        ▼
+Scheduling Engine
+        │
+        ▼
+Scheduling Algorithms
+        │
+        ▼
+Sequencing Engine
+        │
+        ▼
+Capacity Planning Engine
+        │
+        ▼
+CP-SAT Solver
+        │
+        ▼
+Production Schedule
+Chapter 10 – Non-Functional Requirements
+Özellik	Hedef
+Availability	≥99.9%
+Scalability	Yatay ölçeklenebilir
+Reliability	Yüksek
+Maintainability	Modüler yapı
+Extensibility	Yeni algoritma eklenebilir
+Explainability	Kararlar izlenebilir
+Auditability	Tam kayıt tutulur
+Security	Yetkilendirme desteklenir
+Chapter 11 – Performance Targets
+KPI	Hedef
+Tek Sipariş Planlama	<200 ms
+Hat Planlama	<2 sn
+Fabrika Planlama	<60 sn
+Yerel Yeniden Planlama	<2 sn
+Fabrika Yeniden Planlama	<30 sn
+Hard Constraint Başarı Oranı	%100
+Schedule Stability	≥95%
+Chapter 12 – Dependency Matrix
+Modül	Bağımlılık
+Constraint Library	Zorunlu
+Objective Library	Zorunlu
+OR-Tools CP-SAT	Zorunlu
+Line Balancing Engine	Zorunlu
+Operator Assignment Engine	Zorunlu
+Decision Engine	Zorunlu
+Calendar Service	Zorunlu
+Configuration Service	Zorunlu
+Audit Service	Zorunlu
+Chapter 13 – Development Deliverables
+
+Scheduling Engine geliştirme sürecinde aşağıdaki çıktılar oluşturulacaktır.
+
+Çıktı	Açıklama
+Domain Model	Alan modeli
+Solver Model	CP-SAT modeli
+Scheduling Service	Uygulama servisi
+REST API	Planlama API'leri
+Event Handlers	Olay işleyicileri
+Unit Tests	Birim testleri
+Integration Tests	Entegrasyon testleri
+Performance Tests	Performans testleri
+Technical Documentation	Teknik dokümantasyon
+Chapter 14 – Acceptance Criteria
+
+Scheduling Engine aşağıdaki şartlar sağlandığında tamamlanmış kabul edilir:
+
+Tüm alt modüller uygulanmış olmalıdır.
+Matematiksel model CP-SAT üzerinde çalışmalıdır.
+Constraint ve Objective kütüphaneleri entegre edilmelidir.
+Planlama ve yeniden planlama senaryoları başarıyla çalışmalıdır.
+Performans hedefleri karşılanmalıdır.
+Harici sistem entegrasyonları doğrulanmalıdır.
+Test senaryoları başarıyla tamamlanmalıdır.
+Teknik dokümantasyon güncel olmalıdır.
+Chapter 15 – Document References
+Doküman	Açıklama
+DOC-009C	Scheduling Engine
+DOC-009C-1	Mathematical Optimization Model
+DOC-009C-2	Constraint Library Specification
+DOC-009C-3	Objective Function Library
+DOC-009C-4	OR-Tools CP-SAT Implementation
+DOC-009C-5	Scheduling Algorithms
+DOC-009C-6	Sequencing Engine
+DOC-009C-7	Capacity Planning Engine
+DOC-009C-8	Rescheduling Engine
+Document Status
+
+DOC-009C-9 – Scheduling Engine Final Technical Specification
+
+Status: ✅ Completed
+Architecture Status: Final
+Implementation Status: Ready for Development
+DOC-009C Serisi Tamamlandı ✅
+
+Bu belge ile Scheduling Engine için planlanan tüm alt dokümanlar tamamlanmıştır.
+
+Tamamlanan seri:
+
+✅ DOC-009C – Scheduling Engine
+✅ DOC-009C-1 – Mathematical Optimization Model
+✅ DOC-009C-2 – Constraint Library Specification
+✅ DOC-009C-3 – Objective Function Library
+✅ DOC-009C-4 – OR-Tools CP-SAT Implementation Specification
+✅ DOC-009C-5 – Scheduling Algorithms
+✅ DOC-009C-6 – Sequencing Engine
+✅ DOC-009C-7 – Capacity Planning Engine
+✅ DOC-009C-8 – Rescheduling Engine
+✅ DOC-009C-9 – Final Technical Specification
+Next Document (Plana Göre)
+
+Bir sonraki ana doküman:
+
+DOC-009D – Bottleneck Resolution Engine
+
+Bu doküman, üretim darboğazlarını tespit eden, analiz eden ve alternatif çözüm önerileri üreten optimizasyon motorunun ana mimari spesifikasyonunu tanımlayacaktır. Bu motor, Scheduling Engine ve Line Balancing Engine ile birlikte çalışarak üretim akışının sürekli iyileştirilmesini sağlayacaktır.
