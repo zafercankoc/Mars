@@ -1,0 +1,1211 @@
+DOC-009D
+Bottleneck Resolution Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Bottleneck Resolution Engine (BRE)
+Document Type: Core Engine Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bottleneck Resolution Engine (BRE), üretim sisteminde darboğaz (Bottleneck) oluşturan kaynakları tespit eden, analiz eden ve çözüm önerileri üreten optimizasyon motorudur.
+
+Motorun amacı;
+
+darboğazları otomatik olarak belirlemek,
+üretim akışını iyileştirmek,
+kapasite kullanımını artırmak,
+teslim performansını korumak,
+Scheduling Engine ve Line Balancing Engine'i desteklemektir.
+
+BRE, doğrudan üretim planı oluşturmaz; mevcut planı analiz ederek iyileştirme önerileri üretir ve gerekli durumlarda yeniden planlama süreçlerini tetikler.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+BRE-001	Bottleneck Detection
+BRE-002	Bottleneck Classification
+BRE-003	Root Cause Analysis
+BRE-004	Resolution Strategy Generation
+BRE-005	Capacity Improvement Analysis
+BRE-006	Alternative Resource Recommendation
+BRE-007	Continuous Monitoring
+BRE-008	Resolution Publication
+Chapter 3 – Engine Architecture
+Production Schedule
+        │
+        ▼
+Load Analyzer
+        │
+        ▼
+Bottleneck Detector
+        │
+        ▼
+Root Cause Analyzer
+        │
+        ▼
+Resolution Planner
+        │
+        ▼
+Decision Engine
+        │
+        ▼
+Scheduling Engine
+Chapter 4 – Bottleneck Definition
+
+Bir kaynak aşağıdaki koşullardan biri gerçekleştiğinde darboğaz olarak değerlendirilir.
+
+Kapasite kullanım oranı kritik eşiği aşar.
+Sürekli işlem kuyruğu oluşur.
+Ortalama bekleme süresi sınır değerin üzerindedir.
+Teslim tarihi gecikmeleri bu kaynaktan kaynaklanmaktadır.
+Alternatif kaynak bulunmamaktadır.
+Chapter 5 – Bottleneck Types
+Kod	Tür	Açıklama
+BT-101	Machine Bottleneck	Makine darboğazı
+BT-102	Operator Bottleneck	Operatör darboğazı
+BT-103	Line Bottleneck	Üretim hattı darboğazı
+BT-104	Work Center Bottleneck	İş merkezi darboğazı
+BT-105	Material Bottleneck	Malzeme darboğazı
+BT-106	Tool Bottleneck	Aparat darboğazı
+BT-107	Calendar Bottleneck	Takvim kaynaklı darboğaz
+BT-108	External Bottleneck	Dış sistem kaynaklı darboğaz
+Chapter 6 – Detection Criteria
+
+Darboğaz analizi aşağıdaki göstergelere göre yapılır.
+
+Kriter	Ölçüm
+Capacity Utilization	%
+Queue Length	Operasyon Sayısı
+Average Waiting Time	Dakika
+Resource Idle Time	Dakika
+Due Date Risk	%
+WIP Level	Adet
+Throughput	Ürün / Saat
+Chapter 7 – Root Cause Analysis
+
+Motor aşağıdaki nedenleri analiz eder.
+
+Kapasite yetersizliği
+Yanlış operatör ataması
+Dengesiz hat yükü
+Uzun setup süreleri
+Makine arızaları
+Bakım faaliyetleri
+Malzeme gecikmeleri
+Hatalı planlama
+Takvim kısıtları
+
+Bir darboğaz için birden fazla kök neden tanımlanabilir.
+
+Chapter 8 – Resolution Strategies
+
+Desteklenen çözüm stratejileri:
+
+Kod	Strateji
+RS-101	Alternative Machine Assignment
+RS-102	Operator Reassignment
+RS-103	Production Line Change
+RS-104	Shift Adjustment
+RS-105	Overtime Recommendation
+RS-106	Order Resequencing
+RS-107	Capacity Rebalancing
+RS-108	Incremental Rescheduling
+
+Motor, uygun stratejileri öncelik sırasına göre değerlendirir.
+
+Chapter 9 – Resolution Evaluation
+
+Her çözüm önerisi aşağıdaki kriterlere göre puanlanır.
+
+Teslim performansına etkisi
+Kapasite kullanımına etkisi
+Setup değişim maliyeti
+Operasyon sayısı değişikliği
+Plan kararlılığı
+Uygulanabilirlik
+Toplam optimizasyon skoru
+
+En yüksek puanlı çözüm önerisi Decision Engine'e aktarılır.
+
+Chapter 10 – Runtime Behaviour
+
+Motor aşağıdaki olaylarda otomatik çalıştırılır.
+
+Yeni plan oluşturulduğunda
+Yeniden planlama tamamlandığında
+Makine arızası oluştuğunda
+Operatör değiştiğinde
+Kapasite aşımı oluştuğunda
+Manuel analiz talebinde
+Belirlenen izleme periyotlarında
+Chapter 11 – Integration Points
+Modül	Amaç
+Scheduling Engine	Plan analizi
+Capacity Planning Engine	Kapasite verisi
+Line Balancing Engine	Hat dengesi
+Operator Assignment Engine	Operatör analizi
+Simulation Engine	Çözüm doğrulama
+Decision Engine	Karar puanlama
+Audit Service	Kayıt ve izlenebilirlik
+Chapter 12 – Performance Targets
+KPI	Hedef
+Darboğaz Tespiti	<500 ms
+Kök Neden Analizi	<1 sn
+Çözüm Üretimi	<2 sn
+Fabrika Analizi	<10 sn
+Yanlış Pozitif Oranı	≤%2
+Darboğaz Tespit Doğruluğu	≥%98
+Chapter 13 – Acceptance Criteria
+
+Bottleneck Resolution Engine tamamlanmış kabul edilmesi için:
+
+Darboğaz türleri tanımlanmış olmalıdır.
+Tespit kriterleri oluşturulmuş olmalıdır.
+Kök neden analizi desteklenmelidir.
+Çözüm stratejileri tanımlanmış olmalıdır.
+Çözüm puanlama mekanizması uygulanmalıdır.
+Scheduling Engine ve Capacity Planning Engine ile entegre çalışmalıdır.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009D – Bottleneck Resolution Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009D-1 – Bottleneck Detection Algorithms
+
+Bu belge, Bottleneck Resolution Engine'in kullandığı darboğaz tespit algoritmalarını, analiz yöntemlerini ve karar modellerini teknik düzeyde tanımlayacaktır.
+
+sıradaki 
+MARS APS
+DOC-009D-1
+Bottleneck Detection Algorithms
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Bottleneck Resolution Engine (BRE)
+Module: Bottleneck Detection Algorithms (BDA)
+Document Type: Technical Algorithm Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Bottleneck Resolution Engine tarafından kullanılan darboğaz tespit algoritmalarını tanımlar.
+
+Amaç;
+
+darboğazları doğru ve erken tespit etmek,
+üretim akışını sürekli izlemek,
+kapasite problemlerini belirlemek,
+Scheduling Engine'e karar desteği sağlamaktır.
+
+Bu modül yalnızca tespit (Detection) işlemini gerçekleştirir. Kök neden analizi ve çözüm önerileri sonraki modüller tarafından yürütülür.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+BDA-001	Capacity Monitoring
+BDA-002	Queue Analysis
+BDA-003	Throughput Analysis
+BDA-004	Waiting Time Analysis
+BDA-005	WIP Analysis
+BDA-006	Critical Resource Detection
+BDA-007	Bottleneck Scoring
+BDA-008	Detection Publication
+Chapter 3 – Detection Pipeline
+Production Data
+        │
+        ▼
+Resource Metrics Collector
+        │
+        ▼
+Detection Algorithms
+        │
+        ▼
+Bottleneck Scoring
+        │
+        ▼
+Threshold Evaluation
+        │
+        ▼
+Detected Bottlenecks
+Chapter 4 – Input Data
+
+Algoritmalar aşağıdaki verileri kullanır.
+
+Veri	Kaynak
+Production Schedule	Scheduling Engine
+Machine Status	MES
+Operator Status	Operator Assignment Engine
+Capacity Data	Capacity Planning Engine
+Queue Length	Sequencing Engine
+WIP Levels	MES
+Shift Calendar	Calendar Service
+Maintenance Schedule	Maintenance Service
+Chapter 5 – Detection Algorithms
+Kod	Algoritma
+ALG-201	Capacity Utilization Analysis
+ALG-202	Queue Length Analysis
+ALG-203	Waiting Time Analysis
+ALG-204	Throughput Analysis
+ALG-205	WIP Analysis
+ALG-206	Critical Path Analysis
+ALG-207	Composite Bottleneck Score
+Chapter 6 – Capacity Utilization Analysis (ALG-201)
+Objective
+
+Kaynak kullanım oranlarını analiz ederek darboğazları belirlemek.
+
+Hesaplanan Metrikler
+Theoretical Capacity
+Available Capacity
+Planned Capacity
+Utilization Rate
+Değerlendirme
+Kullanım Oranı	Durum
+<70%	Normal
+70–85%	İzleme
+85–95%	Risk
+>95%	Darboğaz
+Chapter 7 – Queue Length Analysis (ALG-202)
+Objective
+
+Kaynak önünde biriken operasyon kuyruklarını analiz etmek.
+
+Ölçülen Değerler
+Bekleyen operasyon sayısı
+Ortalama kuyruk uzunluğu
+Maksimum kuyruk uzunluğu
+Kuyruk büyüme hızı
+
+Uzun süre yüksek kalan kuyruklar darboğaz göstergesi olarak değerlendirilir.
+
+Chapter 8 – Waiting Time Analysis (ALG-203)
+Objective
+
+Operasyonların kaynak bekleme sürelerini analiz etmek.
+
+Ölçülen Metrikler
+Ortalama bekleme süresi
+Maksimum bekleme süresi
+Bekleme varyansı
+Toplam bekleme süresi
+
+Yüksek bekleme süreleri darboğaz puanını artırır.
+
+Chapter 9 – Throughput Analysis (ALG-204)
+Objective
+
+Kaynakların üretim hızını değerlendirmek.
+
+Ölçülen Metrikler
+Saatlik üretim
+Günlük üretim
+Planlanan üretim
+Gerçekleşen üretim
+Throughput sapması
+
+Planlanan üretim hızının sürekli altında kalan kaynaklar analiz edilir.
+
+Chapter 10 – WIP Analysis (ALG-205)
+Objective
+
+Hatlar arasında oluşan yarı mamul birikimini analiz etmek.
+
+Ölçülen Metrikler
+WIP miktarı
+Ortalama WIP
+Kritik WIP seviyesi
+WIP büyüme eğilimi
+
+Artan WIP, akış problemlerinin erken göstergesi olarak değerlendirilir.
+
+Chapter 11 – Critical Path Analysis (ALG-206)
+Objective
+
+Üretim akışındaki kritik operasyonları belirlemek.
+
+Analiz edilen kriterler:
+
+Operasyon bağımlılıkları
+Kritik kaynaklar
+Gecikme etkisi
+Toplam çevrim süresi
+
+Kritik yol üzerindeki darboğazlar daha yüksek öncelikle raporlanır.
+
+Chapter 12 – Composite Bottleneck Score (ALG-207)
+
+Her kaynak için birleşik bir darboğaz puanı hesaplanır.
+
+Değerlendirilen bileşenler:
+
+Kapasite kullanım oranı
+Kuyruk uzunluğu
+Bekleme süresi
+Throughput sapması
+WIP seviyesi
+Teslim tarihi riski
+
+Sonuç olarak her kaynak için 0–100 aralığında bir Bottleneck Score üretilir.
+
+Chapter 13 – Threshold Evaluation
+Skor	Durum
+0–39	Normal
+40–59	İzlenmeli
+60–79	Risk
+80–100	Kritik Darboğaz
+
+Eşik değerleri sistem konfigürasyonu üzerinden değiştirilebilir.
+
+Chapter 14 – Integration Points
+Modül	Amaç
+Scheduling Engine	Üretim planı
+Capacity Planning Engine	Kapasite verisi
+Sequencing Engine	Kuyruk bilgisi
+Simulation Engine	Senaryo doğrulama
+Decision Engine	Karar desteği
+Audit Service	Analiz kayıtları
+Chapter 15 – Performance Targets
+KPI	Hedef
+Tek Kaynak Analizi	<20 ms
+Hat Analizi	<200 ms
+Fabrika Analizi	<2 sn
+Composite Score Hesabı	<500 ms
+Darboğaz Tespit Doğruluğu	≥98%
+Yanlış Pozitif Oranı	≤2%
+Chapter 16 – Acceptance Criteria
+
+Bottleneck Detection Algorithms modülü tamamlanmış kabul edilmesi için:
+
+Tüm tespit algoritmaları tanımlanmış olmalıdır.
+Composite Bottleneck Score hesaplanmalıdır.
+Eşik değerlendirme mekanizması uygulanmalıdır.
+Performans hedefleri karşılanmalıdır.
+Scheduling Engine ve Capacity Planning Engine ile tam entegre çalışmalıdır.
+Document Status
+
+DOC-009D-1 – Bottleneck Detection Algorithms
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009D-2 – Root Cause Analysis Engine
+
+Bu belge, tespit edilen darboğazların temel nedenlerini analiz eden, çoklu sebep ilişkilerini değerlendiren ve çözüm stratejilerinin temelini oluşturan analiz motorunu tanımlayacaktır.
+DOC-009D-2
+Root Cause Analysis Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Bottleneck Resolution Engine (BRE)
+Module: Root Cause Analysis Engine (RCAE)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Root Cause Analysis Engine (RCAE), Bottleneck Detection Algorithms tarafından tespit edilen darboğazların temel nedenlerini analiz eden alt motordur.
+
+Amaç;
+
+gerçek darboğaz nedenini belirlemek,
+semptom ile kök nedeni ayırmak,
+çoklu neden ilişkilerini analiz etmek,
+doğru çözüm stratejisinin seçilmesini sağlamaktır.
+
+Bu modül çözüm üretmez; yalnızca darboğazın nedenlerini belirleyerek Resolution Strategy Engine'e veri sağlar.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+RCA-001	Root Cause Identification
+RCA-002	Multi-Cause Analysis
+RCA-003	Dependency Analysis
+RCA-004	Impact Assessment
+RCA-005	Cause Ranking
+RCA-006	Confidence Scoring
+RCA-007	Root Cause Publication
+RCA-008	Analysis Logging
+Chapter 3 – Engine Architecture
+Detected Bottleneck
+        │
+        ▼
+Data Collector
+        │
+        ▼
+Cause Analyzer
+        │
+        ▼
+Dependency Evaluator
+        │
+        ▼
+Cause Ranking
+        │
+        ▼
+Confidence Scoring
+        │
+        ▼
+Resolution Strategy Engine
+Chapter 4 – Input Data
+
+Root Cause Analysis Engine aşağıdaki veri kaynaklarını kullanır.
+
+Veri	Kaynak
+Bottleneck Score	DOC-009D-1
+Production Schedule	Scheduling Engine
+Resource Calendar	Calendar Service
+Machine Status	MES
+Operator Status	HR / MES
+Maintenance Plan	Maintenance Service
+Material Availability	ERP / WMS
+Historical Events	Audit Service
+Chapter 5 – Root Cause Categories
+Kod	Kategori
+RC-101	Capacity Constraint
+RC-102	Machine Failure
+RC-103	Operator Constraint
+RC-104	Material Shortage
+RC-105	Tool Unavailability
+RC-106	Setup Duration
+RC-107	Routing Design
+RC-108	Scheduling Policy
+RC-109	Calendar Restriction
+RC-110	External Dependency
+Chapter 6 – Cause Identification Rules
+
+Her darboğaz aşağıdaki analizlerden geçirilir.
+
+Capacity Analysis
+Kapasite yeterli mi?
+Fazla yük var mı?
+Resource Analysis
+Alternatif kaynak mevcut mu?
+Kaynak kullanılabilir durumda mı?
+Schedule Analysis
+Plan sıralaması doğru mu?
+Gereksiz beklemeler oluşuyor mu?
+Material Analysis
+Malzeme eksikliği var mı?
+Malzeme gecikmesi darboğaza neden oluyor mu?
+Calendar Analysis
+Vardiya veya takvim kısıtları etkili mi?
+Chapter 7 – Multi-Cause Analysis
+
+Bir darboğaz birden fazla kök nedene sahip olabilir.
+
+Örnek:
+
+Neden	Etki
+Makine kapasitesi	%45
+Uzun setup süresi	%30
+Operatör eksikliği	%15
+Malzeme gecikmesi	%10
+
+Toplam etki oranı %100 olacak şekilde normalize edilir.
+
+Chapter 8 – Dependency Analysis
+
+Motor aşağıdaki bağımlılıkları değerlendirir.
+
+Makine → Operatör
+Operatör → Vardiya
+Operasyon → Malzeme
+Operasyon → Aparat
+Hat → İş Merkezi
+Sipariş → Önceki Operasyon
+
+Bağımlılıklar çözüm önerilerinin doğruluğunu artırmak için kullanılır.
+
+Chapter 9 – Cause Ranking
+
+Her kök neden aşağıdaki kriterlere göre sıralanır.
+
+Etki oranı
+Tekrarlanma sıklığı
+Kritik kaynak üzerindeki etkisi
+Teslim tarihi riski
+Üretim kaybı
+
+En yüksek puanlı neden "Primary Root Cause" olarak işaretlenir.
+
+Chapter 10 – Confidence Scoring
+
+Her analiz sonucu için güven skoru hesaplanır.
+
+Skor	Güven Seviyesi
+90–100	Çok Yüksek
+75–89	Yüksek
+60–74	Orta
+40–59	Düşük
+<40	Belirsiz
+
+Düşük güven skorlarında birden fazla çözüm stratejisi önerilebilir.
+
+Chapter 11 – Output Model
+
+Her analiz aşağıdaki çıktıyı üretir.
+
+Alan	Açıklama
+Bottleneck ID	Darboğaz kimliği
+Primary Root Cause	Ana neden
+Secondary Causes	İkincil nedenler
+Cause Ranking	Öncelik sıralaması
+Impact Score	Etki puanı
+Confidence Score	Güven puanı
+Analysis Timestamp	Analiz zamanı
+Chapter 12 – Runtime Behaviour
+
+Motor aşağıdaki durumlarda çalıştırılır.
+
+Yeni darboğaz tespit edildiğinde
+Darboğaz puanı değiştiğinde
+Yeniden planlama sonrasında
+Kapasite değişikliğinde
+Manuel analiz talebinde
+
+Yalnızca ilgili darboğaz için analiz gerçekleştirilir.
+
+Chapter 13 – Integration Points
+Modül	Amaç
+Bottleneck Detection Algorithms	Girdi
+Scheduling Engine	Plan bilgisi
+Capacity Planning Engine	Kapasite analizi
+Operator Assignment Engine	Operatör durumu
+Simulation Engine	Senaryo doğrulama
+Resolution Strategy Engine	Çözüm üretimi
+Audit Service	Analiz kayıtları
+Chapter 14 – Performance Targets
+KPI	Hedef
+Tek Darboğaz Analizi	<100 ms
+Fabrika Analizi	<3 sn
+Çoklu Neden Analizi	<500 ms
+Güven Skoru Hesabı	<100 ms
+Doğru Kök Neden Oranı	≥95%
+Chapter 15 – Acceptance Criteria
+
+Root Cause Analysis Engine tamamlanmış kabul edilmesi için:
+
+Kök neden kategorileri tanımlanmış olmalıdır.
+Çoklu neden analizi desteklenmelidir.
+Bağımlılık analizi uygulanmalıdır.
+Neden sıralama algoritması oluşturulmalıdır.
+Güven skoru hesaplanmalıdır.
+Resolution Strategy Engine ile tam entegre çalışmalıdır.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009D-2 – Root Cause Analysis Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009D-3
+Resolution Strategy Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Bottleneck Resolution Engine (BRE)
+Module: Resolution Strategy Engine (RSE)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Resolution Strategy Engine (RSE), Root Cause Analysis Engine tarafından belirlenen kök nedenlere göre uygulanabilir çözüm stratejileri üreten alt motordur.
+
+Motorun amacı;
+
+darboğazı ortadan kaldıracak alternatif aksiyonları üretmek,
+her çözümün üretim planına etkisini değerlendirmek,
+uygulanabilir çözümleri önceliklendirmek,
+Decision Engine'e karar alternatifleri sağlamaktır.
+
+Bu modül doğrudan üretim planını değiştirmez. Üretilen stratejiler Decision Engine tarafından değerlendirilir ve onaylanan stratejiler Scheduling Engine veya ilgili modüllere uygulanır.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+RSE-001	Strategy Generation
+RSE-002	Alternative Evaluation
+RSE-003	Feasibility Analysis
+RSE-004	Strategy Ranking
+RSE-005	Impact Estimation
+RSE-006	Risk Assessment
+RSE-007	Recommendation Publication
+RSE-008	Strategy Logging
+Chapter 3 – Engine Architecture
+Root Cause Analysis
+        │
+        ▼
+Strategy Generator
+        │
+        ▼
+Feasibility Analyzer
+        │
+        ▼
+Impact Estimator
+        │
+        ▼
+Strategy Ranking
+        │
+        ▼
+Decision Engine
+Chapter 4 – Input Data
+
+Resolution Strategy Engine aşağıdaki girdileri kullanır.
+
+Veri	Kaynak
+Root Cause Analysis	DOC-009D-2
+Production Schedule	Scheduling Engine
+Capacity Information	Capacity Planning Engine
+Resource Availability	MES / ERP
+Line Balance	Line Balancing Engine
+Operator Assignment	Operator Assignment Engine
+Business Rules	Rule Engine
+Optimization Objectives	Objective Library
+Chapter 5 – Strategy Categories
+Kod	Strateji
+STR-101	Alternative Machine Assignment
+STR-102	Operator Reassignment
+STR-103	Production Line Change
+STR-104	Shift Optimization
+STR-105	Overtime Planning
+STR-106	Order Resequencing
+STR-107	Capacity Rebalancing
+STR-108	Partial Rescheduling
+STR-109	Full Rescheduling
+STR-110	Manual Intervention Required
+Chapter 6 – Strategy Generation Rules
+
+Her kök neden için uygun stratejiler oluşturulur.
+
+Kök Neden	Varsayılan Strateji
+Makine kapasitesi	Alternative Machine Assignment
+Operatör eksikliği	Operator Reassignment
+Uzun setup süresi	Order Resequencing
+Hat dengesizliği	Capacity Rebalancing
+Takvim kısıtı	Shift Optimization
+Malzeme gecikmesi	Partial Rescheduling
+Makine arızası	Alternative Machine + Partial Rescheduling
+
+Bir kök neden için birden fazla strateji üretilebilir.
+
+Chapter 7 – Feasibility Analysis
+
+Her strateji uygulanmadan önce aşağıdaki kriterlere göre değerlendirilir.
+
+Alternatif kaynak mevcut mu?
+Hard Constraint ihlali oluşuyor mu?
+Operatör yeterliliği uygun mu?
+Takvim uygun mu?
+Kapasite yeterli mi?
+Gerekli ekipman mevcut mu?
+
+Başarısız stratejiler elenir.
+
+Chapter 8 – Impact Estimation
+
+Her çözüm önerisinin üretim planına etkisi hesaplanır.
+
+Değerlendirilen metrikler:
+
+Makespan değişimi
+Tardiness değişimi
+OTD etkisi
+Kaynak kullanım oranı
+Setup süresi değişimi
+Plan kararlılığı
+Toplam operasyon değişikliği
+
+Bu analiz simülasyon verileri kullanılarak gerçekleştirilir.
+
+Chapter 9 – Strategy Ranking
+
+Çözüm stratejileri aşağıdaki kriterlere göre puanlanır.
+
+Kriter	Açıklama
+Feasibility Score	Uygulanabilirlik
+Impact Score	Üretim planına etkisi
+Risk Score	Operasyonel risk
+Stability Score	Plan kararlılığı
+Optimization Score	Toplam optimizasyon katkısı
+
+En yüksek puanlı strateji önerilen çözüm olarak işaretlenir.
+
+Chapter 10 – Risk Assessment
+
+Her çözüm için risk seviyesi hesaplanır.
+
+Risk	Açıklama
+Low	Plan üzerinde düşük etki
+Medium	Sınırlı değişiklik
+High	Geniş kapsamlı değişiklik
+Critical	Tam yeniden planlama gerektirir
+
+Risk seviyesi Decision Engine tarafından değerlendirilir.
+
+Chapter 11 – Recommendation Model
+
+Her öneri aşağıdaki yapıda oluşturulur.
+
+Alan	Açıklama
+Recommendation ID	Öneri kimliği
+Strategy Type	Strateji türü
+Root Cause	İlgili kök neden
+Expected Improvement	Beklenen iyileşme
+Risk Level	Risk seviyesi
+Confidence Score	Güven puanı
+Estimated Runtime	Tahmini uygulama süresi
+Chapter 12 – Runtime Behaviour
+
+Motor aşağıdaki durumlarda çalıştırılır.
+
+Yeni kök neden analizi tamamlandığında
+Darboğaz puanı kritik seviyeye ulaştığında
+Manuel çözüm talebinde
+Yeniden planlama öncesinde
+Simülasyon senaryosu oluşturulurken
+
+Her olay için yalnızca ilgili darboğaz değerlendirilir.
+
+Chapter 13 – Integration Points
+Modül	Amaç
+Root Cause Analysis Engine	Girdi
+Decision Engine	Strateji değerlendirme
+Scheduling Engine	Plan güncelleme
+Simulation Engine	Etki analizi
+Capacity Planning Engine	Kapasite doğrulama
+Operator Assignment Engine	Operatör doğrulama
+Audit Service	Kayıt ve izlenebilirlik
+Chapter 14 – Performance Targets
+KPI	Hedef
+Tek Strateji Üretimi	<100 ms
+Çoklu Strateji Analizi	<500 ms
+Etki Hesaplama	<1 sn
+Strateji Sıralama	<100 ms
+Fabrika Analizi	<5 sn
+Doğru Strateji Önerisi	≥95%
+Chapter 15 – Acceptance Criteria
+
+Resolution Strategy Engine tamamlanmış kabul edilmesi için:
+
+Çözüm stratejileri tanımlanmış olmalıdır.
+Kök neden–strateji eşleştirmesi uygulanmalıdır.
+Uygulanabilirlik analizi desteklenmelidir.
+Etki tahmini gerçekleştirilebilmelidir.
+Risk değerlendirmesi yapılmalıdır.
+Strateji sıralama algoritması uygulanmalıdır.
+Decision Engine ile tam entegre çalışmalıdır.
+Document Status
+
+DOC-009D-3 – Resolution Strategy Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+OC-009D-4
+Simulation-Based Resolution Validation
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Bottleneck Resolution Engine (BRE)
+Module: Simulation-Based Resolution Validation (SRV)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Simulation-Based Resolution Validation (SRV), Resolution Strategy Engine tarafından üretilen çözüm önerilerini gerçek üretim planına uygulamadan önce sanal ortamda doğrulayan alt motordur.
+
+Amaç;
+
+önerilen stratejilerin etkisini simüle etmek,
+beklenen performans kazanımlarını ölçmek,
+olası riskleri önceden belirlemek,
+en yüksek faydayı sağlayan çözümü Decision Engine'e sunmaktır.
+
+SRV, üretim verisini değiştirmez; yalnızca doğrulama ve karşılaştırma işlemlerini gerçekleştirir.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+SRV-001	Simulation Scenario Generation
+SRV-002	Strategy Execution Simulation
+SRV-003	Performance Comparison
+SRV-004	Risk Validation
+SRV-005	Constraint Verification
+SRV-006	Result Scoring
+SRV-007	Best Strategy Selection
+SRV-008	Validation Publication
+Chapter 3 – Engine Architecture
+Resolution Strategy Engine
+            │
+            ▼
+Scenario Generator
+            │
+            ▼
+Simulation Engine
+            │
+            ▼
+Result Analyzer
+            │
+            ▼
+Score Calculator
+            │
+            ▼
+Decision Engine
+Chapter 4 – Input Data
+
+Simulation doğrulaması aşağıdaki verileri kullanır.
+
+Veri	Kaynak
+Current Schedule	Scheduling Engine
+Resolution Strategies	DOC-009D-3
+Capacity Data	Capacity Planning Engine
+Resource Status	MES
+Calendar	Calendar Service
+Constraint Library	Constraint Library
+Objective Library	Objective Library
+Chapter 5 – Simulation Scenarios
+
+Desteklenen senaryolar:
+
+Kod	Senaryo
+SIM-101	Alternative Machine
+SIM-102	Alternative Operator
+SIM-103	Order Resequencing
+SIM-104	Capacity Rebalancing
+SIM-105	Shift Optimization
+SIM-106	Partial Rescheduling
+SIM-107	Full Rescheduling
+SIM-108	Combined Strategy
+
+Her öneri bağımsız olarak simüle edilir.
+
+Chapter 6 – Simulation Process
+
+Her çözüm önerisi aşağıdaki süreçten geçer.
+
+Mevcut plan kopyalanır.
+Çözüm önerisi plana uygulanır.
+Scheduling Engine yeniden çalıştırılır.
+Constraint kontrolleri yapılır.
+KPI değerleri hesaplanır.
+Sonuçlar mevcut plan ile karşılaştırılır.
+
+Gerçek üretim planı bu süreçten etkilenmez.
+
+Chapter 7 – Validation Metrics
+
+Simülasyon sonunda aşağıdaki göstergeler hesaplanır.
+
+KPI	Açıklama
+Makespan	Toplam tamamlanma süresi
+Tardiness	Toplam gecikme
+OTD	Zamanında teslim oranı
+Resource Utilization	Kaynak kullanım oranı
+Queue Length	Ortalama kuyruk
+Setup Time	Toplam setup süresi
+WIP	Yarı mamul miktarı
+Schedule Stability	Plan kararlılığı
+Chapter 8 – Constraint Verification
+
+Her simülasyon sonucu aşağıdaki kontrollerden geçirilir.
+
+Hard Constraint ihlali
+Soft Constraint ihlali
+Kaynak çakışması
+Takvim uyumluluğu
+Operatör yeterliliği
+Kapasite uygunluğu
+Rota bütünlüğü
+
+Hard Constraint ihlali bulunan stratejiler geçersiz kabul edilir.
+
+Chapter 9 – Strategy Comparison
+
+Her strateji mevcut plan ile karşılaştırılır.
+
+Karşılaştırma	Ölçüt
+Makespan Değişimi	%
+Gecikme Azalması	%
+Kapasite Kullanımı	%
+Setup Azalması	%
+OTD İyileşmesi	%
+Plan Değişiklik Sayısı	Adet
+Chapter 10 – Result Scoring
+
+Her simülasyon sonucuna birleşik bir doğrulama puanı atanır.
+
+Değerlendirilen kriterler:
+
+Performans iyileşmesi
+Risk seviyesi
+Constraint uyumluluğu
+Plan kararlılığı
+Hesaplama maliyeti
+Uygulanabilirlik
+
+Sonuç 0–100 arasında bir Validation Score olarak hesaplanır.
+
+Chapter 11 – Best Strategy Selection
+
+En uygun çözüm aşağıdaki önceliklere göre belirlenir.
+
+Hard Constraint ihlali olmamalıdır.
+En yüksek Validation Score seçilir.
+Eşit puan durumunda en yüksek Schedule Stability tercih edilir.
+Hâlâ eşitlik varsa daha düşük operasyon değişikliği yapan çözüm seçilir.
+Son aşamada daha kısa hesaplama süresine sahip çözüm tercih edilir.
+Chapter 12 – Output Model
+Alan	Açıklama
+Simulation ID	Simülasyon kimliği
+Strategy ID	Strateji kimliği
+Validation Score	Doğrulama puanı
+Improvement Score	İyileşme puanı
+Risk Score	Risk puanı
+Constraint Status	Uygunluk durumu
+Recommendation	Kabul / Reddet
+Chapter 13 – Integration Points
+Modül	Amaç
+Resolution Strategy Engine	Çözüm önerileri
+Scheduling Engine	Plan simülasyonu
+Capacity Planning Engine	Kapasite doğrulaması
+Decision Engine	Nihai karar
+Audit Service	Simülasyon kayıtları
+Simulation Engine	Senaryo çalıştırma
+Chapter 14 – Performance Targets
+KPI	Hedef
+Tek Senaryo Simülasyonu	<2 sn
+10 Strateji Karşılaştırması	<15 sn
+Sonuç Analizi	<500 ms
+Validation Score Hesabı	<100 ms
+Geçersiz Strateji Tespiti	%100
+Simülasyon Doğruluğu	≥99%
+Chapter 15 – Acceptance Criteria
+
+Simulation-Based Resolution Validation modülü tamamlanmış kabul edilmesi için:
+
+Simülasyon senaryoları tanımlanmış olmalıdır.
+Strateji doğrulama süreci oluşturulmuş olmalıdır.
+KPI karşılaştırmaları yapılabilmelidir.
+Constraint doğrulama mekanizması uygulanmalıdır.
+Validation Score hesaplanmalıdır.
+En iyi strateji otomatik seçilebilmelidir.
+Decision Engine ile tam entegre çalışmalıdır.
+Document Status
+
+DOC-009D-4 – Simulation-Based Resolution Validation
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009D-5
+Bottleneck Resolution Engine Final Technical Specification
+
+Version: 1.0
+Status: Final
+Engine: Bottleneck Resolution Engine (BRE)
+Document Type: Final Technical Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Bottleneck Resolution Engine (BRE) için hazırlanan tüm teknik dokümanların konsolide edilmiş nihai teknik referansıdır.
+
+Amaçları;
+
+BRE mimarisini tek dokümanda toplamak,
+alt modüller arasındaki veri akışını tanımlamak,
+geliştirme ekibi için resmi referans oluşturmak,
+test, bakım ve sürüm yönetimi süreçlerinde kullanılacak teknik standardı belirlemektir.
+
+Bu belge yeni mimari tanımlamaz; DOC-009D serisindeki teknik kararların son sürümüdür.
+
+Chapter 2 – Engine Overview
+
+Bottleneck Resolution Engine, MARS APS içerisinde üretim darboğazlarını sürekli izleyen, analiz eden ve çözüm önerileri oluşturan uzman optimizasyon motorudur.
+
+Temel görevleri:
+
+Darboğaz tespiti
+Kök neden analizi
+Çözüm stratejisi üretimi
+Simülasyon doğrulaması
+Karar desteği sağlama
+Sürekli performans izleme
+
+BRE, Scheduling Engine ve Decision Engine arasında karar destek katmanı olarak çalışır.
+
+Chapter 3 – Engine Architecture
+                    Bottleneck Resolution Engine
+                                   │
+     ┌───────────────────────────────────────────────────────┐
+     │                                                       │
+     │  Bottleneck Detection Algorithms                      │
+     │  Root Cause Analysis Engine                           │
+     │  Resolution Strategy Engine                           │
+     │  Simulation-Based Resolution Validation               │
+     │                                                       │
+     └───────────────────────────────────────────────────────┘
+Chapter 4 – Module Structure
+Kod	Modül	Doküman
+BRE	Bottleneck Resolution Engine	DOC-009D
+BRE-BDA	Bottleneck Detection Algorithms	DOC-009D-1
+BRE-RCA	Root Cause Analysis Engine	DOC-009D-2
+BRE-RSE	Resolution Strategy Engine	DOC-009D-3
+BRE-SRV	Simulation-Based Resolution Validation	DOC-009D-4
+Chapter 5 – End-to-End Workflow
+Production Schedule
+        │
+        ▼
+Bottleneck Detection
+        │
+        ▼
+Root Cause Analysis
+        │
+        ▼
+Resolution Strategy Generation
+        │
+        ▼
+Simulation Validation
+        │
+        ▼
+Decision Engine
+        │
+        ▼
+Scheduling Engine
+Chapter 6 – Functional Workflow
+Üretim planı analiz edilir.
+Darboğazlar tespit edilir.
+Darboğazların kök nedenleri belirlenir.
+Her kök neden için alternatif çözüm stratejileri oluşturulur.
+Stratejiler simülasyon ortamında doğrulanır.
+En uygun çözüm Decision Engine'e gönderilir.
+Onaylanan çözüm Scheduling Engine tarafından uygulanır.
+Chapter 7 – Core Components
+Bileşen	Görev
+Detection Layer	Darboğaz tespiti
+Analysis Layer	Kök neden analizi
+Strategy Layer	Çözüm üretimi
+Simulation Layer	Strateji doğrulama
+Decision Interface	Karar aktarımı
+Audit Layer	İzlenebilirlik
+Chapter 8 – Data Flow
+MES / ERP / Scheduling Engine
+              │
+              ▼
+ Bottleneck Resolution Engine
+              │
+              ▼
+Detection
+      │
+      ▼
+Root Cause
+      │
+      ▼
+Resolution
+      │
+      ▼
+Simulation
+      │
+      ▼
+Decision Engine
+Chapter 9 – External Integrations
+Sistem	Amaç
+Scheduling Engine	Üretim planı
+Capacity Planning Engine	Kapasite verileri
+Line Balancing Engine	Hat yükleri
+Operator Assignment Engine	Operatör bilgileri
+Decision Engine	Nihai karar
+Simulation Engine	Senaryo çalıştırma
+ERP	Sipariş bilgileri
+MES	Gerçek zamanlı üretim verileri
+WMS	Malzeme durumu
+Audit Service	Kayıt ve izlenebilirlik
+Chapter 10 – Non-Functional Requirements
+Özellik	Hedef
+Availability	≥99.9%
+Scalability	Yatay ölçeklenebilir
+Reliability	Yüksek
+Maintainability	Modüler yapı
+Explainability	Her karar açıklanabilir
+Auditability	Tam izlenebilirlik
+Extensibility	Yeni analiz algoritmaları eklenebilir
+Security	Rol tabanlı erişim desteği
+Chapter 11 – Performance Targets
+KPI	Hedef
+Darboğaz Tespiti	<500 ms
+Kök Neden Analizi	<1 sn
+Strateji Üretimi	<1 sn
+Simülasyon Doğrulaması	<2 sn
+Fabrika Genel Analizi	<10 sn
+Darboğaz Doğruluğu	≥98%
+Kök Neden Doğruluğu	≥95%
+Geçersiz Strateji Yakalama	%100
+Chapter 12 – Dependencies
+Modül	Durum
+Scheduling Engine	Zorunlu
+Capacity Planning Engine	Zorunlu
+Line Balancing Engine	Zorunlu
+Operator Assignment Engine	Zorunlu
+Decision Engine	Zorunlu
+Simulation Engine	Zorunlu
+Constraint Library	Zorunlu
+Objective Library	Zorunlu
+Audit Service	Zorunlu
+Chapter 13 – Development Deliverables
+Çıktı	Açıklama
+Detection Service	Darboğaz tespit servisi
+Root Cause Service	Kök neden analiz servisi
+Resolution Service	Çözüm stratejisi servisi
+Validation Service	Simülasyon doğrulama servisi
+REST API	Servis arayüzleri
+Event Handlers	Olay işleyicileri
+Unit Tests	Birim testleri
+Integration Tests	Entegrasyon testleri
+Technical Documentation	Teknik dokümantasyon
+Chapter 14 – Acceptance Criteria
+
+Bottleneck Resolution Engine aşağıdaki şartlar sağlandığında tamamlanmış kabul edilir.
+
+Darboğaz tespit algoritmaları uygulanmış olmalıdır.
+Kök neden analizi çalışmalıdır.
+Çözüm stratejileri üretilebilmelidir.
+Simülasyon doğrulaması tamamlanmalıdır.
+Decision Engine entegrasyonu sağlanmalıdır.
+Performans hedefleri karşılanmalıdır.
+Tüm modüller entegrasyon testlerinden geçmiş olmalıdır.
+Teknik dokümantasyon tamamlanmış olmalıdır.
+Chapter 15 – Document References
+Doküman	Açıklama
+DOC-009D	Bottleneck Resolution Engine
+DOC-009D-1	Bottleneck Detection Algorithms
+DOC-009D-2	Root Cause Analysis Engine
+DOC-009D-3	Resolution Strategy Engine
+DOC-009D-4	Simulation-Based Resolution Validation
+Document Status
+
+DOC-009D-5 – Bottleneck Resolution Engine Final Technical Specification
+
+Status: ✅ Completed
+Architecture Status: Final
+Implementation Status: Ready for Development
+DOC-009D Serisi Tamamlandı ✅
+
+Bu belge ile Bottleneck Resolution Engine için planlanan tüm alt dokümanlar tamamlanmıştır.
+
+Tamamlanan seri:
+
+✅ DOC-009D – Bottleneck Resolution Engine
+✅ DOC-009D-1 – Bottleneck Detection Algorithms
+✅ DOC-009D-2 – Root Cause Analysis Engine
+✅ DOC-009D-3 – Resolution Strategy Engine
+✅ DOC-009D-4 – Simulation-Based Resolution Validation
+✅ DOC-009D-5 – Final Technical Specification
+Next Document (Master Plan)
+
+Plana göre sıradaki ana doküman:
+
+DOC-009E – Simulation Engine
+
+Bu doküman, MARS APS'in dijital ikiz (Digital Twin) yaklaşımıyla çalışan simülasyon motorunun ana mimarisini tanımlayacaktır. Simulation Engine; "What-if" analizleri, senaryo üretimi, KPI tahminleri ve optimizasyon sonuçlarının doğrulanması için kullanılacak merkezi simülasyon altyapısını oluşturacaktır. Bu seri de önceki motorlarda olduğu gibi ana doküman ve alt teknik dokümanlardan oluşacaktır.
+
