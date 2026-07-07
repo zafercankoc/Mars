@@ -1,0 +1,1489 @@
+DOC-009E
+Simulation Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Simulation Engine (SME)
+Document Type: Core Engine Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Simulation Engine (SME), MARS APS içerisinde üretim planlarının, optimizasyon sonuçlarının ve alternatif senaryoların gerçek üretim ortamını etkilemeden sanal olarak değerlendirilmesini sağlayan simülasyon motorudur.
+
+Motorun amacı;
+
+üretim planlarını doğrulamak,
+alternatif senaryoları karşılaştırmak,
+karar kalitesini artırmak,
+KPI tahminleri üretmek,
+Decision Engine'e güvenilir analiz sonuçları sağlamaktır.
+
+Simulation Engine üretim verisini değiştirmez; yalnızca sanal kopyalar (Simulation Snapshot) üzerinde çalışır.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+SME-001	Simulation Scenario Management
+SME-002	Digital Twin Execution
+SME-003	What-if Analysis
+SME-004	KPI Prediction
+SME-005	Strategy Comparison
+SME-006	Constraint Validation
+SME-007	Simulation Reporting
+SME-008	Result Publication
+Chapter 3 – Engine Architecture
+Production Snapshot
+        │
+        ▼
+Scenario Builder
+        │
+        ▼
+Digital Twin Model
+        │
+        ▼
+Simulation Executor
+        │
+        ▼
+KPI Calculator
+        │
+        ▼
+Decision Engine
+Chapter 4 – Simulation Scope
+
+Simulation Engine aşağıdaki alanlarda simülasyon gerçekleştirebilir.
+
+Alan	Açıklama
+Production Schedule	Üretim planı
+Capacity Planning	Kapasite
+Line Balancing	Hat dengesi
+Operator Assignment	Operatör dağılımı
+Material Flow	Malzeme akışı
+Machine Availability	Makine durumu
+Shift Calendar	Vardiya planı
+Resource Utilization	Kaynak kullanımı
+Chapter 5 – Supported Simulation Types
+Kod	Simülasyon
+SIM-001	What-if Analysis
+SIM-002	Capacity Simulation
+SIM-003	Resource Simulation
+SIM-004	Schedule Simulation
+SIM-005	Shift Simulation
+SIM-006	Material Simulation
+SIM-007	Bottleneck Simulation
+SIM-008	Full Factory Simulation
+Chapter 6 – Simulation Inputs
+
+Simulation Engine aşağıdaki girdileri kullanır.
+
+Veri	Kaynak
+Production Orders	ERP
+Production Schedule	Scheduling Engine
+Capacity Data	Capacity Planning Engine
+Operator Assignments	Operator Assignment Engine
+Line Balance	Line Balancing Engine
+Machine Status	MES
+Calendar	Calendar Service
+Business Rules	Rule Engine
+Chapter 7 – Simulation Outputs
+
+Her simülasyon aşağıdaki çıktıları üretir.
+
+Tahmini Makespan
+Tahmini OTD
+Tahmini Tardiness
+Kapasite Kullanımı
+Kaynak Kullanım Oranı
+Bekleme Süresi
+Ortalama WIP
+Darboğaz Noktaları
+Plan Kararlılığı
+KPI Karşılaştırmaları
+Chapter 8 – Simulation Lifecycle
+Create Snapshot
+        │
+        ▼
+Generate Scenario
+        │
+        ▼
+Execute Simulation
+        │
+        ▼
+Validate Constraints
+        │
+        ▼
+Calculate KPIs
+        │
+        ▼
+Publish Results
+Chapter 9 – Scenario Management
+
+Her simülasyon bağımsız bir senaryo olarak saklanır.
+
+Alan	Açıklama
+Scenario ID	Benzersiz kimlik
+Parent Scenario	Üst senaryo
+Description	Açıklama
+Created By	Sistem / Kullanıcı
+Timestamp	Oluşturulma zamanı
+Simulation Status	Durum
+Chapter 10 – Runtime Behaviour
+
+Simulation Engine aşağıdaki durumlarda çalıştırılır.
+
+Manuel simülasyon talebi
+What-if analizi
+Bottleneck Resolution doğrulaması
+Decision Engine değerlendirmesi
+Scheduling Engine doğrulaması
+Performans analizi
+
+Gerçek üretim planı hiçbir zaman doğrudan değiştirilmez.
+
+Chapter 11 – Integration Points
+Modül	Amaç
+Scheduling Engine	Üretim planı
+Line Balancing Engine	Hat dengesi
+Capacity Planning Engine	Kapasite
+Operator Assignment Engine	Operatör bilgisi
+Bottleneck Resolution Engine	Çözüm doğrulama
+Decision Engine	Karar desteği
+ERP	Sipariş bilgileri
+MES	Gerçek zamanlı üretim verileri
+Chapter 12 – Performance Targets
+KPI	Hedef
+Senaryo Oluşturma	<500 ms
+Tek Senaryo Simülasyonu	<2 sn
+Fabrika Simülasyonu	<30 sn
+KPI Hesaplama	<500 ms
+Sonuç Yayınlama	<200 ms
+Chapter 13 – Acceptance Criteria
+
+Simulation Engine tamamlanmış kabul edilmesi için:
+
+Simülasyon türleri tanımlanmış olmalıdır.
+Digital Twin modeli kullanılmalıdır.
+Senaryo yönetimi desteklenmelidir.
+KPI tahminleri üretilebilmelidir.
+Constraint doğrulaması yapılmalıdır.
+Decision Engine ile tam entegre çalışmalıdır.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009E – Simulation Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009E-1 – Digital Twin Architecture
+
+Bu doküman, Simulation Engine'in temelini oluşturan dijital ikiz mimarisini; üretim sistemi modelini, veri senkronizasyonunu, durum yönetimini ve simülasyon nesnelerini teknik düzeyde tanımlayacaktır
+DOC-009E-1
+Digital Twin Architecture
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Simulation Engine (SME)
+Module: Digital Twin Architecture (DTA)
+Document Type: Technical Architecture Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Digital Twin Architecture (DTA), Simulation Engine'in temelini oluşturan sanal üretim modeli mimarisini tanımlar.
+
+Amaç;
+
+fiziksel üretim sisteminin dijital temsilini oluşturmak,
+gerçek zamanlı üretim durumunu sanal ortama yansıtmak,
+simülasyonların güvenilir veri üzerinde çalışmasını sağlamak,
+diğer optimizasyon motorlarına ortak simülasyon altyapısı sunmaktır.
+
+Digital Twin yalnızca okunabilir (read-only) üretim verisi üzerinde çalışır ve gerçek sistemi doğrudan değiştirmez.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+DTA-001	Digital Twin Model Management
+DTA-002	Production Snapshot Creation
+DTA-003	State Synchronization
+DTA-004	Resource Modeling
+DTA-005	Event Replication
+DTA-006	Version Management
+DTA-007	Simulation Context Creation
+DTA-008	Snapshot Publication
+Chapter 3 – Architecture Overview
+ERP / MES / WMS
+        │
+        ▼
+Data Synchronization Layer
+        │
+        ▼
+Digital Twin Repository
+        │
+        ▼
+Snapshot Builder
+        │
+        ▼
+Simulation Engine
+Chapter 4 – Digital Twin Components
+Bileşen	Görev
+Resource Model	Kaynakların sanal temsili
+Production Model	Üretim emirleri ve operasyonlar
+Calendar Model	Takvim ve vardiyalar
+Material Model	Malzeme ve stok durumu
+Machine Model	Makine durum bilgisi
+Operator Model	Operatör durumu
+Routing Model	Operasyon rotaları
+Constraint Model	Kısıtların temsili
+Chapter 5 – Digital Twin Objects
+
+Sanal model aşağıdaki nesnelerden oluşur.
+
+Nesne	Açıklama
+Factory	Fabrika
+Production Line	Üretim hattı
+Work Center	İş merkezi
+Machine	Makine
+Operator	Operatör
+Shift	Vardiya
+Calendar	Takvim
+Production Order	Üretim emri
+Operation	Operasyon
+Material	Malzeme
+Tool	Aparat
+Inventory	Stok
+Chapter 6 – State Synchronization
+
+Digital Twin aşağıdaki olaylarla senkronize edilir.
+
+Olay	Kaynak
+Yeni sipariş	ERP
+Üretim başlangıcı	MES
+Operasyon tamamlandı	MES
+Makine durumu değişti	MES
+Operatör değişti	HR / MES
+Malzeme hareketi	WMS
+Takvim güncellendi	Calendar Service
+
+Senkronizasyon yalnızca Digital Twin modelini günceller; gerçek üretim verisi değiştirilmez.
+
+Chapter 7 – Snapshot Management
+
+Her simülasyon için bağımsız bir Snapshot oluşturulur.
+
+Alan	Açıklama
+Snapshot ID	Benzersiz kimlik
+Timestamp	Oluşturulma zamanı
+Source Version	Veri sürümü
+Scenario ID	İlgili senaryo
+Status	Active / Archived
+Created By	Sistem veya kullanıcı
+
+Snapshot'lar değiştirilemez (Immutable) olarak saklanır.
+
+Chapter 8 – Version Management
+
+Digital Twin sürümleri aşağıdaki bilgilerle yönetilir.
+
+Alan	Açıklama
+Twin Version	Dijital ikiz sürümü
+Parent Version	Önceki sürüm
+Data Version	Kaynak veri sürümü
+Change Reason	Güncelleme nedeni
+Effective Time	Geçerlilik zamanı
+
+Her Snapshot belirli bir Twin Version ile ilişkilendirilir.
+
+Chapter 9 – Event Replication
+
+Üretim olayları Digital Twin üzerinde yeniden oluşturulur.
+
+Desteklenen olaylar:
+
+Sipariş oluşturma
+Operasyon başlatma
+Operasyon tamamlama
+Makine arızası
+Operatör değişimi
+Malzeme gecikmesi
+Bakım başlangıcı
+Vardiya değişikliği
+
+Bu olaylar yalnızca simülasyon ortamında yürütülür.
+
+Chapter 10 – Consistency Rules
+
+Digital Twin aşağıdaki kuralları sağlamalıdır.
+
+Veri bütünlüğü korunmalıdır.
+Snapshot oluşturulduktan sonra değiştirilemez.
+Kaynak ilişkileri tutarlı olmalıdır.
+Constraint tanımları Snapshot içinde sabit kalmalıdır.
+Her simülasyon aynı Snapshot üzerinde deterministik sonuç üretmelidir.
+Chapter 11 – Integration Points
+Modül	Amaç
+ERP	Sipariş verileri
+MES	Üretim durumu
+WMS	Malzeme ve stok
+Scheduling Engine	Plan bilgisi
+Capacity Planning Engine	Kapasite modeli
+Line Balancing Engine	Hat yapısı
+Operator Assignment Engine	Operatör modeli
+Audit Service	Sürüm kayıtları
+Chapter 12 – Performance Targets
+KPI	Hedef
+Snapshot Oluşturma	<500 ms
+Veri Senkronizasyonu	<1 sn
+Twin Güncelleme	<500 ms
+Snapshot Yükleme	<300 ms
+Fabrika Twin Oluşturma	<5 sn
+Chapter 13 – Acceptance Criteria
+
+Digital Twin Architecture tamamlanmış kabul edilmesi için:
+
+Dijital ikiz bileşenleri tanımlanmış olmalıdır.
+Snapshot yönetimi uygulanmalıdır.
+Durum senkronizasyonu desteklenmelidir.
+Versiyon yönetimi oluşturulmalıdır.
+Tutarlılık kuralları uygulanmalıdır.
+Simulation Engine ile tam entegre çalışmalıdır.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009E-1 – Digital Twin Architecture
+
+Status: ✅ Completed
+Architecture Status: Frozen
+DOC-009E-2
+What-if Scenario Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Simulation Engine (SME)
+Module: What-if Scenario Engine (WSE)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+What-if Scenario Engine (WSE), kullanıcıların ve optimizasyon motorlarının mevcut üretim planını değiştirmeden alternatif senaryolar oluşturmasını, çalıştırmasını ve karşılaştırmasını sağlayan simülasyon modülüdür.
+
+Amaç;
+
+alternatif üretim senaryoları oluşturmak,
+plan değişikliklerinin etkisini önceden analiz etmek,
+farklı optimizasyon stratejilerini karşılaştırmak,
+Decision Engine'e doğrulanmış senaryo sonuçları sağlamaktır.
+
+WSE yalnızca Simulation Snapshot üzerinde çalışır ve gerçek üretim planına doğrudan müdahale etmez.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+WSE-001	Scenario Creation
+WSE-002	Scenario Cloning
+WSE-003	Parameter Modification
+WSE-004	Scenario Execution
+WSE-005	Scenario Comparison
+WSE-006	Scenario Ranking
+WSE-007	Scenario Publication
+WSE-008	Scenario Archiving
+Chapter 3 – Engine Architecture
+Simulation Snapshot
+        │
+        ▼
+Scenario Builder
+        │
+        ▼
+Scenario Repository
+        │
+        ▼
+Simulation Engine
+        │
+        ▼
+Comparison Engine
+        │
+        ▼
+Decision Engine
+Chapter 4 – Scenario Types
+Kod	Senaryo
+SCN-101	Capacity Change
+SCN-102	Machine Addition
+SCN-103	Machine Removal
+SCN-104	Operator Change
+SCN-105	Shift Modification
+SCN-106	Order Priority Change
+SCN-107	Scheduling Policy Change
+SCN-108	Material Delay
+SCN-109	Maintenance Planning
+SCN-110	Mixed Scenario
+Chapter 5 – Scenario Parameters
+
+Bir senaryoda aşağıdaki parametreler değiştirilebilir.
+
+Parametre	Açıklama
+Makine sayısı	Yeni veya çıkarılan makine
+Operatör sayısı	Personel değişiklikleri
+Vardiya yapısı	Vardiya ekleme / kaldırma
+Çalışma takvimi	Tatil veya fazla mesai
+Sipariş öncelikleri	Öncelik güncellemeleri
+Rotalar	Alternatif operasyon rotaları
+Kaynak kapasiteleri	Kapasite artış / azalışı
+İş kuralları	Planlama politikaları
+Chapter 6 – Scenario Lifecycle
+Create Scenario
+        │
+        ▼
+Modify Parameters
+        │
+        ▼
+Validate Scenario
+        │
+        ▼
+Run Simulation
+        │
+        ▼
+Calculate KPIs
+        │
+        ▼
+Compare Results
+        │
+        ▼
+Archive Scenario
+Chapter 7 – Validation Rules
+
+Her senaryo çalıştırılmadan önce aşağıdaki kontroller yapılır.
+
+Snapshot geçerli mi?
+Parametreler tutarlı mı?
+Hard Constraint ihlali var mı?
+Kaynak tanımları eksiksiz mi?
+Takvim uygun mu?
+İş kuralları geçerli mi?
+
+Geçersiz senaryolar simülasyona alınmaz.
+
+Chapter 8 – Scenario Comparison
+
+Senaryolar aşağıdaki KPI'lara göre karşılaştırılır.
+
+KPI	Açıklama
+Makespan	Toplam üretim süresi
+OTD	Zamanında teslim oranı
+Tardiness	Gecikme süresi
+Resource Utilization	Kaynak kullanım oranı
+Setup Time	Toplam setup süresi
+Queue Length	Ortalama kuyruk uzunluğu
+WIP	Yarı mamul seviyesi
+Bottleneck Count	Darboğaz sayısı
+Chapter 9 – Scenario Ranking
+
+Her senaryo aşağıdaki kriterlere göre puanlanır.
+
+Kriter	Açıklama
+Performance Score	Performans iyileşmesi
+Resource Score	Kaynak verimliliği
+Delivery Score	Teslim performansı
+Stability Score	Plan kararlılığı
+Cost Score	Tahmini operasyon maliyeti
+Risk Score	Operasyonel risk
+
+Sonuç olarak her senaryo için Overall Scenario Score (0–100) hesaplanır.
+
+Chapter 10 – Output Model
+Alan	Açıklama
+Scenario ID	Senaryo kimliği
+Parent Scenario	Kaynak senaryo
+Scenario Type	Senaryo türü
+Simulation ID	Simülasyon kimliği
+Overall Score	Toplam puan
+KPI Summary	KPI özeti
+Recommendation	Önerilen / Önerilmeyen
+Created Time	Oluşturulma zamanı
+Chapter 11 – Runtime Behaviour
+
+What-if Scenario Engine aşağıdaki durumlarda çalıştırılır.
+
+Kullanıcı yeni senaryo oluşturduğunda
+Decision Engine alternatif istediğinde
+Bottleneck Resolution doğrulama istediğinde
+Scheduling Engine farklı plan seçenekleri oluşturduğunda
+Manuel analiz talebinde
+
+Her senaryo birbirinden tamamen bağımsız yürütülür.
+
+Chapter 12 – Integration Points
+Modül	Amaç
+Digital Twin Architecture	Snapshot yönetimi
+Scheduling Engine	Üretim planı
+Capacity Planning Engine	Kapasite modeli
+Line Balancing Engine	Hat dengesi
+Operator Assignment Engine	Operatör modeli
+Bottleneck Resolution Engine	Çözüm doğrulama
+Decision Engine	Karar desteği
+Audit Service	Senaryo kayıtları
+Chapter 13 – Performance Targets
+KPI	Hedef
+Senaryo Oluşturma	<300 ms
+Senaryo Doğrulama	<200 ms
+Tek Senaryo Simülasyonu	<2 sn
+10 Senaryo Karşılaştırması	<20 sn
+Senaryo Puanlama	<100 ms
+Sonuç Yayınlama	<200 ms
+Chapter 14 – Acceptance Criteria
+
+What-if Scenario Engine tamamlanmış kabul edilmesi için:
+
+Senaryo oluşturma ve klonlama desteklenmelidir.
+Parametre değişiklikleri uygulanabilmelidir.
+Senaryo doğrulama mekanizması çalışmalıdır.
+KPI karşılaştırmaları üretilebilmelidir.
+Overall Scenario Score hesaplanmalıdır.
+Decision Engine ile tam entegre çalışmalıdır.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009E-2 – What-if Scenario Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009E-3 – KPI Prediction & Analytics Engine
+DOC-009E-3
+KPI Prediction & Analytics Engine
+
+Version: 1.0 Status: Architecture Freeze Engine: Simulation Engine (SME) Module: KPI Prediction & Analytics Engine (KPAE) Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+KPI Prediction & Analytics Engine (KPAE), simülasyon sonuçlarını analiz ederek üretim performans göstergelerini tahmin eden ve karar süreçlerine analitik içgörü sağlayan modüldür.
+
+Amaç;
+
+üretim KPI’larını tahmin etmek,
+
+teslim performansını öngörmek,
+
+kapasite kullanım eğilimlerini analiz etmek,
+
+darboğaz risklerini belirlemek,
+
+Decision Engine’e karşılaştırmalı performans verisi sağlamaktır.
+
+Bu modül yalnızca tahmin ve analiz üretir; gerçek üretim planını değiştirmez.
+
+Chapter 2 – Responsibilities
+
+Kod
+
+	
+
+Görev
+
+
+
+
+KPAE-001
+
+	
+
+KPI Prediction
+
+
+
+
+KPAE-002
+
+	
+
+Trend Analysis
+
+
+
+
+KPAE-003
+
+	
+
+Delivery Performance Forecast
+
+
+
+
+KPAE-004
+
+	
+
+Capacity Forecast
+
+
+
+
+KPAE-005
+
+	
+
+Bottleneck Trend Analysis
+
+
+
+
+KPAE-006
+
+	
+
+Scenario Comparison Analytics
+
+
+
+
+KPAE-007
+
+	
+
+Prediction Publication
+
+
+
+
+KPAE-008
+
+	
+
+Analytics Logging
+
+Chapter 3 – Engine Architecture
+Chapter 4 – Input Data
+
+KPAE aşağıdaki veri kaynaklarını kullanır.
+
+Veri
+
+	
+
+Kaynak
+
+
+
+
+Simulation Results
+
+	
+
+Simulation Engine
+
+
+
+
+Production Schedule
+
+	
+
+Scheduling Engine
+
+
+
+
+Capacity Data
+
+	
+
+Capacity Planning Engine
+
+
+
+
+Bottleneck Data
+
+	
+
+BRE
+
+
+
+
+Historical KPIs
+
+	
+
+Analytics Repository
+
+
+
+
+Resource Utilization
+
+	
+
+MES
+
+
+
+
+Order Information
+
+	
+
+ERP
+
+
+
+
+Scenario Metadata
+
+	
+
+WSE
+
+Chapter 5 – Predicted KPIs
+
+Motor aşağıdaki KPI’ları tahmin eder.
+
+KPI
+
+	
+
+Açıklama
+
+
+
+
+Makespan
+
+	
+
+Toplam tamamlanma süresi
+
+
+
+
+OTD
+
+	
+
+Zamanında teslim oranı
+
+
+
+
+Tardiness
+
+	
+
+Toplam gecikme
+
+
+
+
+Resource Utilization
+
+	
+
+Kaynak kullanım oranı
+
+
+
+
+Machine Utilization
+
+	
+
+Makine kullanım oranı
+
+
+
+
+Operator Utilization
+
+	
+
+Operatör kullanım oranı
+
+
+
+
+WIP Level
+
+	
+
+Yarı mamul seviyesi
+
+
+
+
+Queue Length
+
+	
+
+Ortalama kuyruk uzunluğu
+
+
+
+
+Bottleneck Count
+
+	
+
+Darboğaz sayısı
+
+
+
+
+Throughput
+
+	
+
+Üretim hızı
+
+Chapter 6 – Prediction Process
+Chapter 7 – Trend Analysis
+
+KPAE aşağıdaki eğilimleri analiz eder.
+
+Kapasite kullanım eğilimi
+
+Teslim performansı eğilimi
+
+Darboğaz tekrar sıklığı
+
+Kuyruk büyüme eğilimi
+
+WIP değişim eğilimi
+
+Setup süresi eğilimi
+
+Kaynak dengesizliği eğilimi
+
+Trendler geçmiş simülasyon sonuçları ile karşılaştırılır.
+
+Chapter 8 – Forecast Horizon
+
+Desteklenen tahmin periyotları:
+
+Periyot
+
+	
+
+Kullanım
+
+
+
+
+Saatlik
+
+	
+
+Kısa vadeli analiz
+
+
+
+
+Günlük
+
+	
+
+Operasyonel planlama
+
+
+
+
+Haftalık
+
+	
+
+Kapasite planlama
+
+
+
+
+Aylık
+
+	
+
+Taktik analiz
+
+Chapter 9 – Confidence Scoring
+
+Her tahmin için güven skoru hesaplanır.
+
+Skor
+
+	
+
+Güven Seviyesi
+
+
+
+
+90–100
+
+	
+
+Çok Yüksek
+
+
+
+
+75–89
+
+	
+
+Yüksek
+
+
+
+
+60–74
+
+	
+
+Orta
+
+
+
+
+40–59
+
+	
+
+Düşük
+
+
+
+
+<40
+
+	
+
+Belirsiz
+
+Güven skoru, simülasyon kalitesi ve veri bütünlüğüne göre hesaplanır.
+
+Chapter 10 – Scenario Comparison Analytics
+
+Birden fazla senaryo aşağıdaki kriterlere göre karşılaştırılır.
+
+Kriter
+
+	
+
+Ölçüt
+
+
+
+
+Makespan
+
+	
+
+% değişim
+
+
+
+
+OTD
+
+	
+
+% iyileşme
+
+
+
+
+Tardiness
+
+	
+
+% azalma
+
+
+
+
+Capacity Utilization
+
+	
+
+% kullanım
+
+
+
+
+WIP
+
+	
+
+% değişim
+
+
+
+
+Bottleneck Count
+
+	
+
+Adet
+
+
+
+
+Schedule Stability
+
+	
+
+% koruma
+
+Chapter 11 – Output Model
+
+Her analiz aşağıdaki çıktıyı üretir.
+
+Alan
+
+	
+
+Açıklama
+
+
+
+
+Analytics ID
+
+	
+
+Analiz kimliği
+
+
+
+
+Scenario ID
+
+	
+
+İlgili senaryo
+
+
+
+
+Predicted KPIs
+
+	
+
+Tahmini KPI’lar
+
+
+
+
+Trend Summary
+
+	
+
+Eğilim özeti
+
+
+
+
+Confidence Score
+
+	
+
+Güven puanı
+
+
+
+
+Risk Indicators
+
+	
+
+Risk göstergeleri
+
+
+
+
+Recommendation
+
+	
+
+Analitik öneri
+
+Chapter 12 – Integration Points
+
+Modül
+
+	
+
+Amaç
+
+
+
+
+Simulation Engine
+
+	
+
+Simülasyon sonuçları
+
+
+
+
+What-if Scenario Engine
+
+	
+
+Senaryo bilgileri
+
+
+
+
+Scheduling Engine
+
+	
+
+Plan verisi
+
+
+
+
+Capacity Planning Engine
+
+	
+
+Kapasite analizi
+
+
+
+
+Bottleneck Resolution Engine
+
+	
+
+Darboğaz analizi
+
+
+
+
+Decision Engine
+
+	
+
+Karar desteği
+
+
+
+
+Audit Service
+
+	
+
+Kayıt ve izlenebilirlik
+
+Chapter 13 – Performance Targets
+
+KPI
+
+	
+
+Hedef
+
+
+
+
+KPI Hesaplama
+
+	
+
+<200 ms
+
+
+
+
+Trend Analizi
+
+	
+
+<500 ms
+
+
+
+
+Tahmin Üretimi
+
+	
+
+<1 sn
+
+
+
+
+10 Senaryo Karşılaştırması
+
+	
+
+<5 sn
+
+
+
+
+Confidence Score Hesabı
+
+	
+
+<100 ms
+
+
+
+
+Analiz Yayınlama
+
+	
+
+<200 ms
+
+Chapter 14 – Acceptance Criteria
+
+KPI Prediction & Analytics Engine tamamlanmış kabul edilmesi için:
+
+KPI tahmin modeli tanımlanmış olmalıdır.
+
+Trend analizi desteklenmelidir.
+
+Güven skoru hesaplanmalıdır.
+
+Senaryo karşılaştırma analitiği uygulanmalıdır.
+
+Risk göstergeleri üretilebilmelidir.
+
+Decision Engine ile tam entegre çalışmalıdır.
+
+Performans hedefleri karşılanmalıdır.
+
+Document Status
+
+DOC-009E-3 – KPI Prediction & Analytics Engine
+
+Status: ✅ Completed
+
+Architecture Status: Frozen
+
+Next Document
+
+DOC-009E-4 – Simulation Engine Final Technical Specification
+DOC-009E-4
+Simulation Engine Final Technical Specification
+
+Version: 1.0
+Status: Final
+Engine: Simulation Engine (SME)
+Document Type: Final Technical Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, MARS APS Simulation Engine (SME) için hazırlanan tüm teknik dokümanların konsolide edilmiş nihai teknik referansıdır.
+
+Amaçları;
+
+Simulation Engine mimarisini tek dokümanda toplamak,
+alt modüller arasındaki veri akışını tanımlamak,
+geliştirme ekibi için resmi teknik referans oluşturmak,
+test, bakım ve sürüm yönetiminde kullanılacak standartları belirlemektir.
+
+Bu belge yeni mimari tanımlamaz; DOC-009E serisinde alınan mimari kararların nihai sürümünü temsil eder.
+
+Chapter 2 – Engine Overview
+
+Simulation Engine, MARS APS içerisinde üretim sisteminin Digital Twin modeli üzerinde çalışan, alternatif senaryoları değerlendiren ve karar motorlarını besleyen merkezi simülasyon altyapısıdır.
+
+Temel görevleri:
+
+Digital Twin yönetimi
+Simulation Snapshot oluşturma
+What-if senaryoları üretme
+KPI tahminleri oluşturma
+Senaryo karşılaştırmaları
+Constraint doğrulama
+Decision Engine'e analitik veri sağlama
+
+Simulation Engine hiçbir zaman gerçek üretim verisini doğrudan değiştirmez.
+
+Chapter 3 – Engine Architecture
+                   Simulation Engine
+                           │
+      ┌────────────────────────────────────┐
+      │                                    │
+      │  Digital Twin Architecture         │
+      │  What-if Scenario Engine           │
+      │  KPI Prediction & Analytics Engine │
+      │                                    │
+      └────────────────────────────────────┘
+                           │
+                           ▼
+                   Decision Engine
+Chapter 4 – Module Structure
+Kod	Modül	Doküman
+SME	Simulation Engine	DOC-009E
+SME-DTA	Digital Twin Architecture	DOC-009E-1
+SME-WSE	What-if Scenario Engine	DOC-009E-2
+SME-KPAE	KPI Prediction & Analytics Engine	DOC-009E-3
+Chapter 5 – End-to-End Workflow
+ERP / MES / WMS
+        │
+        ▼
+Digital Twin Synchronization
+        │
+        ▼
+Snapshot Creation
+        │
+        ▼
+Scenario Generation
+        │
+        ▼
+Simulation Execution
+        │
+        ▼
+KPI Prediction
+        │
+        ▼
+Scenario Comparison
+        │
+        ▼
+Decision Engine
+Chapter 6 – Functional Workflow
+Gerçek üretim verileri Digital Twin ile senkronize edilir.
+Simulation Snapshot oluşturulur.
+What-if senaryosu hazırlanır.
+Simülasyon yürütülür.
+Constraint doğrulaması yapılır.
+KPI tahminleri hesaplanır.
+Senaryolar karşılaştırılır.
+Sonuçlar Decision Engine'e gönderilir.
+Chapter 7 – Core Components
+Bileşen	Görev
+Digital Twin Layer	Dijital üretim modeli
+Snapshot Manager	Snapshot oluşturma ve yönetimi
+Scenario Manager	Senaryo oluşturma ve yönetimi
+Simulation Executor	Simülasyon yürütme
+KPI Analytics	KPI hesaplama ve tahmin
+Comparison Engine	Senaryo karşılaştırma
+Validation Layer	Constraint doğrulama
+Audit Layer	İzlenebilirlik ve kayıt
+Chapter 8 – Data Flow
+ERP / MES / WMS
+        │
+        ▼
+Digital Twin
+        │
+        ▼
+Simulation Snapshot
+        │
+        ▼
+Scenario Engine
+        │
+        ▼
+Simulation Executor
+        │
+        ▼
+KPI Analytics
+        │
+        ▼
+Decision Engine
+Chapter 9 – External Integrations
+Sistem	Amaç
+ERP	Sipariş verileri
+MES	Gerçek zamanlı üretim bilgileri
+WMS	Stok ve malzeme bilgileri
+Scheduling Engine	Üretim planı
+Capacity Planning Engine	Kapasite modeli
+Line Balancing Engine	Hat dengesi
+Operator Assignment Engine	Operatör modeli
+Bottleneck Resolution Engine	Darboğaz doğrulama
+Decision Engine	Nihai karar desteği
+Audit Service	İzlenebilirlik
+Chapter 10 – Non-Functional Requirements
+Özellik	Hedef
+Availability	≥99.9%
+Scalability	Horizontal Scaling
+Reliability	High Availability
+Maintainability	Modular Architecture
+Deterministic Simulation	Aynı girdilerle aynı sonuç
+Snapshot Immutability	Desteklenmeli
+Explainability	Simülasyon sonuçları açıklanabilir olmalı
+Security	Role-Based Access Control (RBAC)
+Chapter 11 – Performance Targets
+KPI	Hedef
+Snapshot Oluşturma	<500 ms
+Tek Senaryo Simülasyonu	<2 sn
+KPI Hesaplama	<500 ms
+Senaryo Karşılaştırma	<2 sn
+Fabrika Seviyesi Simülasyon	<30 sn
+Sonuç Yayınlama	<200 ms
+Snapshot Yükleme	<300 ms
+Chapter 12 – Dependencies
+Modül	Durum
+ERP Integration	Zorunlu
+MES Integration	Zorunlu
+WMS Integration	Zorunlu
+Scheduling Engine	Zorunlu
+Capacity Planning Engine	Zorunlu
+Line Balancing Engine	Zorunlu
+Operator Assignment Engine	Zorunlu
+Decision Engine	Zorunlu
+Audit Service	Zorunlu
+Chapter 13 – Development Deliverables
+Çıktı	Açıklama
+Digital Twin Service	Dijital ikiz servisi
+Snapshot Manager	Snapshot yönetimi
+Scenario Service	Senaryo yönetimi
+Simulation Executor	Simülasyon yürütme servisi
+KPI Analytics Service	KPI analiz servisi
+Comparison Service	Senaryo karşılaştırma servisi
+REST API	Dış servis arayüzleri
+Event Handlers	Olay işleyicileri
+Unit Tests	Birim testleri
+Integration Tests	Entegrasyon testleri
+Technical Documentation	Teknik dokümantasyon
+Chapter 14 – Acceptance Criteria
+
+Simulation Engine aşağıdaki koşullar sağlandığında tamamlanmış kabul edilir.
+
+Digital Twin Architecture uygulanmış olmalıdır.
+Snapshot yönetimi çalışmalıdır.
+What-if senaryoları oluşturulabilmelidir.
+Simülasyon yürütme mekanizması tamamlanmış olmalıdır.
+KPI Prediction & Analytics Engine entegre edilmelidir.
+Constraint doğrulaması desteklenmelidir.
+Decision Engine ile tam entegrasyon sağlanmalıdır.
+Performans hedefleri karşılanmalıdır.
+Tüm modüller entegrasyon testlerinden başarıyla geçmiş olmalıdır.
+Chapter 15 – Document References
+Doküman	Açıklama
+DOC-009E	Simulation Engine
+DOC-009E-1	Digital Twin Architecture
+DOC-009E-2	What-if Scenario Engine
+DOC-009E-3	KPI Prediction & Analytics Engine
+Document Status
+
+DOC-009E-4 – Simulation Engine Final Technical Specification
+
+Status: ✅ Completed
+Architecture Status: Final
+Implementation Status: Ready for Development
+DOC-009E Serisi Tamamlandı ✅
+
+Bu belge ile Simulation Engine için planlanan tüm teknik dokümanlar tamamlanmıştır.
+
+Tamamlanan seri:
+
+✅ DOC-009E – Simulation Engine
+✅ DOC-009E-1 – Digital Twin Architecture
+✅ DOC-009E-2 – What-if Scenario Engine
+✅ DOC-009E-3 – KPI Prediction & Analytics Engine
+✅ DOC-009E-4 – Simulation Engine Final Technical Specification
+Next Document (Master Plan)
+
+Plana göre sıradaki ana doküman:
+
+DOC-009F – Decision Scoring Engine
+
+Bu doküman, MARS APS'in nihai karar mekanizmasını tanımlayan ve tüm optimizasyon motorlarından (Scheduling, Line Balancing, Operator Assignment, Bottleneck Resolution ve Simulation Engine) gelen alternatif çözümleri çok kriterli karar analizi (MCDA) ile değerlendirerek en uygun üretim planını seçen merkezi karar motorunun teknik mimarisini tanımlayacaktır. Bu seri de önceki motorlarda olduğu gibi ana doküman ve alt teknik dokümanlardan oluşacaktır.
+
