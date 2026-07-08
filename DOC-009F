@@ -1,0 +1,1017 @@
+DOC-009F
+Decision Scoring Engine
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Decision Scoring Engine (DSE)
+Document Type: Core Engine Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Decision Scoring Engine (DSE), MARS APS içerisinde tüm optimizasyon motorları tarafından üretilen alternatif üretim planlarını ve çözüm senaryolarını değerlendiren merkezi karar motorudur.
+
+Motorun amacı;
+
+alternatif çözümleri karşılaştırmak,
+çok kriterli karar analizi (MCDA) gerçekleştirmek,
+üretim hedeflerine en uygun çözümü seçmek,
+kararların nedenlerini açıklanabilir (Explainable Decision) hale getirmek,
+Scheduling Engine'e uygulanacak nihai üretim planını belirlemektir.
+
+Decision Scoring Engine, yeni bir üretim planı oluşturmaz; diğer motorlardan gelen çözümleri değerlendirir ve en uygun olanını seçer.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+DSE-001	Alternative Plan Evaluation
+DSE-002	Multi-Criteria Decision Analysis (MCDA)
+DSE-003	Decision Scoring
+DSE-004	Trade-off Analysis
+DSE-005	Explainable Decision Generation
+DSE-006	Recommendation Ranking
+DSE-007	Decision Publication
+DSE-008	Decision Logging & Audit
+Chapter 3 – Engine Architecture
+Line Balancing Engine
+            │
+Operator Assignment Engine
+            │
+Scheduling Engine
+            │
+Bottleneck Resolution Engine
+            │
+Simulation Engine
+            │
+            ▼
+     Decision Scoring Engine
+            │
+            ▼
+     Final Production Plan
+Chapter 4 – Input Sources
+
+Decision Scoring Engine aşağıdaki modüllerden veri alır.
+
+Kaynak	Sağlanan Veri
+Line Balancing Engine	Hat dengeleme sonuçları
+Operator Assignment Engine	Operatör atamaları
+Scheduling Engine	Alternatif üretim planları
+Bottleneck Resolution Engine	Çözüm stratejileri
+Simulation Engine	Simülasyon sonuçları
+Rule Engine	İş kuralları
+Objective Library	Hedef fonksiyonları
+Constraint Library	Kısıt doğrulamaları
+Chapter 5 – Decision Scope
+
+Motor aşağıdaki karar türlerini destekler.
+
+Kod	Karar Türü
+DEC-101	Best Schedule Selection
+DEC-102	Best Line Balance
+DEC-103	Best Operator Assignment
+DEC-104	Best Capacity Strategy
+DEC-105	Best Bottleneck Resolution
+DEC-106	Best Simulation Scenario
+DEC-107	Global Production Plan Selection
+DEC-108	Multi-Objective Optimization Decision
+Chapter 6 – Evaluation Criteria
+
+Karar değerlendirmesinde kullanılan temel kriterler:
+
+Kriter	Açıklama
+Makespan	Toplam üretim süresi
+OTD	Zamanında teslim oranı
+Tardiness	Gecikme miktarı
+Resource Utilization	Kaynak verimliliği
+Machine Utilization	Makine kullanım oranı
+Operator Utilization	Operatör kullanım oranı
+Schedule Stability	Plan kararlılığı
+Setup Time	Toplam hazırlık süresi
+Production Cost	Tahmini üretim maliyeti
+Bottleneck Risk	Darboğaz riski
+Chapter 7 – Decision Workflow
+Receive Alternatives
+          │
+          ▼
+Constraint Verification
+          │
+          ▼
+MCDA Evaluation
+          │
+          ▼
+Decision Scoring
+          │
+          ▼
+Ranking
+          │
+          ▼
+Publish Best Decision
+Chapter 8 – Decision Output
+
+Her karar aşağıdaki çıktıları üretir.
+
+Alan	Açıklama
+Decision ID	Karar kimliği
+Selected Alternative	Seçilen alternatif
+Decision Score	Karar puanı
+Confidence Score	Güven puanı
+Ranking	Alternatif sıralaması
+Decision Reason	Karar açıklaması
+Execution Recommendation	Uygulama önerisi
+Chapter 9 – Runtime Behaviour
+
+Decision Scoring Engine aşağıdaki durumlarda çalıştırılır.
+
+Scheduling Engine yeni plan ürettiğinde
+Simulation tamamlandığında
+Bottleneck Resolution yeni çözüm önerdiğinde
+Kullanıcı alternatif plan karşılaştırması istediğinde
+Yeniden planlama gerektiğinde
+
+Motor yalnızca doğrulanmış (validated) alternatifleri değerlendirir.
+
+Chapter 10 – Integration Points
+Modül	Amaç
+Scheduling Engine	Plan alternatifleri
+Simulation Engine	Simülasyon sonuçları
+Bottleneck Resolution Engine	Çözüm stratejileri
+Line Balancing Engine	Hat dengeleme sonuçları
+Operator Assignment Engine	Operatör atamaları
+Rule Engine	İş kuralları
+Audit Service	Karar kayıtları
+Chapter 11 – Performance Targets
+KPI	Hedef
+Alternatif Yükleme	<200 ms
+MCDA Hesaplama	<500 ms
+Karar Puanlama	<300 ms
+Alternatif Sıralama	<200 ms
+Nihai Karar Üretimi	<1 sn
+Explainable Decision Oluşturma	<500 ms
+Chapter 12 – Acceptance Criteria
+
+Decision Scoring Engine tamamlanmış kabul edilmesi için:
+
+Alternatif planları değerlendirebilmelidir.
+Çok kriterli karar analizi uygulanmalıdır.
+Karar puanı hesaplanmalıdır.
+Alternatif sıralaması üretilebilmelidir.
+Karar gerekçesi oluşturulmalıdır.
+Scheduling Engine'e uygulanacak nihai plan gönderilebilmelidir.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009F – Decision Scoring Engine
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009F-1 – Multi-Criteria Decision Analysis (MCDA) Framework
+
+Bu doküman, Decision Scoring Engine'in temelini oluşturan çok kriterli karar analizi altyapısını; kriter ağırlıkları, normalizasyon yöntemleri, puanlama modelleri ve alternatif değerlendirme algoritmalarını teknik düzeyde tanımlayacaktır. Bu belge, DSE serisinin en önemli teknik dokümanlarından biridir.
+MARS APS
+DOC-009F-1
+Multi-Criteria Decision Analysis (MCDA) Framework
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Decision Scoring Engine (DSE)
+Module: Multi-Criteria Decision Analysis (MCDA) Framework
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Multi-Criteria Decision Analysis (MCDA) Framework, Decision Scoring Engine içerisinde yer alan ve farklı optimizasyon motorlarından gelen alternatif çözümleri çok sayıda performans kriterine göre objektif olarak değerlendiren karar modelidir.
+
+Amaç;
+
+alternatif üretim planlarını ortak bir puanlama sistemine dönüştürmek,
+farklı KPI'ları karşılaştırılabilir hale getirmek,
+işletme hedeflerine uygun en iyi alternatifi seçmek,
+karar sürecini standartlaştırmak,
+kararların açıklanabilirliğini artırmaktır.
+
+MCDA Framework yeni çözüm üretmez; mevcut alternatifleri değerlendirir ve puanlar.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+MCDA-001	Criteria Management
+MCDA-002	Criteria Normalization
+MCDA-003	Weight Management
+MCDA-004	Alternative Evaluation
+MCDA-005	Composite Score Calculation
+MCDA-006	Alternative Ranking
+MCDA-007	Decision Explanation
+MCDA-008	Result Publication
+Chapter 3 – Framework Architecture
+Alternative Plans
+        │
+        ▼
+Criteria Collector
+        │
+        ▼
+Normalization Engine
+        │
+        ▼
+Weight Engine
+        │
+        ▼
+Score Calculator
+        │
+        ▼
+Ranking Engine
+        │
+        ▼
+Decision Scoring Engine
+Chapter 4 – Evaluation Criteria
+
+MCDA Framework aşağıdaki temel kriterleri destekler.
+
+Kod	Kriter
+C-001	Makespan
+C-002	On-Time Delivery (OTD)
+C-003	Total Tardiness
+C-004	Resource Utilization
+C-005	Machine Utilization
+C-006	Operator Utilization
+C-007	Setup Time
+C-008	Work In Process (WIP)
+C-009	Bottleneck Score
+C-010	Production Cost
+C-011	Schedule Stability
+C-012	Energy Consumption
+Chapter 5 – Criteria Classification
+
+Kriterler iki ana gruba ayrılır.
+
+Benefit Criteria (Yüksek olması istenir)
+OTD
+Resource Utilization
+Machine Utilization
+Operator Utilization
+Schedule Stability
+Cost Criteria (Düşük olması istenir)
+Makespan
+Tardiness
+Setup Time
+Production Cost
+Bottleneck Score
+WIP
+Energy Consumption
+Chapter 6 – Normalization Model
+
+Alternatiflerin farklı ölçü birimlerinde hesaplanan KPI değerleri ortak ölçeğe dönüştürülür.
+
+Normalize edilmiş değer aralığı:
+
+0.00 – 1.00
+
+Anlamı:
+
+Değer	Açıklama
+1.00	En iyi
+0.80	Çok iyi
+0.60	İyi
+0.40	Orta
+0.20	Zayıf
+0.00	En kötü
+
+Normalizasyon işlemi tüm alternatifler için aynı yöntemle uygulanır.
+
+Chapter 7 – Weight Management
+
+Her değerlendirme kriteri ağırlık (Weight) ile temsil edilir.
+
+Alan	Açıklama
+Weight ID	Kimlik
+Criterion	İlgili kriter
+Weight Value	Ağırlık değeri
+Effective Date	Geçerlilik tarihi
+Version	Sürüm
+
+Kurallar:
+
+Her ağırlık değeri 0–1 aralığındadır.
+Tüm ağırlıkların toplamı 1.00 olmalıdır.
+Ağırlıklar sistem yöneticisi tarafından yönetilir.
+Sürümleme desteklenir.
+Chapter 8 – Composite Score Calculation
+
+Her alternatif için tek bir Composite Decision Score hesaplanır.
+
+Hesaplama süreci:
+
+KPI değerleri normalize edilir.
+İlgili ağırlık uygulanır.
+Tüm ağırlıklı puanlar toplanır.
+Nihai karar puanı oluşturulur.
+
+Sonuç:
+
+Decision Score = 0 – 100
+Chapter 9 – Alternative Ranking
+
+Alternatifler aşağıdaki kurallara göre sıralanır.
+
+En yüksek Decision Score önceliklidir.
+Eşit puan durumunda yüksek OTD tercih edilir.
+Hâlâ eşitse düşük Makespan seçilir.
+Ardından düşük Tardiness dikkate alınır.
+Son olarak yüksek Schedule Stability tercih edilir.
+Chapter 10 – Decision Explanation
+
+Her karar için açıklanabilirlik bilgisi oluşturulur.
+
+Alan	Açıklama
+Selected Criteria	Etkili kriterler
+Positive Factors	Kararı destekleyen faktörler
+Negative Factors	Kararı olumsuz etkileyen faktörler
+Final Score	Nihai puan
+Confidence	Güven seviyesi
+
+Bu bilgiler kullanıcı arayüzünde ve Audit kayıtlarında kullanılacaktır.
+
+Chapter 11 – Integration Points
+Modül	Amaç
+Scheduling Engine	Plan alternatifleri
+Simulation Engine	KPI sonuçları
+Line Balancing Engine	Hat performansı
+Operator Assignment Engine	Operatör performansı
+Bottleneck Resolution Engine	Darboğaz verileri
+Rule Engine	İş kuralları
+Audit Service	Karar kayıtları
+Chapter 12 – Performance Targets
+KPI	Hedef
+Normalizasyon	<100 ms
+Ağırlık Uygulama	<100 ms
+Composite Score Hesabı	<200 ms
+100 Alternatif Sıralama	<500 ms
+Karar Açıklaması	<300 ms
+Chapter 13 – Acceptance Criteria
+
+MCDA Framework tamamlanmış kabul edilmesi için:
+
+Kriter yönetimi uygulanmalıdır.
+Normalizasyon mekanizması çalışmalıdır.
+Ağırlık yönetimi desteklenmelidir.
+Composite Decision Score hesaplanmalıdır.
+Alternatif sıralaması üretilebilmelidir.
+Karar açıklamaları oluşturulmalıdır.
+Decision Scoring Engine ile tam entegre çalışmalıdır.
+Document Status
+
+DOC-009F-1 – Multi-Criteria Decision Analysis (MCDA) Framework
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009F-2 – Decision Weight Management System
+
+Bu doküman, MCDA Framework içerisinde kullanılan kriter ağırlıklarının tanımlanması, sürümlenmesi, yönetilmesi ve farklı üretim stratejilerine göre dinamik olarak uygulanmasını sağlayan ağırlık yönetim sistemini teknik olarak tanımlayacaktır. Bu modül, karar mekanizmasının esnekliğini ve farklı işletme hedeflerine uyarlanabilirliğini sağlayan temel bileşendir.
+DOC-009F-2
+Decision Weight Management System
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Decision Scoring Engine (DSE)
+Module: Decision Weight Management System (DWMS)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Decision Weight Management System (DWMS), Decision Scoring Engine içerisinde kullanılan karar kriteri ağırlıklarının tanımlanmasını, sürümlenmesini, doğrulanmasını ve uygulanmasını sağlayan merkezi yönetim modülüdür.
+
+Amaç;
+
+karar kriterlerinin ağırlıklarını merkezi olarak yönetmek,
+farklı üretim stratejileri için farklı ağırlık profilleri oluşturmak,
+ağırlık değişikliklerini sürümlendirmek,
+Decision Scoring Engine'e tutarlı ve izlenebilir ağırlık bilgisi sağlamaktır.
+
+DWMS yalnızca ağırlık yönetimini gerçekleştirir; karar puanı hesaplamaz.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+DWMS-001	Weight Profile Management
+DWMS-002	Weight Validation
+DWMS-003	Version Management
+DWMS-004	Profile Activation
+DWMS-005	Weight Distribution Control
+DWMS-006	Change History
+DWMS-007	Profile Publication
+DWMS-008	Audit Logging
+Chapter 3 – Module Architecture
+Decision Profiles
+        │
+        ▼
+Weight Repository
+        │
+        ▼
+Validation Engine
+        │
+        ▼
+Version Manager
+        │
+        ▼
+Decision Scoring Engine
+Chapter 4 – Weight Profiles
+
+Sistem birden fazla karar profili destekler.
+
+Profil	Kullanım Amacı
+Delivery Focus	Teslim performansını önceliklendirir
+Capacity Focus	Kaynak kullanımını önceliklendirir
+Cost Focus	Üretim maliyetini önceliklendirir
+Stability Focus	Plan kararlılığını önceliklendirir
+Balanced	Dengeli karar modeli
+Custom	Kullanıcı tanımlı profil
+
+Aynı anda yalnızca bir profil aktif olabilir.
+
+Chapter 5 – Weight Definition Model
+
+Her ağırlık aşağıdaki alanlarla tanımlanır.
+
+Alan	Açıklama
+Weight ID	Benzersiz kimlik
+Profile ID	Profil kimliği
+Criterion Code	Karar kriteri
+Weight Value	Ağırlık değeri
+Status	Active / Passive
+Version	Sürüm
+Effective Date	Geçerlilik tarihi
+Chapter 6 – Validation Rules
+
+Ağırlık profili etkinleştirilmeden önce aşağıdaki doğrulamalar yapılır.
+
+Tüm kriterler tanımlanmış olmalıdır.
+Ağırlık değeri 0.00–1.00 arasında olmalıdır.
+Toplam ağırlık 1.00 olmalıdır.
+Aynı kriter bir profilde yalnızca bir kez bulunabilir.
+Pasif kriter puanlamaya dahil edilmez.
+
+Doğrulamadan geçmeyen profil aktif hale getirilemez.
+
+Chapter 7 – Version Management
+
+Her değişiklik yeni bir sürüm oluşturur.
+
+Alan	Açıklama
+Version ID	Sürüm numarası
+Previous Version	Önceki sürüm
+Change Date	Değişiklik zamanı
+Changed By	Değişikliği yapan
+Change Reason	Değişiklik nedeni
+
+Eski sürümler silinmez; yalnızca arşivlenir.
+
+Chapter 8 – Profile Activation
+
+Profil aktivasyon süreci:
+
+Select Profile
+      │
+      ▼
+Validate Profile
+      │
+      ▼
+Create Version
+      │
+      ▼
+Activate Profile
+      │
+      ▼
+Publish to Decision Engine
+
+Aktivasyon sonrasında yeni karar hesaplamaları aktif profil üzerinden yapılır.
+
+Chapter 9 – Runtime Behaviour
+
+DWMS aşağıdaki durumlarda çalışır.
+
+Yeni profil oluşturulduğunda
+Profil güncellendiğinde
+Profil etkinleştirildiğinde
+Decision Engine karar hesaplaması başlattığında
+Yönetici ağırlıkları değiştirdiğinde
+
+Aktif profil çalışma sırasında değiştirildiğinde yeni hesaplamalar güncel profil ile başlatılır; devam eden hesaplamalar etkilenmez.
+
+Chapter 10 – Output Model
+Alan	Açıklama
+Profile ID	Profil kimliği
+Version	Aktif sürüm
+Active Status	Aktif/Pasif
+Criteria Count	Kriter sayısı
+Total Weight	Toplam ağırlık
+Validation Status	Doğrulama sonucu
+Published Time	Yayınlanma zamanı
+Chapter 11 – Integration Points
+Modül	Amaç
+MCDA Framework	Ağırlıkların uygulanması
+Decision Scoring Engine	Karar puanlama
+Rule Engine	İş kuralları
+Configuration Service	Profil yönetimi
+Audit Service	Değişiklik kayıtları
+Chapter 12 – Performance Targets
+KPI	Hedef
+Profil Doğrulama	<100 ms
+Profil Aktivasyonu	<200 ms
+Ağırlık Yükleme	<50 ms
+Sürüm Oluşturma	<100 ms
+Yayınlama	<100 ms
+Chapter 13 – Acceptance Criteria
+
+Decision Weight Management System tamamlanmış kabul edilmesi için:
+
+Ağırlık profilleri oluşturulabilmelidir.
+Profil doğrulama mekanizması çalışmalıdır.
+Sürüm yönetimi uygulanmalıdır.
+Profil aktivasyonu desteklenmelidir.
+Aktif profil Decision Scoring Engine tarafından kullanılmalıdır.
+Tüm değişiklikler Audit Service'e kaydedilmelidir.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009F-2 – Decision Weight Management System
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Next Document
+
+DOC-009F-3 – Explainable Decision Framework
+
+Bu doküman, Decision Scoring Engine tarafından verilen her kararın gerekçelerini, kullanılan kriterleri, puanlama etkilerini ve alternatiflerin neden elendiğini açıklayan açıklanabilir karar (Explainable Decision) altyapısını teknik olarak tanımlayacaktır. Bu modül, MARS APS'in denetlenebilir ve şeffaf karar verme mimarisinin temel bileşenidir.
+DOC-009F-3
+Explainable Decision Framework
+
+Version: 1.0
+Status: Architecture Freeze
+Engine: Decision Scoring Engine (DSE)
+Module: Explainable Decision Framework (EDF)
+Document Type: Technical Module Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Explainable Decision Framework (EDF), Decision Scoring Engine tarafından üretilen her kararın nasıl oluştuğunu, hangi kriterlerin etkili olduğunu ve alternatiflerin neden seçildiğini veya elendiğini açıklayan karar şeffaflığı (Explainability) katmanıdır.
+
+Bu modülün amacı;
+
+tüm kararların izlenebilir olmasını sağlamak,
+kullanıcıların karar mekanizmasını anlayabilmesini sağlamak,
+denetim (Audit) süreçlerini desteklemek,
+yöneticilere güvenilir karar açıklamaları sunmak,
+karar süreçlerinin geriye dönük analizini mümkün kılmaktır.
+
+EDF yeni karar üretmez; mevcut kararların açıklamasını oluşturur.
+
+Chapter 2 – Responsibilities
+Kod	Görev
+EDF-001	Decision Explanation Generation
+EDF-002	Criteria Contribution Analysis
+EDF-003	Alternative Comparison Explanation
+EDF-004	Rule Trace Generation
+EDF-005	Decision Justification
+EDF-006	Human Readable Summary
+EDF-007	Explainability Publication
+EDF-008	Audit Trace Integration
+Chapter 3 – Framework Architecture
+Decision Scoring Engine
+          │
+          ▼
+Decision Result
+          │
+          ▼
+Explainability Engine
+          │
+ ┌────────┼────────┐
+ ▼        ▼        ▼
+Criteria  Rule     Alternative
+Analysis  Trace    Comparison
+          │
+          ▼
+Decision Explanation
+          │
+          ▼
+User Interface / Audit Service
+Chapter 4 – Explanation Levels
+
+Sistem dört seviyede açıklama üretir.
+
+Seviye	Açıklama
+Level 1	Nihai karar özeti
+Level 2	Kullanılan kriterler
+Level 3	Kriter katkıları ve puanlar
+Level 4	Ayrıntılı karar izi (Decision Trace)
+
+Kullanıcının yetkisine göre farklı seviyelerde açıklama gösterilebilir.
+
+Chapter 5 – Decision Explanation Model
+
+Her karar için aşağıdaki bilgiler üretilir.
+
+Alan	Açıklama
+Decision ID	Karar kimliği
+Selected Alternative	Seçilen alternatif
+Decision Score	Nihai puan
+Confidence Score	Güven puanı
+Decision Summary	Karar özeti
+Generated Time	Oluşturulma zamanı
+Chapter 6 – Criteria Contribution Analysis
+
+Her kriterin karar üzerindeki etkisi ayrı ayrı hesaplanır.
+
+Alan	Açıklama
+Criterion	Kriter adı
+Raw Value	Ham değer
+Normalized Value	Normalize değer
+Weight	Kullanılan ağırlık
+Contribution	Toplam puana katkı
+Rank	Etki sırası
+
+Bu bilgiler kararın neden oluştuğunu açıklar.
+
+Chapter 7 – Alternative Comparison Explanation
+
+Seçilmeyen alternatifler için açıklama üretilir.
+
+Her alternatif aşağıdaki nedenlerden biri veya birkaçı ile elenebilir.
+
+Daha düşük Decision Score
+Constraint ihlali
+Daha düşük OTD
+Daha yüksek Makespan
+Daha yüksek Production Cost
+Daha yüksek Bottleneck Risk
+Daha düşük Schedule Stability
+Daha düşük Resource Utilization
+
+Bu bilgiler kullanıcı arayüzünde karşılaştırmalı olarak sunulabilir.
+
+Chapter 8 – Rule Trace
+
+Karar sırasında uygulanan kurallar kaydedilir.
+
+Alan	Açıklama
+Rule ID	İş kuralı
+Rule Name	Kural adı
+Evaluation Result	Başarılı / Başarısız
+Trigger Time	Çalışma zamanı
+Decision Impact	Karara etkisi
+
+Rule Trace kayıtları değiştirilemez (Immutable) olarak saklanır.
+
+Chapter 9 – Human Readable Summary
+
+Teknik karar çıktılarının yanında kullanıcı dostu özet oluşturulur.
+
+Örnek içerik:
+
+Seçilen üretim planı en yüksek teslim performansını sağlamaktadır.
+Kaynak kullanım oranı alternatiflere göre daha yüksektir.
+Darboğaz riski en düşük seviyededir.
+Plan kararlılığı kabul edilebilir sınırlar içerisindedir.
+
+Bu özetler sistem tarafından otomatik oluşturulur.
+
+Chapter 10 – Output Model
+Alan	Açıklama
+Explanation ID	Açıklama kimliği
+Decision ID	Karar kimliği
+Summary	Karar özeti
+Criteria Details	Kriter katkıları
+Rule Trace	Uygulanan kurallar
+Alternative Analysis	Alternatif karşılaştırmaları
+Confidence Score	Güven seviyesi
+Chapter 11 – Integration Points
+Modül	Amaç
+Decision Scoring Engine	Karar sonuçları
+MCDA Framework	Kriter puanları
+Decision Weight Management System	Ağırlık bilgileri
+Rule Engine	Kural kayıtları
+Audit Service	Karar kayıtları
+User Interface	Karar açıklamalarının gösterimi
+Chapter 12 – Performance Targets
+KPI	Hedef
+Karar Açıklaması Oluşturma	<300 ms
+Kriter Katkısı Hesabı	<100 ms
+Rule Trace Oluşturma	<100 ms
+Alternatif Analizi	<200 ms
+Açıklama Yayınlama	<100 ms
+Chapter 13 – Acceptance Criteria
+
+Explainable Decision Framework tamamlanmış kabul edilmesi için:
+
+Karar açıklaması otomatik oluşturulmalıdır.
+Kriter katkıları hesaplanmalıdır.
+Alternatiflerin elenme nedenleri raporlanmalıdır.
+Rule Trace kayıtları oluşturulmalıdır.
+İnsan tarafından okunabilir karar özeti üretilmelidir.
+Audit Service ile tam entegre çalışmalıdır.
+Performans hedefleri karşılanmalıdır.
+Document Status
+
+DOC-009F-3 – Explainable Decision Framework
+
+Status: ✅ Completed
+Architecture Status: Frozen
+Implementation Status: Ready for Development
+Next Document
+
+DOC-009F-4 – Decision Scoring Engine Final Technical Specification
+
+Bu belge, Decision Scoring Engine serisinin nihai teknik referans dokümanıdır. MCDA Framework, Decision Weight Management System ve Explainable Decision Framework modüllerini tek bir mimaride birleştirerek DSE'nin geliştirme, entegrasyon ve bakım süreçlerinde kullanılacak resmi teknik spesifikasyonu oluşturacaktır. Bu doküman tamamlandığında DOC-009F serisi de tamamlanmış olacaktır.
+DOC-009F-4
+Decision Scoring Engine Final Technical Specification
+
+Version: 1.0
+Status: Final
+Engine: Decision Scoring Engine (DSE)
+Document Type: Final Technical Specification
+
+Chapter 1 – Purpose
+1.1 Objective
+
+Bu doküman, Decision Scoring Engine (DSE) için hazırlanan tüm teknik dokümanların konsolide edilmiş nihai teknik referansıdır.
+
+Amaçları;
+
+Decision Scoring Engine mimarisini tek dokümanda toplamak,
+alt modüller arasındaki veri akışını standartlaştırmak,
+geliştirme ekibi için resmi teknik referans oluşturmak,
+entegrasyon, test ve bakım süreçlerinde kullanılacak standartları belirlemek,
+karar mekanizmasının tek referans mimarisini tanımlamaktır.
+
+Bu belge yeni algoritma tanımlamaz; DOC-009F serisinde belirlenen mimarinin nihai sürümünü temsil eder.
+
+Chapter 2 – Engine Overview
+
+Decision Scoring Engine, MARS APS içerisinde yer alan tüm optimizasyon motorlarının ürettiği alternatif çözümleri değerlendirerek işletme hedeflerine en uygun üretim planını seçen merkezi karar motorudur.
+
+Motor;
+
+alternatif çözümleri toplar,
+MCDA değerlendirmesi uygular,
+ağırlık profillerini kullanır,
+karar puanını hesaplar,
+alternatifleri sıralar,
+karar gerekçelerini oluşturur,
+uygulanacak nihai üretim planını yayınlar.
+Chapter 3 – Architecture Overview
+                    Decision Scoring Engine
+──────────────────────────────────────────────────────
+
+        MCDA Framework
+
+                │
+
+ Decision Weight Management System
+
+                │
+
+ Explainable Decision Framework
+
+                │
+
+        Decision Publisher
+
+                │
+
+      Final Production Decision
+Chapter 4 – Module Structure
+Kod	Modül	Doküman
+DSE	Decision Scoring Engine	DOC-009F
+MCDA	Multi-Criteria Decision Analysis Framework	DOC-009F-1
+DWMS	Decision Weight Management System	DOC-009F-2
+EDF	Explainable Decision Framework	DOC-009F-3
+Chapter 5 – End-to-End Workflow
+Optimization Engines
+(Line Balancing)
+
+(Operator Assignment)
+
+(Scheduling)
+
+(Bottleneck Resolution)
+
+(Simulation)
+
+        │
+
+        ▼
+
+Alternative Collector
+
+        │
+
+        ▼
+
+Constraint Validation
+
+        │
+
+        ▼
+
+MCDA Evaluation
+
+        │
+
+        ▼
+
+Weight Application
+
+        │
+
+        ▼
+
+Decision Score Calculation
+
+        │
+
+        ▼
+
+Alternative Ranking
+
+        │
+
+        ▼
+
+Decision Explanation
+
+        │
+
+        ▼
+
+Publish Final Decision
+Chapter 6 – Functional Workflow
+
+Karar süreci aşağıdaki adımlarla yürütülür.
+
+Alternatif üretim planları toplanır.
+Hard Constraint doğrulaması yapılır.
+KPI değerleri normalize edilir.
+Aktif Weight Profile uygulanır.
+Decision Score hesaplanır.
+Alternatifler sıralanır.
+Explainable Decision oluşturulur.
+Nihai üretim planı yayınlanır.
+Audit kayıtları oluşturulur.
+Chapter 7 – Core Components
+Bileşen	Görev
+Alternative Collector	Alternatif planların toplanması
+Constraint Validator	Hard Constraint kontrolü
+MCDA Processor	Çok kriterli değerlendirme
+Weight Manager	Aktif ağırlık profilinin uygulanması
+Score Calculator	Nihai karar puanının hesaplanması
+Ranking Engine	Alternatiflerin sıralanması
+Explainability Engine	Karar açıklamalarının oluşturulması
+Decision Publisher	Nihai kararın yayınlanması
+Audit Layer	Karar kayıtlarının tutulması
+Chapter 8 – Decision Flow
+Alternative Plans
+
+        │
+
+        ▼
+
+Validation
+
+        │
+
+        ▼
+
+Normalization
+
+        │
+
+        ▼
+
+Weight Application
+
+        │
+
+        ▼
+
+Composite Score
+
+        │
+
+        ▼
+
+Ranking
+
+        │
+
+        ▼
+
+Decision Explanation
+
+        │
+
+        ▼
+
+Final Decision
+Chapter 9 – External Integrations
+Sistem	Amaç
+Line Balancing Engine	Hat dengeleme sonuçları
+Operator Assignment Engine	Operatör atamaları
+Scheduling Engine	Plan alternatifleri
+Bottleneck Resolution Engine	Darboğaz çözüm önerileri
+Simulation Engine	KPI tahminleri
+Rule Engine	İş kuralları
+Audit Service	Karar kayıtları
+Notification Service	Nihai karar bildirimi
+Chapter 10 – Non-Functional Requirements
+Özellik	Hedef
+Availability	≥99.9%
+Reliability	High Availability
+Scalability	Horizontal Scaling
+Explainability	Zorunlu
+Deterministic Decision	Aynı veri ile aynı karar
+Auditability	Tam izlenebilirlik
+Maintainability	Modüler mimari
+Security	RBAC desteği
+Chapter 11 – Performance Targets
+KPI	Hedef
+Alternatif Yükleme	<200 ms
+Constraint Validation	<200 ms
+MCDA Hesabı	<500 ms
+Decision Score Hesabı	<300 ms
+Ranking	<200 ms
+Explainability	<300 ms
+Final Decision Publication	<200 ms
+Chapter 12 – Dependencies
+Modül	Durum
+MCDA Framework	Zorunlu
+Decision Weight Management System	Zorunlu
+Explainable Decision Framework	Zorunlu
+Scheduling Engine	Zorunlu
+Simulation Engine	Zorunlu
+Audit Service	Zorunlu
+Rule Engine	Zorunlu
+Chapter 13 – Development Deliverables
+Çıktı	Açıklama
+Decision Scoring Service	Karar puanlama servisi
+MCDA Processor	Çok kriterli analiz servisi
+Weight Profile Service	Ağırlık yönetimi
+Decision Ranking Service	Alternatif sıralama
+Explainability Service	Karar açıklama servisi
+Decision Publisher	Nihai karar yayınlama servisi
+REST API	Servis arayüzleri
+Event Consumers	Olay dinleyicileri
+Unit Tests	Birim testleri
+Integration Tests	Entegrasyon testleri
+Technical Documentation	Teknik dokümantasyon
+Chapter 14 – Acceptance Criteria
+
+Decision Scoring Engine aşağıdaki koşullar sağlandığında tamamlanmış kabul edilir.
+
+MCDA Framework uygulanmış olmalıdır.
+Weight Management System çalışmalıdır.
+Explainable Decision Framework entegre edilmiş olmalıdır.
+Alternatif planlar doğru şekilde sıralanmalıdır.
+Nihai karar yayınlanmalıdır.
+Audit kayıtları eksiksiz oluşturulmalıdır.
+Tüm entegrasyon testleri başarıyla tamamlanmalıdır.
+Performans hedefleri karşılanmalıdır.
+Chapter 15 – Document References
+Doküman	Açıklama
+DOC-009F	Decision Scoring Engine
+DOC-009F-1	Multi-Criteria Decision Analysis (MCDA) Framework
+DOC-009F-2	Decision Weight Management System
+DOC-009F-3	Explainable Decision Framework
+Document Status
+
+DOC-009F-4 – Decision Scoring Engine Final Technical Specification
+
+Status: ✅ Completed
+Architecture Status: Final
+Implementation Status: Ready for Development
+DOC-009F Serisi Tamamlandı ✅
+
+Bu belge ile Decision Scoring Engine için planlanan tüm teknik dokümanlar tamamlanmıştır.
+
+Tamamlanan seri:
+
+✅ DOC-009F – Decision Scoring Engine
+✅ DOC-009F-1 – Multi-Criteria Decision Analysis (MCDA) Framework
+✅ DOC-009F-2 – Decision Weight Management System
+✅ DOC-009F-3 – Explainable Decision Framework
+✅ DOC-009F-4 – Decision Scoring Engine Final Technical Specification
+Master Plan'daki Sıradaki Ana Doküman
+
+DOC-009 serisi tamamlanmıştır.
+
+Plana göre bundan sonraki bölüm DOC-010 serisidir. Bu seri, optimizasyon motorlarının üzerinde çalışan Application Services & Workflow Layer (uygulama servisleri ve iş akışı katmanı) mimarisini tanımlar ve tipik olarak aşağıdaki ana modülleri kapsar:
+
+DOC-010 – Workflow Orchestration Engine
+İş emri yaşam döngüsü
+Event Bus ve mesajlaşma akışı
+Servis orkestrasyonu
+Uzun süren işlemler (Saga/Process Manager)
+Süreç izleme ve hata yönetimi
+
+Bu noktadan sonra çekirdek optimizasyon motorlarından uygulama katmanına geçilmiş olacaktır.
